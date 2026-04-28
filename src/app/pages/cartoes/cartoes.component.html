@@ -1,0 +1,269 @@
+<div class="min-h-screen p-8">
+  <div class="max-w-6xl mx-auto w-full space-y-8">
+
+    <!-- Header Section -->
+    <section class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div class="space-y-1">
+        <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
+          Gestão de Cartões
+        </h1>
+        <p class="text-[#515981] max-w-lg font-inter">
+          Gerencie seus cartões de crédito, limites e controle seus gastos mensais.
+        </p>
+      </div>
+      <a
+        routerLink="/cartoes/novo"
+        class="bg-gradient-to-r from-[#820AD1] to-[#B47EDE] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-[#820AD1]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+        <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
+        <span>Novo Cartão</span>
+      </a>
+    </section>
+
+    <!-- Search & Filters -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Search -->
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="relative">
+          <input
+            type="text"
+            [(ngModel)]="filtroTexto"
+            placeholder="Buscar por nome ou bandeira..."
+            class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter">
+          <i-feather name="search" class="w-5 h-5 text-[#515981] absolute left-4 top-1/2 -translate-y-1/2"></i-feather>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="flex items-center space-x-4">
+          <select
+            [(ngModel)]="filtroBandeira"
+            class="flex-1 px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter text-sm">
+            <option *ngFor="let bandeira of bandeiras" [value]="bandeira.id">{{ bandeira.nome }}</option>
+          </select>
+
+          <select
+            [(ngModel)]="filtroStatus"
+            class="flex-1 px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter text-sm">
+            <option value="todos">Todos Status</option>
+            <option value="ativos">Ativos</option>
+            <option value="inativos">Inativos</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Limite Total -->
+      <div class="bg-gradient-to-br from-[#820AD1] to-[#B47EDE] rounded-xl p-6 text-white relative overflow-hidden">
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <i-feather name="credit-card" class="w-6 h-6"></i-feather>
+            </div>
+          </div>
+          <p class="text-sm text-purple-100 font-inter mb-1">Limite Total</p>
+          <p class="text-3xl font-extrabold font-manrope">
+            R$ {{ getLimiteTotal().toFixed(2).replace('.', ',') }}
+          </p>
+          <p class="text-xs text-white/80 mt-2 font-inter">
+            {{ getQuantidadeCartoes() }} cartões
+          </p>
+        </div>
+        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mb-10"></div>
+      </div>
+
+      <!-- Limite Disponível -->
+      <div class="bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl p-6 text-white relative overflow-hidden">
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <i-feather name="check-circle" class="w-6 h-6"></i-feather>
+            </div>
+          </div>
+          <p class="text-sm text-green-100 font-inter mb-1">Limite Disponível</p>
+          <p class="text-3xl font-extrabold font-manrope">
+            R$ {{ getLimiteDisponivel().toFixed(2).replace('.', ',') }}
+          </p>
+          <p class="text-xs text-white/80 mt-2 font-inter">
+            {{ (100 - getPercentualUtilizado()).toFixed(0) }}% disponível
+          </p>
+        </div>
+        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mb-10"></div>
+      </div>
+
+      <!-- Limite Utilizado -->
+      <div class="bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl p-6 text-white relative overflow-hidden">
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <i-feather name="trending-up" class="w-6 h-6"></i-feather>
+            </div>
+          </div>
+          <p class="text-sm text-red-100 font-inter mb-1">Limite Utilizado</p>
+          <p class="text-3xl font-extrabold font-manrope">
+            R$ {{ getLimiteUtilizado().toFixed(2).replace('.', ',') }}
+          </p>
+          <p class="text-xs text-white/80 mt-2 font-inter">
+            {{ getPercentualUtilizado().toFixed(0) }}% utilizado
+          </p>
+        </div>
+        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mb-10"></div>
+      </div>
+    </div>
+
+    <!-- Cards List -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-on-surface font-manrope">
+          Meus Cartões
+        </h2>
+        <button
+          (click)="limparFiltros()"
+          class="px-4 py-2 text-[#515981] hover:bg-[#efefff] rounded-xl transition-colors font-inter text-sm font-bold">
+          Limpar Filtros
+        </button>
+      </div>
+
+      <!-- Card Item -->
+      <div
+        *ngFor="let cartao of getCartoesFiltrados()"
+        class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-[0_8px_30px_rgba(36,44,81,0.06)] transition-shadow">
+
+        <div class="flex flex-col md:flex-row md:items-center gap-6">
+          <!-- Card Visual -->
+          <div
+            class="w-full md:w-80 h-48 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden shadow-xl"
+            [style.background]="'linear-gradient(135deg, ' + cartao.cor + ' 0%, ' + cartao.cor + 'DD 100%)'">
+            <div class="relative z-10">
+              <div class="flex items-center justify-between mb-8">
+                <i-feather name="credit-card" class="w-8 h-8 text-white/80"></i-feather>
+                <span class="text-white/90 font-bold font-inter text-sm uppercase">{{ getBandeiraNome(cartao.bandeira) }}</span>
+              </div>
+              <p class="text-white font-mono text-xl mb-4 tracking-wider">•••• •••• •••• ••••</p>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-white/70 text-xs font-inter mb-1">Titular</p>
+                  <p class="text-white font-bold font-inter text-sm">{{ cartao.nome }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-white/70 text-xs font-inter mb-1">Vencimento</p>
+                  <p class="text-white font-bold font-inter text-sm">Dia {{ cartao.diaVencimento }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+            <div class="absolute -top-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
+          </div>
+
+          <!-- Card Info -->
+          <div class="flex-1 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-[#515981] font-inter mb-1">Limite Total</p>
+                <p class="text-lg font-bold text-on-surface font-manrope">
+                  R$ {{ cartao.limite.toFixed(2).replace('.', ',') }}
+                </p>
+              </div>
+              <div>
+                <p class="text-xs text-[#515981] font-inter mb-1">Limite Disponível</p>
+                <p class="text-lg font-bold text-[#006947] font-manrope">
+                  R$ {{ cartao.limiteDisponivel.toFixed(2).replace('.', ',') }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs text-[#515981] font-inter">Utilização</span>
+                <span class="text-xs font-bold text-on-surface font-inter">
+                  {{ getPercentualUtilizadoCartao(cartao).toFixed(1) }}%
+                </span>
+              </div>
+              <div class="w-full bg-[#efefff] rounded-full h-2 overflow-hidden">
+                <div
+                  class="h-full rounded-full transition-all duration-300"
+                  [style.width.%]="getPercentualUtilizadoCartao(cartao)"
+                  [ngClass]="{
+                    'bg-gradient-to-r from-[#006947] to-[#69f6b8]': getPercentualUtilizadoCartao(cartao) < 50,
+                    'bg-gradient-to-r from-[#ff928b] to-[#b51621]': getPercentualUtilizadoCartao(cartao) >= 50
+                  }">
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between pt-4 border-t border-[#a3abd7]/10">
+              <div class="flex items-center space-x-3">
+                <span class="text-xs text-[#515981] font-inter">Fechamento: Dia {{ cartao.diaFechamento }}</span>
+                <button
+                  (click)="toggleAtivo(cartao, $event)"
+                  [ngClass]="{
+                    'bg-[#69f6b8]/20 text-[#006947]': cartao.ativo,
+                    'bg-[#ff928b]/20 text-[#b51621]': !cartao.ativo
+                  }"
+                  class="px-3 py-1 rounded-lg text-xs font-bold font-inter transition-colors">
+                  {{ cartao.ativo ? 'Ativo' : 'Inativo' }}
+                </button>
+              </div>
+              <div class="flex items-center space-x-2">
+                <a
+                  [routerLink]="['/cartoes', cartao.id, 'editar']"
+                  class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+                  <i-feather name="edit-2" class="w-5 h-5"></i-feather>
+                </a>
+                <button
+                  (click)="excluirCartao(cartao.id, $event)"
+                  class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
+                  <i-feather name="trash-2" class="w-5 h-5"></i-feather>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="getCartoesFiltrados().length === 0"
+        class="bg-white rounded-xl p-12 text-center border-2 border-dashed border-[#a3abd7]/30">
+        <div class="w-16 h-16 bg-[#efefff] rounded-full flex items-center justify-center mx-auto mb-4">
+          <i-feather name="credit-card" class="w-8 h-8 text-[#515981]"></i-feather>
+        </div>
+        <h3 class="text-lg font-bold text-on-surface mb-2 font-manrope">
+          Nenhum cartão encontrado
+        </h3>
+        <p class="text-sm text-[#515981] mb-4 font-inter">
+          Não há cartões cadastrados ou nenhum corresponde aos filtros aplicados.
+        </p>
+        <a
+          routerLink="/cartoes/novo"
+          class="inline-flex items-center space-x-2 bg-gradient-to-r from-[#820AD1] to-[#B47EDE] text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity font-inter">
+          <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
+          <span>Adicionar Primeiro Cartão</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div class="bg-gradient-to-br from-[#820AD1] to-[#B47EDE] rounded-3xl p-8 text-white relative overflow-hidden group">
+      <div class="relative z-10 space-y-4">
+        <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-inter">
+          Dica de Controle
+        </span>
+        <h2 class="text-2xl font-extrabold leading-tight font-manrope">
+          Mantenha o controle dos seus limites.
+        </h2>
+        <p class="text-purple-50 text-sm max-w-2xl font-inter">
+          Evite utilizar mais de 30% do limite disponível de cada cartão. Isso ajuda a manter um bom score
+          de crédito e demonstra responsabilidade financeira para as instituições.
+        </p>
+      </div>
+      <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+      <div class="absolute bottom-0 right-0 w-48 h-48 bg-purple-400/20 rounded-full blur-2xl -mr-10 -mb-10 group-hover:scale-125 transition-transform duration-700"></div>
+    </div>
+
+  </div>
+</div>

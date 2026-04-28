@@ -1,0 +1,16 @@
+<!-- Layout Principal com Sidebar -->
+<div class="min-h-screen bg-surface">
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="transition-all duration-300 ml-64">
+    <!-- Navbar -->
+    <app-navbar></app-navbar>
+
+    <!-- Router Outlet - Conteúdo das páginas -->
+    <main class="p-0">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

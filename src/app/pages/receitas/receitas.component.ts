@@ -1,0 +1,237 @@
+import { Component, signal, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { FeatherModule } from 'angular-feather';
+import { FormsModule } from '@angular/forms';
+import { ReceitaService, Receita as ReceitaAPI } from '../../shared/services/receita.service';
+
+interface Receita {
+  id: string;
+  descricao: string;
+  valor: number;
+  data: Date;
+  categoriaId: string;
+  categoriaNome: string;
+  categoriaIcone: string;
+  categoriaCor: string;
+  recorrente: boolean;
+  recebida: boolean;
+  observacoes?: string;
+}
+
+@Component({
+  selector: 'app-receitas',
+  standalone: true,
+  imports: [CommonModule, RouterLink, FeatherModule, FormsModule],
+  templateUrl: './receitas.component.html',
+  styleUrl: './receitas.component.css'
+})
+export class ReceitasComponent implements OnInit {
+  private receitaService = inject(ReceitaService);
+
+  filtroTexto = signal('');
+  filtroCategoria = signal('todas');
+  filtroStatus = signal('todas');
+  mesAtual = signal(new Date().getMonth() + 1);
+  anoAtual = signal(new Date().getFullYear());
+  carregando = signal(false);
+  erro = signal<string | null>(null);
+
+  meses = [
+    { numero: 1, nome: 'Janeiro' },
+    { numero: 2, nome: 'Fevereiro' },
+    { numero: 3, nome: 'Março' },
+    { numero: 4, nome: 'Abril' },
+    { numero: 5, nome: 'Maio' },
+    { numero: 6, nome: 'Junho' },
+    { numero: 7, nome: 'Julho' },
+    { numero: 8, nome: 'Agosto' },
+    { numero: 9, nome: 'Setembro' },
+    { numero: 10, nome: 'Outubro' },
+    { numero: 11, nome: 'Novembro' },
+    { numero: 12, nome: 'Dezembro' }
+  ];
+
+  receitas = signal<Receita[]>([]);
+
+  categorias = [
+    { id: 'todas', nome: 'Todas Categorias' },
+    { id: '1', nome: 'Salário' },
+    { id: '2', nome: 'Freelance' },
+    { id: '3', nome: 'Aluguel' },
+    { id: '4', nome: 'Investimentos' },
+    { id: '5', nome: 'Vendas' },
+    { id: '6', nome: 'Bônus' }
+  ];
+
+  ngOnInit() {
+    this.carregarReceitas();
+  }
+
+  carregarReceitas() {
+    this.carregando.set(true);
+    this.erro.set(null);
+
+    const primeiroDia = new Date(this.anoAtual(), this.mesAtual() - 1, 1);
+    const ultimoDia = new Date(this.anoAtual(), this.mesAtual(), 0);
+
+    const filtros = {
+      dataInicio: primeiroDia.toISOString().split('T')[0],
+      dataFim: ultimoDia.toISOString().split('T')[0]
+    };
+
+    this.receitaService.listar(filtros).subscribe({
+      next: (response) => {
+        if (response.success && Array.isArray(response.data)) {
+          this.receitas.set((response.data as ReceitaAPI[]).map(r => ({
+            id: r.id || '',
+            descricao: r.descricao,
+            valor: r.valor,
+            data: new Date(r.data),
+            categoriaId: r.categoriaId,
+            categoriaNome: (r as any).categoriaId?.nome || 'Sem categoria',
+            categoriaIcone: (r as any).categoriaId?.icone || 'circle',
+            categoriaCor: (r as any).categoriaId?.cor || '#69f6b8',
+            recorrente: r.recorrente,
+            recebida: true,
+            observacoes: r.observacoes
+          })));
+        }
+        this.carregando.set(false);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar receitas:', err);
+        this.erro.set('Não foi possível carregar as receitas');
+        this.carregando.set(false);
+      }
+    });
+  }
+
+  getMesNome(): string {
+    const mes = this.meses.find(m => m.numero === this.mesAtual());
+    return mes ? mes.nome : '';
+  }
+
+  proximoMes() {
+    if (this.mesAtual() === 12) {
+      this.mesAtual.set(1);
+      this.anoAtual.set(this.anoAtual() + 1);
+    } else {
+      this.mesAtual.set(this.mesAtual() + 1);
+    }
+    this.carregarReceitas();
+  }
+
+  mesAnterior() {
+    if (this.mesAtual() === 1) {
+      this.mesAtual.set(12);
+      this.anoAtual.set(this.anoAtual() - 1);
+    } else {
+      this.mesAtual.set(this.mesAtual() - 1);
+    }
+    this.carregarReceitas();
+  }
+
+  getReceitasFiltradas(): Receita[] {
+    let receitas = this.receitas().filter(r => {
+      const dataR = new Date(r.data);
+      return dataR.getMonth() + 1 === this.mesAtual() && dataR.getFullYear() === this.anoAtual();
+    });
+
+    if (this.filtroTexto()) {
+      const texto = this.filtroTexto().toLowerCase();
+      receitas = receitas.filter(r =>
+        r.descricao.toLowerCase().includes(texto) ||
+        r.categoriaNome.toLowerCase().includes(texto)
+      );
+    }
+
+    if (this.filtroCategoria() !== 'todas') {
+      receitas = receitas.filter(r => r.categoriaId === this.filtroCategoria());
+    }
+
+    if (this.filtroStatus() === 'recebidas') {
+      receitas = receitas.filter(r => r.recebida);
+    } else if (this.filtroStatus() === 'pendentes') {
+      receitas = receitas.filter(r => !r.recebida);
+    }
+
+    return receitas.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+  }
+
+  getTotalReceitas(): number {
+    return this.getReceitasFiltradas().reduce((sum, r) => sum + r.valor, 0);
+  }
+
+  getMaiorReceita(): number {
+    const receitas = this.getReceitasFiltradas();
+    if (receitas.length === 0) return 0;
+    return Math.max(...receitas.map(r => r.valor));
+  }
+
+  getQuantidadeReceitas(): number {
+    return this.getReceitasFiltradas().length;
+  }
+
+  getTotalRecebido(): number {
+    return this.getReceitasFiltradas()
+      .filter(r => r.recebida)
+      .reduce((sum, r) => sum + r.valor, 0);
+  }
+
+  getTotalPendente(): number {
+    return this.getReceitasFiltradas()
+      .filter(r => !r.recebida)
+      .reduce((sum, r) => sum + r.valor, 0);
+  }
+
+  getQuantidadeRecebidas(): number {
+    return this.getReceitasFiltradas().filter(r => r.recebida).length;
+  }
+
+  getQuantidadePendentes(): number {
+    return this.getReceitasFiltradas().filter(r => !r.recebida).length;
+  }
+
+  toggleRecebida(receita: Receita, event: Event) {
+    event.stopPropagation();
+    const receitas = this.receitas().map(r => {
+      if (r.id === receita.id) {
+        return { ...r, recebida: !r.recebida };
+      }
+      return r;
+    });
+    this.receitas.set(receitas);
+  }
+
+  excluirReceita(id: string, event: Event) {
+    event.stopPropagation();
+    if (confirm('Deseja realmente excluir esta receita?')) {
+      this.receitaService.deletar(id).subscribe({
+        next: (response) => {
+          if (response.success) {
+            const receitas = this.receitas().filter(r => r.id !== id);
+            this.receitas.set(receitas);
+          } else {
+            alert('Erro ao excluir receita: ' + (response.error || 'Erro desconhecido'));
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao excluir receita:', err);
+          alert('Não foi possível excluir a receita');
+        }
+      });
+    }
+  }
+
+  formatarData(data: Date): string {
+    const d = new Date(data);
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  limparFiltros() {
+    this.filtroTexto.set('');
+    this.filtroCategoria.set('todas');
+    this.filtroStatus.set('todas');
+  }
+}

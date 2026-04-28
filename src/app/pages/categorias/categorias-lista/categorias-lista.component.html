@@ -1,0 +1,168 @@
+<div class="min-h-screen p-8">
+  <div class="max-w-6xl mx-auto w-full space-y-8">
+
+    <!-- Header Section -->
+    <section class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div class="space-y-1">
+        <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
+          Categorias e Subcategorias
+        </h1>
+        <p class="text-[#515981] max-w-lg font-inter">
+          Organize suas movimentações financeiras com uma estrutura hierárquica precisa para relatórios detalhados.
+        </p>
+      </div>
+      <a
+        routerLink="/categorias/novo"
+        class="bg-gradient-to-r from-primary to-[#6e9fff] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+        <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
+        <span>Adicionar Nova Categoria</span>
+      </a>
+    </section>
+
+    <!-- Categories List -->
+    <div class="grid grid-cols-1 gap-6">
+
+      <!-- Category Card -->
+      <div
+        *ngFor="let categoria of categorias()"
+        class="bg-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+
+        <!-- Category Header -->
+        <div
+          (click)="categoria.subcategorias?.length ? toggleCategory(categoria.id) : null"
+          [ngClass]="categoria.subcategorias?.length ? 'cursor-pointer' : ''"
+          class="p-6 flex items-center justify-between hover:bg-[#efefff] transition-colors group">
+
+          <div class="flex items-center space-x-5">
+            <!-- Icon -->
+            <div
+              class="w-12 h-12 rounded-xl flex items-center justify-center"
+              [style.background-color]="categoria.cor + '30'"
+              [style.color]="categoria.cor">
+              <i-feather
+                [name]="categoria.icone || 'tag'"
+                class="w-6 h-6">
+              </i-feather>
+            </div>
+
+            <!-- Info -->
+            <div>
+              <h3 class="font-bold text-lg text-on-surface font-manrope">
+                {{ categoria.nome }}
+              </h3>
+              <p class="text-xs text-[#515981] font-inter">
+                {{ categoria.subcategorias?.length || 0 }} Subcategorias cadastradas
+              </p>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center space-x-2">
+            <a
+              [routerLink]="['/categorias', categoria.id, 'editar']"
+              (click)="$event.stopPropagation()"
+              class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+              <i-feather name="edit-2" class="w-5 h-5"></i-feather>
+            </a>
+            <button
+              (click)="excluirCategoria(categoria.id, $event)"
+              class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
+              <i-feather name="trash-2" class="w-5 h-5"></i-feather>
+            </button>
+            <i-feather
+              *ngIf="categoria.subcategorias?.length"
+              [name]="isExpanded(categoria.id) ? 'chevron-down' : 'chevron-right'"
+              class="w-5 h-5 text-[#515981] ml-2 transition-transform"
+              [ngClass]="{'rotate-0': isExpanded(categoria.id)}">
+            </i-feather>
+          </div>
+        </div>
+
+        <!-- Subcategories List (Expandable) -->
+        <div
+          *ngIf="categoria.subcategorias?.length && isExpanded(categoria.id)"
+          class="bg-[#efefff]/50 px-6 py-4 border-t border-[#a3abd7]/10 space-y-3">
+
+          <!-- Subcategory Item -->
+          <div
+            *ngFor="let sub of categoria.subcategorias"
+            class="flex items-center justify-between py-2 border-b border-[#a3abd7]/5">
+            <div class="flex items-center space-x-3">
+              <div class="w-1.5 h-1.5 rounded-full bg-[#006947]"></div>
+              <span class="text-sm font-medium text-on-surface font-inter">
+                {{ sub.nome }}
+              </span>
+            </div>
+            <div class="flex space-x-1">
+              <button
+                class="p-1.5 text-[#515981] hover:text-primary transition-colors">
+                <i-feather name="edit-2" class="w-4 h-4"></i-feather>
+              </button>
+              <button
+                (click)="excluirSubcategoria(categoria.id, sub.id, $event)"
+                class="p-1.5 text-[#515981] hover:text-[#b31b25] transition-colors">
+                <i-feather name="trash-2" class="w-4 h-4"></i-feather>
+              </button>
+            </div>
+          </div>
+
+          <!-- Add Subcategory Button -->
+          <button
+            class="w-full mt-2 py-3 border-2 border-dashed border-[#a3abd7]/30 rounded-xl text-primary text-xs font-bold hover:bg-primary/5 transition-colors flex items-center justify-center space-x-2 font-inter">
+            <i-feather name="plus" class="w-4 h-4"></i-feather>
+            <span>Adicionar Subcategoria</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Stats Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Dica Card -->
+      <div class="md:col-span-2 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-3xl p-8 text-white relative overflow-hidden group">
+        <div class="relative z-10 space-y-4">
+          <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-inter">
+            Dica de Gestão
+          </span>
+          <h2 class="text-2xl font-extrabold leading-tight font-manrope">
+            Mantenha sua estrutura simples.
+          </h2>
+          <p class="text-blue-50 text-sm max-w-sm font-inter">
+            Muitas subcategorias podem tornar o lançamento de transações confuso.
+            Tente agrupar itens semelhantes para uma visão macro mais clara.
+          </p>
+          <button class="mt-4 bg-white text-primary px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-blue-50 transition-colors font-inter">
+            Ver Sugestões
+          </button>
+        </div>
+
+        <!-- Abstract Background -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div class="absolute bottom-0 right-0 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl -mr-10 -mb-10 group-hover:scale-125 transition-transform duration-700"></div>
+      </div>
+
+      <!-- Stats Card -->
+      <div class="bg-white rounded-3xl p-8 flex flex-col justify-center items-center text-center space-y-4 border border-[#a3abd7]/10">
+        <div class="w-16 h-16 rounded-full bg-[#69f6b8] flex items-center justify-center text-[#005a3c]">
+          <i-feather name="bar-chart-2" class="w-8 h-8"></i-feather>
+        </div>
+        <div>
+          <p class="text-3xl font-extrabold text-on-surface font-manrope">
+            {{ getTotalCategorias() }}
+          </p>
+          <p class="text-sm text-[#515981] font-inter">Categorias Ativas</p>
+        </div>
+        <div class="w-full pt-4 border-t border-[#a3abd7]/10">
+          <div class="flex justify-between text-xs font-bold px-2 font-inter">
+            <span class="text-[#005a3c]">{{ getTotalReceitas() }} Receitas</span>
+            <span class="text-[#69000a]">{{ getTotalDespesas() }} Despesas</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

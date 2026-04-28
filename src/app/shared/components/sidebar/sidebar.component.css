@@ -1,0 +1,19 @@
+/* Component-specific styles */
+
+/* Custom scrollbar for navigation */
+nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+nav::-webkit-scrollbar-thumb {
+  background: #d6dbff;
+  border-radius: 3px;
+}
+
+nav::-webkit-scrollbar-thumb:hover {
+  background: #a3abd7;
+}

@@ -1,0 +1,277 @@
+<div class="min-h-screen p-8">
+  <div class="max-w-6xl mx-auto w-full space-y-8">
+
+    <!-- Header Section -->
+    <section class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div class="space-y-1">
+        <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
+          Orçamentos e Planejamento
+        </h1>
+        <p class="text-[#515981] max-w-lg font-inter">
+          Defina limites de gastos por categoria e acompanhe seu desempenho financeiro mês a mês.
+        </p>
+      </div>
+      <a
+        routerLink="/orcamentos/novo"
+        class="bg-gradient-to-r from-primary to-[#6e9fff] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+        <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
+        <span>Criar Novo Orçamento</span>
+      </a>
+    </section>
+
+    <!-- Period Selector -->
+    <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <i-feather name="calendar" class="w-6 h-6 text-primary"></i-feather>
+          <div>
+            <p class="text-xs text-[#515981] font-inter">Período Selecionado</p>
+            <h2 class="text-2xl font-extrabold text-on-surface font-manrope">
+              {{ getMesNome() }} {{ anoAtual() }}
+            </h2>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button
+            (click)="mesAnterior()"
+            class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+            <i-feather name="chevron-left" class="w-5 h-5"></i-feather>
+          </button>
+          <button
+            (click)="proximoMes()"
+            class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+            <i-feather name="chevron-right" class="w-5 h-5"></i-feather>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Total Planejado -->
+      <div class="bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl p-6 text-white relative overflow-hidden">
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <i-feather name="dollar-sign" class="w-6 h-6"></i-feather>
+            </div>
+          </div>
+          <p class="text-sm text-blue-100 font-inter mb-1">Total Planejado</p>
+          <p class="text-3xl font-extrabold font-manrope">
+            R$ {{ getTotalPlanejado().toFixed(2).replace('.', ',') }}
+          </p>
+        </div>
+        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mb-10"></div>
+      </div>
+
+      <!-- Total Gasto -->
+      <div class="bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl p-6 text-white relative overflow-hidden">
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <i-feather name="trending-down" class="w-6 h-6"></i-feather>
+            </div>
+          </div>
+          <p class="text-sm text-red-100 font-inter mb-1">Total Gasto</p>
+          <p class="text-3xl font-extrabold font-manrope">
+            R$ {{ getTotalGasto().toFixed(2).replace('.', ',') }}
+          </p>
+          <p class="text-xs text-white/80 mt-2 font-inter">
+            {{ getPercentualTotalGasto().toFixed(1) }}% do planejado
+          </p>
+        </div>
+        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mb-10"></div>
+      </div>
+
+      <!-- Saldo Restante -->
+      <div class="bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl p-6 text-white relative overflow-hidden">
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <i-feather name="trending-up" class="w-6 h-6"></i-feather>
+            </div>
+          </div>
+          <p class="text-sm text-green-100 font-inter mb-1">Saldo Restante</p>
+          <p class="text-3xl font-extrabold font-manrope">
+            R$ {{ getTotalRestante().toFixed(2).replace('.', ',') }}
+          </p>
+        </div>
+        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mb-10"></div>
+      </div>
+    </div>
+
+    <!-- Budget Cards -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-on-surface font-manrope">
+          Orçamentos por Categoria
+        </h2>
+        <div class="flex items-center space-x-4 text-xs font-bold font-inter">
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 rounded-full bg-[#69f6b8]"></div>
+            <span class="text-[#515981]">{{ getQuantidadeDentroDoLimite() }} Dentro do Limite</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 rounded-full bg-[#ff928b]"></div>
+            <span class="text-[#515981]">{{ getQuantidadeExcedidos() }} Excedidos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget Item -->
+      <div
+        *ngFor="let orcamento of getOrcamentosDoMes()"
+        class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-[0_8px_30px_rgba(36,44,81,0.06)] transition-shadow">
+
+        <div class="flex items-start justify-between mb-4">
+          <!-- Category Info -->
+          <div class="flex items-center space-x-4">
+            <div
+              class="w-12 h-12 rounded-xl flex items-center justify-center"
+              [style.background-color]="orcamento.categoriaCor + '30'"
+              [style.color]="orcamento.categoriaCor">
+              <i-feather
+                [name]="orcamento.categoriaIcone"
+                class="w-6 h-6">
+              </i-feather>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-on-surface font-manrope">
+                {{ orcamento.categoriaNome }}
+              </h3>
+              <p class="text-xs text-[#515981] font-inter">
+                R$ {{ orcamento.valorGasto.toFixed(2).replace('.', ',') }} de R$ {{ orcamento.valorPlanejado.toFixed(2).replace('.', ',') }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center space-x-2">
+            <span
+              *ngIf="isExcedido(orcamento)"
+              class="bg-[#ff928b]/20 text-[#b51621] px-3 py-1 rounded-lg text-xs font-bold font-inter">
+              Excedido
+            </span>
+            <span
+              *ngIf="!isExcedido(orcamento) && getPercentualGasto(orcamento) >= 90"
+              class="bg-[#fff3cd] text-[#856404] px-3 py-1 rounded-lg text-xs font-bold font-inter">
+              Alerta
+            </span>
+            <a
+              [routerLink]="['/orcamentos', orcamento.id, 'editar']"
+              class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+              <i-feather name="edit-2" class="w-5 h-5"></i-feather>
+            </a>
+            <button
+              (click)="excluirOrcamento(orcamento.id, $event)"
+              class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
+              <i-feather name="trash-2" class="w-5 h-5"></i-feather>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-xs font-bold font-inter">
+            <span class="text-[#515981]">{{ getPercentualGasto(orcamento).toFixed(1) }}% utilizado</span>
+            <span
+              [ngClass]="{
+                'text-[#006947]': !isExcedido(orcamento),
+                'text-[#b51621]': isExcedido(orcamento)
+              }">
+              {{ isExcedido(orcamento) ? 'R$ ' + (getValorRestante(orcamento) * -1).toFixed(2).replace('.', ',') + ' acima' : 'R$ ' + getValorRestante(orcamento).toFixed(2).replace('.', ',') + ' restante' }}
+            </span>
+          </div>
+          <div class="w-full bg-[#efefff] rounded-full h-3 overflow-hidden">
+            <div
+              class="h-full rounded-full transition-all duration-300"
+              [ngClass]="{
+                'bg-gradient-to-r from-[#006947] to-[#69f6b8]': !isExcedido(orcamento) && getPercentualGasto(orcamento) < 90,
+                'bg-gradient-to-r from-[#ffa500] to-[#ffcc00]': !isExcedido(orcamento) && getPercentualGasto(orcamento) >= 90,
+                'bg-gradient-to-r from-[#b51621] to-[#ff928b]': isExcedido(orcamento)
+              }"
+              [style.width.%]="getProgressWidth(orcamento)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="getOrcamentosDoMes().length === 0"
+        class="bg-white rounded-xl p-12 text-center border-2 border-dashed border-[#a3abd7]/30">
+        <div class="w-16 h-16 bg-[#efefff] rounded-full flex items-center justify-center mx-auto mb-4">
+          <i-feather name="pie-chart" class="w-8 h-8 text-[#515981]"></i-feather>
+        </div>
+        <h3 class="text-lg font-bold text-on-surface mb-2 font-manrope">
+          Nenhum orçamento definido para este mês
+        </h3>
+        <p class="text-sm text-[#515981] mb-4 font-inter">
+          Crie orçamentos para acompanhar seus gastos por categoria.
+        </p>
+        <a
+          routerLink="/orcamentos/novo"
+          class="inline-flex items-center space-x-2 bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-primary/90 transition-colors font-inter">
+          <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
+          <span>Criar Primeiro Orçamento</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Dica Card -->
+      <div class="bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-3xl p-8 text-white relative overflow-hidden group">
+        <div class="relative z-10 space-y-4">
+          <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-inter">
+            Dica de Planejamento
+          </span>
+          <h2 class="text-2xl font-extrabold leading-tight font-manrope">
+            Use a regra 50-30-20.
+          </h2>
+          <p class="text-blue-50 text-sm max-w-sm font-inter">
+            Destine 50% da renda para necessidades, 30% para desejos e 20% para poupança.
+            Este método simples ajuda a manter o equilíbrio financeiro.
+          </p>
+          <button class="mt-4 bg-white text-primary px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-blue-50 transition-colors font-inter">
+            Saiba Mais
+          </button>
+        </div>
+
+        <!-- Abstract Background -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div class="absolute bottom-0 right-0 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl -mr-10 -mb-10 group-hover:scale-125 transition-transform duration-700"></div>
+      </div>
+
+      <!-- Performance Card -->
+      <div class="bg-white rounded-3xl p-8 flex flex-col justify-center space-y-6 border border-[#a3abd7]/10">
+        <div class="flex items-center space-x-4">
+          <div class="w-16 h-16 rounded-full bg-[#69f6b8]/20 flex items-center justify-center text-[#006947]">
+            <i-feather name="bar-chart-2" class="w-8 h-8"></i-feather>
+          </div>
+          <div>
+            <p class="text-sm text-[#515981] font-inter">Desempenho Geral</p>
+            <p class="text-3xl font-extrabold text-on-surface font-manrope">
+              {{ (100 - getPercentualTotalGasto()).toFixed(1) }}%
+            </p>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-[#515981] font-inter">Orçamentos Ativos</span>
+            <span class="text-sm font-bold text-on-surface font-inter">{{ getOrcamentosDoMes().length }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-[#515981] font-inter">Dentro do Limite</span>
+            <span class="text-sm font-bold text-[#006947] font-inter">{{ getQuantidadeDentroDoLimite() }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-[#515981] font-inter">Excedidos</span>
+            <span class="text-sm font-bold text-[#b51621] font-inter">{{ getQuantidadeExcedidos() }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

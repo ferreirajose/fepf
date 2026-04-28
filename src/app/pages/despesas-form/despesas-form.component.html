@@ -1,0 +1,393 @@
+<div class="min-h-screen p-8 bg-[#f7f5ff]">
+  <div class="max-w-4xl mx-auto w-full">
+
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center space-x-4 mb-4">
+        <button
+          (click)="cancelar()"
+          class="p-2 text-[#515981] hover:bg-white rounded-xl transition-colors">
+          <i-feather name="arrow-left" class="w-6 h-6"></i-feather>
+        </button>
+        <div>
+          <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
+            {{ isEdicao() ? 'Editar Despesa' : 'Cadastro de Despesas' }}
+          </h1>
+          <p class="text-[#515981] font-inter mt-1">
+            {{ isEdicao() ? 'Atualize as informações da despesa' : 'Registre uma nova despesa no sistema' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="salvar()">
+      <div class="space-y-6">
+
+        <!-- Informações Básicas Card -->
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center">
+              <i-feather name="file-text" class="w-5 h-5 text-white"></i-feather>
+            </div>
+            <h2 class="text-xl font-bold text-on-surface font-manrope">Informações Básicas</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Descrição -->
+            <div class="md:col-span-2">
+              <label for="descricao" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+                Descrição *
+              </label>
+              <input
+                id="descricao"
+                type="text"
+                formControlName="descricao"
+                placeholder="Ex: Supermercado Extra"
+                class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
+                [ngClass]="form.get('descricao')?.invalid && form.get('descricao')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
+              />
+              <p *ngIf="form.get('descricao')?.invalid && form.get('descricao')?.touched"
+                 class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+                <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
+                <span>A descrição deve ter no mínimo 3 caracteres</span>
+              </p>
+            </div>
+
+            <!-- Valor -->
+            <div>
+              <label for="valor" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+                Valor *
+              </label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#515981] font-inter font-bold">R$</span>
+                <input
+                  id="valor"
+                  type="number"
+                  step="0.01"
+                  formControlName="valor"
+                  placeholder="0,00"
+                  class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter font-bold text-2xl transition-all"
+                  [ngClass]="form.get('valor')?.invalid && form.get('valor')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
+                />
+              </div>
+              <p *ngIf="form.get('valor')?.invalid && form.get('valor')?.touched"
+                 class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+                <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
+                <span>Informe um valor válido</span>
+              </p>
+            </div>
+
+            <!-- Data -->
+            <div>
+              <label for="data" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+                Data *
+              </label>
+              <div class="relative">
+                <input
+                  id="data"
+                  type="date"
+                  formControlName="data"
+                  class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
+                  [ngClass]="form.get('data')?.invalid && form.get('data')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categoria Card -->
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+              <i-feather name="tag" class="w-5 h-5 text-white"></i-feather>
+            </div>
+            <h2 class="text-xl font-bold text-on-surface font-manrope">Categoria</h2>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <button
+              type="button"
+              *ngFor="let categoria of categorias"
+              (click)="selecionarCategoria(categoria.id)"
+              class="p-4 rounded-xl transition-all hover:scale-105"
+              [ngClass]="form.get('categoriaId')?.value === categoria.id
+                ? 'bg-gradient-to-br shadow-lg ring-2 ring-offset-2'
+                : 'bg-[#efefff] hover:bg-[#dde1ff]'"
+              [style.background]="form.get('categoriaId')?.value === categoria.id ? 'linear-gradient(135deg, ' + categoria.cor + ', ' + categoria.cor + 'AA)' : ''"
+              [style.color]="form.get('categoriaId')?.value === categoria.id ? 'white' : '#515981'"
+              [style.border-color]="form.get('categoriaId')?.value === categoria.id ? categoria.cor : 'transparent'">
+              <div class="flex flex-col items-center space-y-2">
+                <i-feather
+                  [name]="categoria.icone"
+                  class="w-6 h-6">
+                </i-feather>
+                <span class="text-xs font-bold font-inter">{{ categoria.nome }}</span>
+              </div>
+            </button>
+          </div>
+
+          <p *ngIf="form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched"
+             class="text-[#b31b25] text-xs mt-4 font-inter flex items-center space-x-1">
+            <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
+            <span>Selecione uma categoria</span>
+          </p>
+        </div>
+
+        <!-- Pagamento Card -->
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl flex items-center justify-center">
+              <i-feather name="credit-card" class="w-5 h-5 text-white"></i-feather>
+            </div>
+            <h2 class="text-xl font-bold text-on-surface font-manrope">Forma de Pagamento</h2>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+            <label
+              *ngFor="let forma of formasPagamento"
+              class="relative cursor-pointer">
+              <input
+                type="radio"
+                formControlName="formaPagamento"
+                [value]="forma.id"
+                class="peer sr-only"
+              />
+              <div class="p-4 bg-[#efefff] rounded-xl text-center font-inter transition-all hover:bg-[#dde1ff] peer-checked:bg-gradient-to-br peer-checked:from-[#006947] peer-checked:to-[#69f6b8] peer-checked:text-white peer-checked:shadow-lg">
+                <i-feather [name]="forma.icone" class="w-5 h-5 mx-auto mb-2"></i-feather>
+                <span class="text-xs font-bold block">{{ forma.nome }}</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Cartão (só aparece se for crédito) -->
+          <div *ngIf="form.get('formaPagamento')?.value === 'credito'" class="mt-6">
+            <label for="cartaoId" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              Cartão de Crédito *
+            </label>
+            <select
+              id="cartaoId"
+              formControlName="cartaoId"
+              class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
+              [ngClass]="form.get('cartaoId')?.invalid && form.get('cartaoId')?.touched ? 'ring-2 ring-[#b31b25]' : ''">
+              <option value="">Selecione um cartão</option>
+              <option *ngFor="let cartao of cartoes" [value]="cartao.id">
+                {{ cartao.nome }} ({{ cartao.bandeira }})
+              </option>
+            </select>
+            <p *ngIf="form.get('cartaoId')?.invalid && form.get('cartaoId')?.touched"
+               class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+              <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
+              <span>Selecione um cartão</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Configurações Adicionais -->
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center">
+              <i-feather name="settings" class="w-5 h-5 text-white"></i-feather>
+            </div>
+            <h2 class="text-xl font-bold text-on-surface font-manrope">Configurações</h2>
+          </div>
+
+          <div class="space-y-6">
+            <!-- Status de Pagamento -->
+            <div class="flex items-center justify-between p-4 bg-[#efefff] rounded-xl">
+              <div class="flex items-center space-x-3">
+                <i-feather name="check-circle" class="w-5 h-5 text-[#006947]"></i-feather>
+                <div>
+                  <p class="text-sm font-bold text-on-surface font-inter">Despesa já paga?</p>
+                  <p class="text-xs text-[#515981] font-inter">Marque se a despesa já foi quitada</p>
+                </div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" formControlName="pago" class="sr-only peer">
+                <div class="w-11 h-6 bg-[#a3abd7] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#006947]"></div>
+              </label>
+            </div>
+
+            <!-- Recorrente -->
+            <div class="flex items-center justify-between p-4 bg-[#efefff] rounded-xl">
+              <div class="flex items-center space-x-3">
+                <i-feather name="repeat" class="w-5 h-5 text-primary"></i-feather>
+                <div>
+                  <p class="text-sm font-bold text-on-surface font-inter">Despesa recorrente?</p>
+                  <p class="text-xs text-[#515981] font-inter">A despesa se repete mensalmente</p>
+                </div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" formControlName="recorrente" class="sr-only peer">
+                <div class="w-11 h-6 bg-[#a3abd7] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+
+            <!-- Frequência (só aparece se recorrente) -->
+            <div *ngIf="form.get('recorrente')?.value" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="frequenciaRecorrencia" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+                  Frequência
+                </label>
+                <select
+                  id="frequenciaRecorrencia"
+                  formControlName="frequenciaRecorrencia"
+                  class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter">
+                  <option value="semanal">Semanal</option>
+                  <option value="mensal">Mensal</option>
+                  <option value="anual">Anual</option>
+                </select>
+              </div>
+              <div>
+                <label for="dataRecorrenciaFim" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+                  Data de Término (opcional)
+                </label>
+                <input
+                  id="dataRecorrenciaFim"
+                  type="date"
+                  formControlName="dataRecorrenciaFim"
+                  class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter"
+                />
+              </div>
+            </div>
+
+            <!-- Observações -->
+            <div>
+              <label for="observacoes" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+                Observações
+              </label>
+              <textarea
+                id="observacoes"
+                formControlName="observacoes"
+                rows="3"
+                placeholder="Adicione observações adicionais sobre esta despesa..."
+                class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter resize-none">
+              </textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Geolocalização Card -->
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+              <i-feather name="map-pin" class="w-5 h-5 text-white"></i-feather>
+            </div>
+            <h2 class="text-xl font-bold text-on-surface font-manrope">Localização</h2>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Botões de Ação -->
+            <div class="flex gap-3">
+              <button
+                type="button"
+                (click)="capturarLocalizacao()"
+                [disabled]="capturandoLocalizacao()"
+                class="flex-1 bg-gradient-to-r from-[#0057bd] to-[#6e9fff] text-white px-4 py-3 rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-2">
+                <i-feather [name]="capturandoLocalizacao() ? 'loader' : 'map-pin'" class="w-4 h-4" [ngClass]="{'animate-spin': capturandoLocalizacao()}"></i-feather>
+                <span>{{ capturandoLocalizacao() ? 'Capturando...' : 'Capturar Localização Atual' }}</span>
+              </button>
+              <button
+                type="button"
+                (click)="limparLocalizacao()"
+                *ngIf="getLocalizacao().latitude"
+                class="bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-4 py-3 rounded-xl font-bold text-sm hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-2">
+                <i-feather name="x" class="w-4 h-4"></i-feather>
+                <span>Limpar</span>
+              </button>
+            </div>
+
+            <!-- Erro -->
+            <div *ngIf="erroLocalizacao()" class="p-4 bg-[#ff928b]/10 border border-[#ff928b] rounded-xl">
+              <div class="flex items-center space-x-2 text-[#b51621]">
+                <i-feather name="alert-circle" class="w-4 h-4"></i-feather>
+                <p class="text-sm font-inter font-bold">{{ erroLocalizacao() }}</p>
+              </div>
+            </div>
+
+            <!-- Informações da Localização -->
+            <div *ngIf="getLocalizacao().latitude" class="space-y-3">
+              <!-- Mapa -->
+              <div class="rounded-xl overflow-hidden border-2 border-[#a3abd7]/20">
+                <iframe
+                  [src]="'https://maps.google.com/maps?q=' + getLocalizacao().latitude + ',' + getLocalizacao().longitude + '&z=16&output=embed' | safeUrl"
+                  width="100%"
+                  height="300"
+                  style="border:0;"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+              </div>
+
+              <!-- Coordenadas -->
+              <div class="p-4 bg-[#efefff] rounded-xl">
+                <div class="flex items-start space-x-3">
+                  <i-feather name="navigation" class="w-5 h-5 text-[#0057bd] mt-0.5"></i-feather>
+                  <div class="flex-1">
+                    <p class="text-xs text-[#515981] font-inter mb-1">Coordenadas</p>
+                    <p class="text-sm font-bold text-on-surface font-inter">
+                      {{ getLocalizacao().latitude.toFixed(6) }}, {{ getLocalizacao().longitude.toFixed(6) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Endereço -->
+              <div *ngIf="getLocalizacao().endereco" class="p-4 bg-[#efefff] rounded-xl">
+                <div class="flex items-start space-x-3">
+                  <i-feather name="map" class="w-5 h-5 text-[#0057bd] mt-0.5"></i-feather>
+                  <div class="flex-1">
+                    <p class="text-xs text-[#515981] font-inter mb-1">Endereço</p>
+                    <p class="text-sm font-bold text-on-surface font-inter">
+                      {{ getLocalizacao().endereco }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Link do Google Maps -->
+              <a
+                [href]="'https://www.google.com/maps?q=' + getLocalizacao().latitude + ',' + getLocalizacao().longitude"
+                target="_blank"
+                class="flex items-center justify-center space-x-2 p-3 bg-white border-2 border-[#0057bd]/30 text-[#0057bd] rounded-xl font-bold text-sm hover:bg-[#efefff] transition-colors font-inter">
+                <i-feather name="external-link" class="w-4 h-4"></i-feather>
+                <span>Abrir no Google Maps</span>
+              </a>
+            </div>
+
+            <!-- Estado Vazio -->
+            <div *ngIf="!getLocalizacao().latitude && !erroLocalizacao()" class="p-6 bg-[#efefff] rounded-xl text-center">
+              <i-feather name="map-pin" class="w-8 h-8 text-[#515981]/30 mx-auto mb-2"></i-feather>
+              <p class="text-sm text-[#515981] font-inter">
+                Nenhuma localização capturada
+              </p>
+              <p class="text-xs text-[#515981]/70 font-inter mt-1">
+                Clique em "Capturar Localização Atual" para registrar onde a despesa foi feita
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col md:flex-row gap-4">
+          <button
+            type="submit"
+            [disabled]="form.invalid"
+            class="flex-1 bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#b51621]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-3">
+            <i-feather [name]="isEdicao() ? 'check-circle' : 'save'" class="w-6 h-6"></i-feather>
+            <span>{{ isEdicao() ? 'Atualizar Despesa' : 'Salvar Despesa' }}</span>
+          </button>
+          <button
+            type="button"
+            (click)="cancelar()"
+            class="flex-1 bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-3">
+            <i-feather name="x" class="w-6 h-6"></i-feather>
+            <span>Cancelar</span>
+          </button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>
