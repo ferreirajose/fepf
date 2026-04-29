@@ -136,7 +136,7 @@ export class ReceitasFormComponent implements OnInit {
 
   getCategoriaSelecionada(): Categoria | undefined {
     const categoriaId = this.form.get('categoriaId')?.value;
-    return this.categorias.find(c => c._id === categoriaId);
+    return this.categorias.find(c => c.id === categoriaId);
   }
 
   selecionarCategoria(categoriaId: string) {
