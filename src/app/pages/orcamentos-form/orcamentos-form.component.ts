@@ -1,8 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
+import { OrcamentoService } from '../../shared/services/orcamento.service';
+import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
 
 interface Categoria {
   id: string;
@@ -18,20 +20,16 @@ interface Categoria {
   templateUrl: './orcamentos-form.component.html',
   styleUrl: './orcamentos-form.component.css'
 })
-export class OrcamentosFormComponent {
+export class OrcamentosFormComponent implements OnInit {
+  private orcamentoService = inject(OrcamentoService);
+  private categoriaService = inject(CategoriaService);
+
   form: FormGroup;
   orcamentoId = signal<string | null>(null);
   isEdicao = signal(false);
-
-  categorias: Categoria[] = [
-    { id: '1', nome: 'Alimentação', icone: 'shopping-cart', cor: '#6e9fff' },
-    { id: '2', nome: 'Transporte', icone: 'truck', cor: '#69f6b8' },
-    { id: '3', nome: 'Moradia', icone: 'home', cor: '#ff928b' },
-    { id: '4', nome: 'Lazer', icone: 'calendar', cor: '#0057bd' },
-    { id: '5', nome: 'Saúde', icone: 'heart', cor: '#006947' },
-    { id: '6', nome: 'Educação', icone: 'book', cor: '#820AD1' },
-    { id: '7', nome: 'Vestuário', icone: 'shopping-bag', cor: '#b51621' }
-  ];
+  carregando = signal(false);
+  erro = signal<string | null>(null);
+  categorias: Categoria[] = [];
 
   meses = [
     { numero: 1, nome: 'Janeiro' },
@@ -74,22 +72,87 @@ export class OrcamentosFormComponent {
     }
   }
 
+  ngOnInit() {
+    this.carregarCategorias();
+  }
+
+  carregarCategorias() {
+    this.categoriaService.listar().subscribe({
+      next: (response) => {
+        if (response.success && Array.isArray(response.data)) {
+          this.categorias = (response.data as CategoriaAPI[])
+            .filter(c => c.tipo === 'despesa' && c.ativo)
+            .map(c => ({
+              id: c._id || '',
+              nome: c.nome,
+              icone: c.icone || 'circle',
+              cor: c.cor || '#6e9fff'
+            }));
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao carregar categorias:', error);
+      }
+    });
+  }
+
   carregarOrcamento(id: string) {
-    const orcamentoMock = {
-      categoriaId: '1',
-      valorPlanejado: 1500.00,
-      mes: 4,
-      ano: 2026,
-      ativo: true,
-      descricao: 'Orçamento mensal para alimentação'
-    };
-    this.form.patchValue(orcamentoMock);
+    this.carregando.set(true);
+    this.orcamentoService.buscarPorId(id).subscribe({
+      next: (response) => {
+        if (response.success && response.data && !Array.isArray(response.data)) {
+          const orcamento = response.data;
+          this.form.patchValue({
+            categoriaId: orcamento.categoriaId,
+            valorPlanejado: orcamento.valor,
+            mes: orcamento.mes,
+            ano: orcamento.ano,
+            descricao: orcamento.observacoes || ''
+          });
+        }
+        this.carregando.set(false);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar orçamento:', err);
+        this.erro.set('Não foi possível carregar o orçamento');
+        this.carregando.set(false);
+      }
+    });
   }
 
   salvar() {
     if (this.form.valid) {
-      console.log('Salvando orçamento:', this.form.value);
-      this.router.navigate(['/orcamentos']);
+      this.carregando.set(true);
+      this.erro.set(null);
+
+      const formValue = this.form.value;
+      const orcamentoData = {
+        categoriaId: formValue.categoriaId,
+        valor: parseFloat(formValue.valorPlanejado),
+        mes: formValue.mes,
+        ano: formValue.ano,
+        observacoes: formValue.descricao || undefined
+      };
+
+      const operacao = this.isEdicao()
+        ? this.orcamentoService.atualizar(this.orcamentoId()!, orcamentoData)
+        : this.orcamentoService.criar(orcamentoData);
+
+      operacao.subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.router.navigate(['/orcamentos']);
+          } else {
+            this.erro.set(response.error || 'Erro ao salvar orçamento');
+            this.carregando.set(false);
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao salvar orçamento:', err);
+          this.erro.set(err.error?.error || 'Não foi possível salvar o orçamento');
+          this.carregando.set(false);
+        }
+      });
     } else {
       Object.keys(this.form.controls).forEach(key => {
         const control = this.form.get(key);

@@ -245,14 +245,24 @@
           </div>
         </div>
 
+        <!-- Mensagem de Erro -->
+        <div *ngIf="erro()" class="bg-[#b31b25]/10 border-2 border-[#b31b25] text-[#b31b25] px-6 py-4 rounded-xl flex items-start space-x-3">
+          <i-feather name="alert-circle" class="w-5 h-5 mt-0.5 flex-shrink-0"></i-feather>
+          <div>
+            <p class="font-bold font-inter">Erro ao salvar</p>
+            <p class="text-sm font-inter mt-1">{{ erro() }}</p>
+          </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex flex-col md:flex-row gap-4">
           <button
             type="submit"
-            [disabled]="form.invalid"
+            [disabled]="form.invalid || carregando()"
             class="flex-1 bg-gradient-to-r from-[#006947] to-[#69f6b8] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#006947]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-3">
-            <i-feather [name]="isEdicao() ? 'check-circle' : 'save'" class="w-6 h-6"></i-feather>
-            <span>{{ isEdicao() ? 'Atualizar Receita' : 'Salvar Receita' }}</span>
+            <i-feather *ngIf="!carregando()" [name]="isEdicao() ? 'check-circle' : 'save'" class="w-6 h-6"></i-feather>
+            <i-feather *ngIf="carregando()" name="loader" class="w-6 h-6 animate-spin"></i-feather>
+            <span>{{ carregando() ? 'Salvando...' : (isEdicao() ? 'Atualizar Receita' : 'Salvar Receita') }}</span>
           </button>
           <button
             type="button"

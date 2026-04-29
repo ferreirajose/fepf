@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
+import { CartaoService } from '../../shared/services/cartao.service';
 
 interface Bandeira {
   id: string;
@@ -18,9 +19,13 @@ interface Bandeira {
   styleUrl: './cartoes-form.component.css'
 })
 export class CartoesFormComponent {
+  private cartaoService = inject(CartaoService);
+
   form: FormGroup;
   cartaoId = signal<string | null>(null);
   isEdicao = signal(false);
+  carregando = signal(false);
+  erro = signal<string | null>(null);
 
   bandeiras: Bandeira[] = [
     { id: 'visa', nome: 'Visa', cor: '#1A1F71' },
@@ -60,23 +65,64 @@ export class CartoesFormComponent {
   }
 
   carregarCartao(id: string) {
-    const cartaoMock = {
-      nome: 'Nubank Ultravioleta',
-      bandeira: 'mastercard',
-      numero: '5555 5555 5555 1234',
-      limite: 15000.00,
-      diaVencimento: 15,
-      diaFechamento: 10,
-      cor: '#820AD1',
-      ativo: true
-    };
-    this.form.patchValue(cartaoMock);
+    this.carregando.set(true);
+    this.cartaoService.buscarPorId(id).subscribe({
+      next: (response) => {
+        if (response.success && response.data && !Array.isArray(response.data)) {
+          const cartao = response.data;
+          this.form.patchValue({
+            nome: cartao.nome,
+            bandeira: cartao.bandeira,
+            limite: cartao.limite,
+            diaVencimento: cartao.diaVencimento,
+            diaFechamento: cartao.diaFechamento,
+            ativo: cartao.ativo
+          });
+        }
+        this.carregando.set(false);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar cartão:', err);
+        this.erro.set('Não foi possível carregar o cartão');
+        this.carregando.set(false);
+      }
+    });
   }
 
   salvar() {
     if (this.form.valid) {
-      console.log('Salvando cartão:', this.form.value);
-      this.router.navigate(['/cartoes']);
+      this.carregando.set(true);
+      this.erro.set(null);
+
+      const formValue = this.form.value;
+      const cartaoData = {
+        nome: formValue.nome,
+        bandeira: formValue.bandeira,
+        limite: parseFloat(formValue.limite),
+        diaVencimento: parseInt(formValue.diaVencimento),
+        diaFechamento: parseInt(formValue.diaFechamento),
+        ativo: formValue.ativo
+      };
+
+      const operacao = this.isEdicao()
+        ? this.cartaoService.atualizar(this.cartaoId()!, cartaoData)
+        : this.cartaoService.criar(cartaoData);
+
+      operacao.subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.router.navigate(['/cartoes']);
+          } else {
+            this.erro.set(response.error || 'Erro ao salvar cartão');
+            this.carregando.set(false);
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao salvar cartão:', err);
+          this.erro.set(err.error?.error || 'Não foi possível salvar o cartão');
+          this.carregando.set(false);
+        }
+      });
     } else {
       Object.keys(this.form.controls).forEach(key => {
         const control = this.form.get(key);

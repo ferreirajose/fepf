@@ -1,9 +1,10 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
+import { ReceitaService } from '../../shared/services/receita.service';
 
 interface Categoria {
   id: string;
@@ -20,9 +21,14 @@ interface Categoria {
   styleUrl: './receitas-form.component.css'
 })
 export class ReceitasFormComponent implements OnInit {
+  private receitaService = inject(ReceitaService);
+  private categoriaService = inject(CategoriaService);
+
   form: FormGroup;
   receitaId = signal<string | null>(null);
   isEdicao = signal(false);
+  carregando = signal(false);
+  erro = signal<string | null>(null);
   categorias: Categoria[] = [];
 
   formasRecebimento = [
@@ -34,8 +40,7 @@ export class ReceitasFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute,
-    private categoriaService: CategoriaService
+    private route: ActivatedRoute
   ) {
     this.form = this.fb.group({
       descricao: ['', [Validators.required, Validators.minLength(3)]],
@@ -100,26 +105,66 @@ export class ReceitasFormComponent implements OnInit {
   }
 
   carregarReceita(id: string) {
-    const receitaMock = {
-      descricao: 'Salário CLT',
-      valor: 5500.00,
-      data: '2026-04-05',
-      categoriaId: '1',
-      formaRecebimento: 'pix',
-      recorrente: true,
-      frequenciaRecorrencia: 'mensal',
-      dataRecorrenciaFim: '',
-      recebida: true,
-      observacoes: 'Pagamento mensal',
-      anexos: []
-    };
-    this.form.patchValue(receitaMock);
+    this.carregando.set(true);
+    this.receitaService.buscarPorId(id).subscribe({
+      next: (response) => {
+        if (response.success && response.data && !Array.isArray(response.data)) {
+          const receita = response.data;
+          const dataFormatada = new Date(receita.data).toISOString().split('T')[0];
+
+          this.form.patchValue({
+            descricao: receita.descricao,
+            valor: receita.valor,
+            data: dataFormatada,
+            categoriaId: receita.categoriaId,
+            recorrente: receita.recorrente,
+            observacoes: receita.observacoes || ''
+          });
+        }
+        this.carregando.set(false);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar receita:', err);
+        this.erro.set('Não foi possível carregar a receita');
+        this.carregando.set(false);
+      }
+    });
   }
 
   salvar() {
     if (this.form.valid) {
-      console.log('Salvando receita:', this.form.value);
-      this.router.navigate(['/receitas']);
+      this.carregando.set(true);
+      this.erro.set(null);
+
+      const formValue = this.form.value;
+      const receitaData = {
+        descricao: formValue.descricao,
+        valor: parseFloat(formValue.valor),
+        data: formValue.data,
+        categoriaId: formValue.categoriaId,
+        recorrente: formValue.recorrente,
+        observacoes: formValue.observacoes || undefined
+      };
+
+      const operacao = this.isEdicao()
+        ? this.receitaService.atualizar(this.receitaId()!, receitaData)
+        : this.receitaService.criar(receitaData);
+
+      operacao.subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.router.navigate(['/receitas']);
+          } else {
+            this.erro.set(response.error || 'Erro ao salvar receita');
+            this.carregando.set(false);
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao salvar receita:', err);
+          this.erro.set(err.error?.error || 'Não foi possível salvar a receita');
+          this.carregando.set(false);
+        }
+      });
     } else {
       Object.keys(this.form.controls).forEach(key => {
         const control = this.form.get(key);
