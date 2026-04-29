@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
 import { OrcamentoService, Orcamento as OrcamentoAPI } from '../../shared/services/orcamento.service';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { AlertDialogComponent } from '../../shared/components/alert-dialog/alert-dialog.component';
 
 interface Orcamento {
   id: string;
@@ -20,7 +22,7 @@ interface Orcamento {
 @Component({
   selector: 'app-orcamentos',
   standalone: true,
-  imports: [CommonModule, RouterLink, FeatherModule],
+  imports: [CommonModule, RouterLink, FeatherModule, ConfirmDialogComponent, AlertDialogComponent],
   templateUrl: './orcamentos.component.html',
   styleUrl: './orcamentos.component.css'
 })
@@ -31,6 +33,21 @@ export class OrcamentosComponent implements OnInit {
   anoAtual = signal(new Date().getFullYear());
   carregando = signal(false);
   erro = signal<string | null>(null);
+
+  // Dialogs
+  confirmDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
+  alertDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info' | 'warning'
+  });
 
   meses = [
     { numero: 1, nome: 'Janeiro' },
@@ -160,22 +177,45 @@ export class OrcamentosComponent implements OnInit {
 
   excluirOrcamento(id: string, event: Event) {
     event.stopPropagation();
-    if (confirm('Deseja realmente excluir este orçamento?')) {
-      this.orcamentoService.deletar(id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            const orcamentos = this.orcamentos().filter(o => o.id !== id);
-            this.orcamentos.set(orcamentos);
-          } else {
-            alert('Erro ao excluir orçamento: ' + (response.error || 'Erro desconhecido'));
+
+    this.confirmDialog.set({
+      isOpen: true,
+      title: 'Excluir Orçamento',
+      message: 'Tem certeza que deseja excluir este orçamento? Esta ação não pode ser desfeita.',
+      onConfirm: () => {
+        this.orcamentoService.deletar(id).subscribe({
+          next: (response) => {
+            if (response.success) {
+              const orcamentos = this.orcamentos().filter(o => o.id !== id);
+              this.orcamentos.set(orcamentos);
+
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Sucesso',
+                message: 'Orçamento excluído com sucesso!',
+                type: 'success'
+              });
+            } else {
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Erro',
+                message: response.error || 'Não foi possível excluir o orçamento',
+                type: 'error'
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Erro ao excluir orçamento:', err);
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Erro',
+              message: 'Não foi possível excluir o orçamento. Tente novamente.',
+              type: 'error'
+            });
           }
-        },
-        error: (err) => {
-          console.error('Erro ao excluir orçamento:', err);
-          alert('Não foi possível excluir o orçamento');
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   getProgressWidth(orcamento: Orcamento): number {

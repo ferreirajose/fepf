@@ -7,6 +7,9 @@ import { ReceitaService } from '../../shared/services/receita.service';
 import { CartaoService } from '../../shared/services/cartao.service';
 import { OrcamentoService } from '../../shared/services/orcamento.service';
 import { CategoriaService } from '../../shared/services/categoria.service';
+import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
+import { MapClustererComponent } from '../../shared/components/map-clusterer/map-clusterer.component';
+import { environment } from '../../../environments/environment';
 import { forkJoin } from 'rxjs';
 
 Chart.register(...registerables);
@@ -14,7 +17,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FeatherModule],
+  imports: [CommonModule, FeatherModule, SafeUrlPipe, MapClustererComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -41,6 +44,9 @@ export class DashboardComponent implements OnInit {
   orcamentos = signal<any[]>([]);
   categorias = signal<any[]>([]);
   transacoesRecentes: any[] = [];
+  despesasComLocalizacao = signal<any[]>([]);
+  gruposDespesas = signal<any[]>([]);
+  googleMapsApiKey = environment.googleMapsApiKey;
 
   ngOnInit() {
     this.carregarDados();
@@ -67,6 +73,8 @@ export class DashboardComponent implements OnInit {
     forkJoin({
       receitas: this.receitaService.obterEstatisticas(filtros),
       despesas: this.despesaService.obterEstatisticas(filtros),
+      receitasLista: this.receitaService.listar(),
+      despesasLista: this.despesaService.listar(),
       cartoes: this.cartaoService.listar(),
       orcamentos: this.orcamentoService.listar({ mes: mesAtual, ano: anoAtual }),
       categorias: this.categoriaService.listar()
@@ -96,6 +104,12 @@ export class DashboardComponent implements OnInit {
           despesas: response.despesas.data
         });
 
+        // Processar transações recentes
+        this.processarTransacoesRecentes(response.receitasLista.data, response.despesasLista.data);
+
+        // Processar despesas com localização
+        this.processarDespesasComLocalizacao(response.despesasLista.data);
+
         this.carregando.set(false);
 
         // Aguardar o próximo ciclo de renderização para criar gráficos
@@ -113,6 +127,226 @@ export class DashboardComponent implements OnInit {
 
   calcularSaldo(): number {
     return this.receitasMes() - this.despesasMes();
+  }
+
+  processarTransacoesRecentes(receitas: any, despesas: any) {
+    const transacoes: any[] = [];
+
+    // Adicionar receitas
+    if (Array.isArray(receitas)) {
+      receitas.forEach((receita: any) => {
+        transacoes.push({
+          tipo: 'receita',
+          descricao: receita.descricao,
+          valor: receita.valor,
+          data: new Date(receita.data)
+        });
+      });
+    }
+
+    // Adicionar despesas
+    if (Array.isArray(despesas)) {
+      despesas.forEach((despesa: any) => {
+        transacoes.push({
+          tipo: 'despesa',
+          descricao: despesa.descricao,
+          valor: despesa.valor,
+          data: new Date(despesa.data)
+        });
+      });
+    }
+
+    // Ordenar por data (mais recente primeiro)
+    transacoes.sort((a, b) => b.data.getTime() - a.data.getTime());
+
+    // Pegar apenas as 5 mais recentes
+    this.transacoesRecentes = transacoes.slice(0, 5);
+  }
+
+  processarDespesasComLocalizacao(despesas: any) {
+    if (!Array.isArray(despesas)) {
+      this.despesasComLocalizacao.set([]);
+      this.gruposDespesas.set([]);
+      return;
+    }
+
+    const despesasComLoc = despesas
+      .filter((despesa: any) =>
+        despesa.localizacao &&
+        despesa.localizacao.latitude &&
+        despesa.localizacao.longitude
+      )
+      .map((despesa: any) => ({
+        id: despesa._id,
+        descricao: despesa.descricao,
+        valor: despesa.valor,
+        data: new Date(despesa.data),
+        latitude: despesa.localizacao.latitude,
+        longitude: despesa.localizacao.longitude,
+        endereco: despesa.localizacao.endereco || `${despesa.localizacao.latitude}, ${despesa.localizacao.longitude}`,
+        categoriaNome: despesa.categoriaId?.nome || 'Sem categoria',
+        categoriaCor: despesa.categoriaId?.cor || '#6e9fff'
+      }))
+      .sort((a: any, b: any) => b.data.getTime() - a.data.getTime());
+
+    this.despesasComLocalizacao.set(despesasComLoc);
+
+    // Agrupar despesas por proximidade (15km)
+    const grupos = this.agruparDespesasPorProximidade(despesasComLoc, 15);
+    this.gruposDespesas.set(grupos);
+  }
+
+  // Calcula distância entre duas coordenadas em km (fórmula de Haversine)
+  calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Raio da Terra em km
+    const dLat = this.toRad(lat2 - lat1);
+    const dLon = this.toRad(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distancia = R * c;
+
+    return distancia;
+  }
+
+  toRad(valor: number): number {
+    return valor * Math.PI / 180;
+  }
+
+  // Agrupa despesas por proximidade (raio em km)
+  agruparDespesasPorProximidade(despesas: any[], raioKm: number): any[] {
+    if (despesas.length === 0) return [];
+
+    const grupos: any[] = [];
+    const processadas = new Set<string>();
+
+    despesas.forEach(despesa => {
+      if (processadas.has(despesa.id)) return;
+
+      // Criar novo grupo com a despesa atual
+      const grupo: any = {
+        id: `grupo-${grupos.length}`,
+        latitude: despesa.latitude,
+        longitude: despesa.longitude,
+        despesas: [despesa],
+        totalValor: despesa.valor,
+        endereco: despesa.endereco
+      };
+
+      processadas.add(despesa.id);
+
+      // Buscar outras despesas próximas
+      despesas.forEach(outraDespesa => {
+        if (processadas.has(outraDespesa.id)) return;
+
+        const distancia = this.calcularDistancia(
+          despesa.latitude,
+          despesa.longitude,
+          outraDespesa.latitude,
+          outraDespesa.longitude
+        );
+
+        if (distancia <= raioKm) {
+          grupo.despesas.push(outraDespesa);
+          grupo.totalValor += outraDespesa.valor;
+          processadas.add(outraDespesa.id);
+        }
+      });
+
+      // Calcular centro do grupo (média das coordenadas)
+      if (grupo.despesas.length > 1) {
+        grupo.latitude = grupo.despesas.reduce((sum: number, d: any) => sum + d.latitude, 0) / grupo.despesas.length;
+        grupo.longitude = grupo.despesas.reduce((sum: number, d: any) => sum + d.longitude, 0) / grupo.despesas.length;
+
+        // Usar o endereço da primeira despesa como referência, mas indicar que é uma área
+        const enderecoBase = grupo.despesas[0].endereco;
+        // Tentar extrair apenas a cidade/bairro do endereço completo
+        const partes = enderecoBase.split(',');
+        if (partes.length >= 2) {
+          grupo.endereco = `Área de ${partes[partes.length - 2].trim()}, ${partes[partes.length - 1].trim()}`;
+        } else {
+          grupo.endereco = `${grupo.despesas.length} despesas nesta área`;
+        }
+      }
+
+      grupos.push(grupo);
+    });
+
+    return grupos;
+  }
+
+  getMapUrl(): string {
+    const grupos = this.gruposDespesas();
+
+    if (grupos.length === 0) {
+      // Mapa padrão centrado nas coordenadas padrão
+      return `https://maps.google.com/maps?q=-7.165104,-34.855471&z=13&output=embed`;
+    }
+
+    // Se tiver apenas um grupo, centralizar nele
+    if (grupos.length === 1) {
+      const grupo = grupos[0];
+      return `https://maps.google.com/maps?q=${grupo.latitude},${grupo.longitude}&z=14&output=embed`;
+    }
+
+    // Para múltiplos grupos, criar uma URL com o centro calculado e zoom ajustado
+    const latitudes = grupos.map(g => g.latitude);
+    const longitudes = grupos.map(g => g.longitude);
+
+    const centerLat = latitudes.reduce((a, b) => a + b, 0) / latitudes.length;
+    const centerLng = longitudes.reduce((a, b) => a + b, 0) / longitudes.length;
+
+    // Calcular zoom baseado na dispersão dos pontos
+    const maxLat = Math.max(...latitudes);
+    const minLat = Math.min(...latitudes);
+    const maxLng = Math.max(...longitudes);
+    const minLng = Math.min(...longitudes);
+
+    const latDiff = maxLat - minLat;
+    const lngDiff = maxLng - minLng;
+    const maxDiff = Math.max(latDiff, lngDiff);
+
+    // Ajustar zoom baseado na diferença
+    let zoom = 13;
+    if (maxDiff < 0.01) zoom = 15;      // Muito próximos
+    else if (maxDiff < 0.05) zoom = 13;  // Próximos
+    else if (maxDiff < 0.1) zoom = 12;   // Moderadamente dispersos
+    else if (maxDiff < 0.2) zoom = 11;   // Dispersos
+    else zoom = 10;                      // Muito dispersos
+
+    return `https://maps.google.com/maps?q=${centerLat},${centerLng}&z=${zoom}&output=embed`;
+  }
+
+  getMapUrlComMarcadores(): string {
+    const grupos = this.gruposDespesas();
+
+    if (grupos.length === 0) {
+      return '';
+    }
+
+    // Criar URL do Google Maps com múltiplos pontos
+    // Usar o formato de busca com múltiplas coordenadas
+    if (grupos.length === 1) {
+      const grupo = grupos[0];
+      return `https://www.google.com/maps/search/?api=1&query=${grupo.latitude},${grupo.longitude}`;
+    }
+
+    // Para múltiplos grupos, criar URL com direções
+    const origem = grupos[0];
+    const destino = grupos[grupos.length - 1];
+    const waypoints = grupos.slice(1, -1).map(g => `${g.latitude},${g.longitude}`).join('|');
+
+    let url = `https://www.google.com/maps/dir/?api=1&origin=${origem.latitude},${origem.longitude}&destination=${destino.latitude},${destino.longitude}`;
+    if (waypoints) {
+      url += `&waypoints=${waypoints}`;
+    }
+    url += '&travelmode=driving';
+
+    return url;
   }
 
   criarGraficos() {

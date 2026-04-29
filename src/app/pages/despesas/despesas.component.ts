@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
 import { FormsModule } from '@angular/forms';
 import { DespesaService, Despesa as DespesaAPI } from '../../shared/services/despesa.service';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { AlertDialogComponent } from '../../shared/components/alert-dialog/alert-dialog.component';
 
 interface Despesa {
   id: string;
@@ -24,7 +26,7 @@ interface Despesa {
 @Component({
   selector: 'app-despesas',
   standalone: true,
-  imports: [CommonModule, RouterLink, FeatherModule, FormsModule],
+  imports: [CommonModule, RouterLink, FeatherModule, FormsModule, ConfirmDialogComponent, AlertDialogComponent],
   templateUrl: './despesas.component.html',
   styleUrl: './despesas.component.css'
 })
@@ -38,6 +40,21 @@ export class DespesasComponent implements OnInit {
   anoAtual = signal(new Date().getFullYear());
   carregando = signal(false);
   erro = signal<string | null>(null);
+
+  // Dialogs
+  confirmDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
+  alertDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info' | 'warning'
+  });
 
   meses = [
     { numero: 1, nome: 'Janeiro' },
@@ -85,7 +102,7 @@ export class DespesasComponent implements OnInit {
       next: (response) => {
         if (response.success && Array.isArray(response.data)) {
           this.despesas.set((response.data as DespesaAPI[]).map(d => ({
-            id: d.id || '',
+            id: (d as any)._id || d.id || '',
             descricao: d.descricao,
             valor: d.valor,
             data: new Date(d.data),
@@ -212,22 +229,45 @@ export class DespesasComponent implements OnInit {
 
   excluirDespesa(id: string, event: Event) {
     event.stopPropagation();
-    if (confirm('Deseja realmente excluir esta despesa?')) {
-      this.despesaService.deletar(id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            const despesas = this.despesas().filter(d => d.id !== id);
-            this.despesas.set(despesas);
-          } else {
-            alert('Erro ao excluir despesa: ' + (response.error || 'Erro desconhecido'));
+
+    this.confirmDialog.set({
+      isOpen: true,
+      title: 'Excluir Despesa',
+      message: 'Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.',
+      onConfirm: () => {
+        this.despesaService.deletar(id).subscribe({
+          next: (response) => {
+            if (response.success) {
+              const despesas = this.despesas().filter(d => d.id !== id);
+              this.despesas.set(despesas);
+
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Sucesso',
+                message: 'Despesa excluída com sucesso!',
+                type: 'success'
+              });
+            } else {
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Erro',
+                message: response.error || 'Não foi possível excluir a despesa',
+                type: 'error'
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Erro ao excluir despesa:', err);
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Erro',
+              message: 'Não foi possível excluir a despesa. Tente novamente.',
+              type: 'error'
+            });
           }
-        },
-        error: (err) => {
-          console.error('Erro ao excluir despesa:', err);
-          alert('Não foi possível excluir a despesa');
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   formatarData(data: Date): string {

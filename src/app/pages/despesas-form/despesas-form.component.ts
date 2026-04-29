@@ -1,6 +1,6 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
@@ -25,7 +25,7 @@ interface Cartao {
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FeatherModule, SafeUrlPipe, RouterLink, CurrencyMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, FeatherModule, SafeUrlPipe, RouterLink, CurrencyMaskDirective],
   templateUrl: './despesas-form.component.html',
   styleUrl: './despesas-form.component.css'
 })
@@ -52,6 +52,8 @@ export class DespesasFormComponent implements OnInit {
 
   capturandoLocalizacao = signal(false);
   erroLocalizacao = signal<string | null>(null);
+  buscandoCoordenadas = signal(false);
+  enderecoManual = signal('');
 
   constructor(
     private fb: FormBuilder,
@@ -197,6 +199,17 @@ export class DespesasFormComponent implements OnInit {
       this.erro.set(null);
 
       const formValue = this.form.value;
+
+      // Se localização não foi capturada, usar coordenadas padrão
+      let localizacao = formValue.localizacao;
+      if (!localizacao.latitude && !localizacao.longitude) {
+        localizacao = {
+          latitude: -7.165104,
+          longitude: -34.855471,
+          endereco: '-7.165104, -34.855471'
+        };
+      }
+
       const despesaData = {
         descricao: formValue.descricao,
         valor: parseFloat(formValue.valor),
@@ -207,7 +220,7 @@ export class DespesasFormComponent implements OnInit {
         recorrente: formValue.recorrente,
         pago: formValue.pago,
         observacoes: formValue.observacoes || undefined,
-        localizacao: formValue.localizacao.latitude ? formValue.localizacao : undefined
+        localizacao: localizacao
       };
 
       const operacao = this.isEdicao()
@@ -320,13 +333,16 @@ export class DespesasFormComponent implements OnInit {
       .then(response => response.json())
       .then(data => {
         if (data && data.display_name) {
-          this.form.patchValue({
-            localizacao: {
-              latitude,
-              longitude,
-              endereco: data.display_name
-            }
-          });
+          // Usar setTimeout para evitar ExpressionChangedAfterItHasBeenCheckedError
+          setTimeout(() => {
+            this.form.patchValue({
+              localizacao: {
+                latitude,
+                longitude,
+                endereco: data.display_name
+              }
+            });
+          }, 0);
         }
       })
       .catch(() => {
@@ -344,6 +360,51 @@ export class DespesasFormComponent implements OnInit {
       }
     });
     this.erroLocalizacao.set(null);
+    this.enderecoManual.set('');
+  }
+
+  buscarCoordenadasPorEndereco() {
+    const endereco = this.enderecoManual();
+
+    if (!endereco || endereco.trim().length < 5) {
+      this.erroLocalizacao.set('Digite um endereço válido com pelo menos 5 caracteres');
+      return;
+    }
+
+    this.buscandoCoordenadas.set(true);
+    this.erroLocalizacao.set(null);
+
+    // Usar API do Nominatim (OpenStreetMap) para geocoding
+    const enderecoEncoded = encodeURIComponent(endereco.trim());
+    fetch(`https://nominatim.openstreetmap.org/search?q=${enderecoEncoded}&format=json&limit=1`)
+      .then(response => response.json())
+      .then(data => {
+        this.buscandoCoordenadas.set(false);
+
+        if (data && data.length > 0) {
+          const resultado = data[0];
+          const latitude = parseFloat(resultado.lat);
+          const longitude = parseFloat(resultado.lon);
+          const enderecoCompleto = resultado.display_name;
+
+          setTimeout(() => {
+            this.form.patchValue({
+              localizacao: {
+                latitude,
+                longitude,
+                endereco: enderecoCompleto
+              }
+            });
+          }, 0);
+        } else {
+          this.erroLocalizacao.set('Endereço não encontrado. Tente ser mais específico (ex: "Rua X, Cidade, Estado")');
+        }
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar coordenadas:', error);
+        this.buscandoCoordenadas.set(false);
+        this.erroLocalizacao.set('Erro ao buscar o endereço. Tente novamente.');
+      });
   }
 
   getLocalizacao() {

@@ -49,7 +49,7 @@ export class CartoesFormComponent {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
       bandeira: ['', Validators.required],
-      numero: ['', [Validators.required, Validators.pattern(/^\d{4}\s?\d{4}\s?\d{4}\s?\d{4}$/)]],
+      dono: [''],
       limite: [null, [Validators.required, Validators.min(0)]],
       diaVencimento: [null, [Validators.required, Validators.min(1), Validators.max(31)]],
       diaFechamento: [null, [Validators.required, Validators.min(1), Validators.max(31)]],
@@ -74,6 +74,7 @@ export class CartoesFormComponent {
           this.form.patchValue({
             nome: cartao.nome,
             bandeira: cartao.bandeira,
+            dono: cartao.dono || '',
             limite: cartao.limite,
             diaVencimento: cartao.diaVencimento,
             diaFechamento: cartao.diaFechamento,
@@ -99,6 +100,7 @@ export class CartoesFormComponent {
       const cartaoData = {
         nome: formValue.nome,
         bandeira: formValue.bandeira,
+        dono: formValue.dono || undefined,
         limite: parseFloat(formValue.limite),
         diaVencimento: parseInt(formValue.diaVencimento),
         diaFechamento: parseInt(formValue.diaFechamento),
@@ -148,13 +150,6 @@ export class CartoesFormComponent {
 
   selecionarCor(cor: string) {
     this.form.patchValue({ cor });
-  }
-
-  formatarNumeroCartao(event: any) {
-    let valor = event.target.value.replace(/\s/g, '');
-    if (valor.length > 16) valor = valor.substring(0, 16);
-    const formatado = valor.match(/.{1,4}/g)?.join(' ') || valor;
-    this.form.patchValue({ numero: formatado }, { emitEvent: false });
   }
 
   getBandeiraSelecionada(): Bandeira | undefined {

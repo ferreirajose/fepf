@@ -118,6 +118,125 @@
       </div>
     </div>
 
+    <!-- Mapa de Despesas -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Mapa -->
+      <div class="lg:col-span-2 bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="flex items-center space-x-3 mb-6">
+          <div class="w-10 h-10 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center">
+            <i-feather name="map-pin" class="w-5 h-5 text-white"></i-feather>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-manrope font-bold text-on-surface">Locais das Despesas</h3>
+            <p class="text-xs text-[#515981] font-inter">
+              {{ despesasComLocalizacao().length }} despesas em {{ gruposDespesas().length }}
+              {{ gruposDespesas().length === 1 ? 'local' : 'locais' }}
+            </p>
+          </div>
+        </div>
+
+        <div *ngIf="despesasComLocalizacao().length > 0" class="space-y-4">
+          <!-- Mapa com Clustering -->
+          <div class="rounded-xl overflow-hidden border-2 border-[#a3abd7]/20">
+            <app-map-clusterer
+              [despesas]="despesasComLocalizacao()"
+              [googleMapsApiKey]="googleMapsApiKey">
+            </app-map-clusterer>
+          </div>
+
+          <!-- Botão Ver Todas no Maps -->
+          <a
+            *ngIf="gruposDespesas().length > 0"
+            [href]="getMapUrlComMarcadores()"
+            target="_blank"
+            class="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+            <i-feather name="external-link" class="w-4 h-4"></i-feather>
+            <span>Ver Todos os Locais no Google Maps</span>
+          </a>
+        </div>
+
+        <!-- Estado Vazio -->
+        <div *ngIf="despesasComLocalizacao().length === 0" class="p-12 bg-[#efefff] rounded-xl text-center">
+          <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+            <i-feather name="map-pin" class="w-8 h-8 text-[#515981]/30"></i-feather>
+          </div>
+          <h3 class="text-lg font-bold text-on-surface mb-2 font-manrope">
+            Nenhuma despesa com localização
+          </h3>
+          <p class="text-sm text-[#515981] font-inter max-w-md mx-auto">
+            As despesas que você capturar a localização aparecerão aqui no mapa.
+            Cadastre despesas e ative a geolocalização!
+          </p>
+        </div>
+      </div>
+
+      <!-- Lista de Todas as Despesas -->
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="flex items-center space-x-3 mb-6">
+          <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+            <i-feather name="list" class="w-5 h-5 text-white"></i-feather>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-manrope font-bold text-on-surface">Todas as Despesas</h3>
+            <p class="text-xs text-[#515981] font-inter">Lista completa ordenada por data</p>
+          </div>
+        </div>
+
+        <div *ngIf="despesasComLocalizacao().length > 0" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
+          <div *ngFor="let despesa of despesasComLocalizacao().slice(0, 10)"
+               class="p-4 bg-[#efefff] hover:bg-[#dde1ff] rounded-xl transition-all group">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center space-x-2 flex-1">
+                <div
+                  class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  [style.background-color]="despesa.categoriaCor + '30'"
+                  [style.color]="despesa.categoriaCor">
+                  <i-feather name="shopping-bag" class="w-4 h-4"></i-feather>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="font-inter font-bold text-sm text-on-surface truncate">{{ despesa.descricao }}</p>
+                  <p class="text-xs text-[#515981] font-inter">{{ despesa.categoriaNome }}</p>
+                </div>
+              </div>
+              <p class="font-manrope font-extrabold text-sm text-[#b51621] ml-2 flex-shrink-0">
+                {{ despesa.valor | currency:'BRL' }}
+              </p>
+            </div>
+
+            <div class="flex items-start space-x-2 mt-3 pt-3 border-t border-[#a3abd7]/10">
+              <i-feather name="map-pin" class="w-3 h-3 text-[#0057bd] mt-0.5 flex-shrink-0"></i-feather>
+              <p class="text-xs text-[#515981] font-inter truncate flex-1" [title]="despesa.endereco">
+                {{ despesa.endereco }}
+              </p>
+            </div>
+
+            <div class="flex items-center space-x-2 mt-2">
+              <i-feather name="calendar" class="w-3 h-3 text-[#515981]"></i-feather>
+              <p class="text-xs text-[#515981] font-inter">
+                {{ despesa.data | date:'dd/MM/yyyy' }}
+              </p>
+            </div>
+
+            <!-- Link para ver no mapa -->
+            <a
+              [href]="'https://www.google.com/maps?q=' + despesa.latitude + ',' + despesa.longitude"
+              target="_blank"
+              class="mt-3 flex items-center justify-center space-x-1 p-2 bg-white border border-[#0057bd]/30 text-[#0057bd] rounded-lg text-xs font-bold hover:bg-[#0057bd] hover:text-white transition-colors opacity-0 group-hover:opacity-100 font-inter">
+              <i-feather name="external-link" class="w-3 h-3"></i-feather>
+              <span>Ver no Maps</span>
+            </a>
+          </div>
+        </div>
+
+        <div *ngIf="despesasComLocalizacao().length === 0" class="text-center py-8">
+          <i-feather name="inbox" class="w-12 h-12 text-[#515981]/30 mx-auto mb-3"></i-feather>
+          <p class="text-sm text-[#515981] font-inter">
+            Nenhuma despesa com localização
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Transações Recentes -->
     <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
       <div class="flex items-center space-x-3 mb-6">

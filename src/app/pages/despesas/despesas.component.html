@@ -313,3 +313,23 @@
 
   </div>
 </div>
+
+<!-- Dialogs -->
+<app-confirm-dialog
+  [isOpen]="confirmDialog().isOpen"
+  [title]="confirmDialog().title"
+  [message]="confirmDialog().message"
+  [type]="'danger'"
+  [confirmText]="'Excluir'"
+  [cancelText]="'Cancelar'"
+  (confirm)="confirmDialog().onConfirm()"
+  (cancel)="confirmDialog.set({...confirmDialog(), isOpen: false})">
+</app-confirm-dialog>
+
+<app-alert-dialog
+  [isOpen]="alertDialog().isOpen"
+  [title]="alertDialog().title"
+  [message]="alertDialog().message"
+  [type]="alertDialog().type"
+  (close)="alertDialog.set({...alertDialog(), isOpen: false})">
+</app-alert-dialog>

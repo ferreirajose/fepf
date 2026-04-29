@@ -4,11 +4,13 @@ import { RouterLink } from '@angular/router';
 import { Categoria } from '../../../shared/models/categoria.model';
 import { FeatherModule } from 'angular-feather';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../../shared/services/categoria.service';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { AlertDialogComponent } from '../../../shared/components/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-categorias-lista',
   standalone: true,
-  imports: [CommonModule, RouterLink, FeatherModule],
+  imports: [CommonModule, RouterLink, FeatherModule, ConfirmDialogComponent, AlertDialogComponent],
   templateUrl: './categorias-lista.component.html',
   styleUrl: './categorias-lista.component.css'
 })
@@ -19,6 +21,21 @@ export class CategoriasListaComponent implements OnInit {
   categorias = signal<Categoria[]>([]);
   carregando = signal(false);
   erro = signal<string | null>(null);
+
+  // Dialogs
+  confirmDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
+  alertDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info' | 'warning'
+  });
 
   ngOnInit() {
     this.carregarCategorias();
@@ -73,22 +90,45 @@ export class CategoriasListaComponent implements OnInit {
 
   excluirCategoria(id: string, event: Event) {
     event.stopPropagation();
-    if (confirm('Deseja realmente excluir esta categoria?')) {
-      this.categoriaService.deletar(id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            const categorias = this.categorias().filter(c => c.id !== id);
-            this.categorias.set(categorias);
-          } else {
-            alert('Erro ao excluir categoria: ' + (response.error || 'Erro desconhecido'));
+
+    this.confirmDialog.set({
+      isOpen: true,
+      title: 'Excluir Categoria',
+      message: 'Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita.',
+      onConfirm: () => {
+        this.categoriaService.deletar(id).subscribe({
+          next: (response) => {
+            if (response.success) {
+              const categorias = this.categorias().filter(c => c.id !== id);
+              this.categorias.set(categorias);
+
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Sucesso',
+                message: 'Categoria excluída com sucesso!',
+                type: 'success'
+              });
+            } else {
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Erro',
+                message: response.error || 'Não foi possível excluir a categoria',
+                type: 'error'
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Erro ao excluir categoria:', err);
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Erro',
+              message: 'Não foi possível excluir a categoria. Tente novamente.',
+              type: 'error'
+            });
           }
-        },
-        error: (err) => {
-          console.error('Erro ao excluir categoria:', err);
-          alert('Não foi possível excluir a categoria');
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   adicionarSubcategoria(categoriaId: string, event: Event) {
@@ -98,15 +138,30 @@ export class CategoriasListaComponent implements OnInit {
       this.categoriaService.adicionarSubcategoria(categoriaId, nome.trim()).subscribe({
         next: (response) => {
           if (response.success && response.data && !Array.isArray(response.data)) {
-            // Atualizar a lista de categorias
             this.carregarCategorias();
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Sucesso',
+              message: 'Subcategoria adicionada com sucesso!',
+              type: 'success'
+            });
           } else {
-            alert('Erro ao adicionar subcategoria: ' + (response.error || 'Erro desconhecido'));
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Erro',
+              message: response.error || 'Não foi possível adicionar a subcategoria',
+              type: 'error'
+            });
           }
         },
         error: (err) => {
           console.error('Erro ao adicionar subcategoria:', err);
-          alert('Não foi possível adicionar a subcategoria');
+          this.alertDialog.set({
+            isOpen: true,
+            title: 'Erro',
+            message: 'Não foi possível adicionar a subcategoria. Tente novamente.',
+            type: 'error'
+          });
         }
       });
     }
@@ -114,30 +169,53 @@ export class CategoriasListaComponent implements OnInit {
 
   excluirSubcategoria(categoriaId: string, subcategoriaId: string, event: Event) {
     event.stopPropagation();
-    if (confirm('Deseja realmente excluir esta subcategoria?')) {
-      this.categoriaService.deletarSubcategoria(categoriaId, subcategoriaId).subscribe({
-        next: (response) => {
-          if (response.success) {
-            const categorias = this.categorias().map(cat => {
-              if (cat.id === categoriaId && cat.subcategorias) {
-                return {
-                  ...cat,
-                  subcategorias: cat.subcategorias.filter(sub => sub.id !== subcategoriaId)
-                };
-              }
-              return cat;
+
+    this.confirmDialog.set({
+      isOpen: true,
+      title: 'Excluir Subcategoria',
+      message: 'Tem certeza que deseja excluir esta subcategoria?',
+      onConfirm: () => {
+        this.categoriaService.deletarSubcategoria(categoriaId, subcategoriaId).subscribe({
+          next: (response) => {
+            if (response.success) {
+              const categorias = this.categorias().map(cat => {
+                if (cat.id === categoriaId && cat.subcategorias) {
+                  return {
+                    ...cat,
+                    subcategorias: cat.subcategorias.filter(sub => sub.id !== subcategoriaId)
+                  };
+                }
+                return cat;
+              });
+              this.categorias.set(categorias);
+
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Sucesso',
+                message: 'Subcategoria excluída com sucesso!',
+                type: 'success'
+              });
+            } else {
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Erro',
+                message: response.error || 'Não foi possível excluir a subcategoria',
+                type: 'error'
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Erro ao excluir subcategoria:', err);
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Erro',
+              message: 'Não foi possível excluir a subcategoria. Tente novamente.',
+              type: 'error'
             });
-            this.categorias.set(categorias);
-          } else {
-            alert('Erro ao excluir subcategoria: ' + (response.error || 'Erro desconhecido'));
           }
-        },
-        error: (err) => {
-          console.error('Erro ao excluir subcategoria:', err);
-          alert('Não foi possível excluir a subcategoria');
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   getTotalReceitas(): number {

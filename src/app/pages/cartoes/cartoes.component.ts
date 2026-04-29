@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
 import { FormsModule } from '@angular/forms';
 import { CartaoService, Cartao as CartaoAPI } from '../../shared/services/cartao.service';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { AlertDialogComponent } from '../../shared/components/alert-dialog/alert-dialog.component';
 
 interface Cartao {
   id: string;
@@ -20,7 +22,7 @@ interface Cartao {
 @Component({
   selector: 'app-cartoes',
   standalone: true,
-  imports: [CommonModule, RouterLink, FeatherModule, FormsModule],
+  imports: [CommonModule, RouterLink, FeatherModule, FormsModule, ConfirmDialogComponent, AlertDialogComponent],
   templateUrl: './cartoes.component.html',
   styleUrl: './cartoes.component.css'
 })
@@ -32,6 +34,21 @@ export class CartoesComponent implements OnInit {
   filtroStatus = signal('todos');
   carregando = signal(false);
   erro = signal<string | null>(null);
+
+  // Dialogs
+  confirmDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
+  alertDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info' | 'warning'
+  });
 
   cartoes = signal<Cartao[]>([]);
 
@@ -159,29 +176,57 @@ export class CartoesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erro ao atualizar cartão:', err);
-        alert('Não foi possível atualizar o status do cartão');
+        this.alertDialog.set({
+          isOpen: true,
+          title: 'Erro',
+          message: 'Não foi possível atualizar o status do cartão. Tente novamente.',
+          type: 'error'
+        });
       }
     });
   }
 
   excluirCartao(id: string, event: Event) {
     event.stopPropagation();
-    if (confirm('Deseja realmente excluir este cartão?')) {
-      this.cartaoService.deletar(id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            const cartoes = this.cartoes().filter(c => c.id !== id);
-            this.cartoes.set(cartoes);
-          } else {
-            alert('Erro ao excluir cartão: ' + (response.error || 'Erro desconhecido'));
+
+    this.confirmDialog.set({
+      isOpen: true,
+      title: 'Excluir Cartão',
+      message: 'Tem certeza que deseja excluir este cartão? Esta ação não pode ser desfeita.',
+      onConfirm: () => {
+        this.cartaoService.deletar(id).subscribe({
+          next: (response) => {
+            if (response.success) {
+              const cartoes = this.cartoes().filter(c => c.id !== id);
+              this.cartoes.set(cartoes);
+
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Sucesso',
+                message: 'Cartão excluído com sucesso!',
+                type: 'success'
+              });
+            } else {
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Erro',
+                message: response.error || 'Não foi possível excluir o cartão',
+                type: 'error'
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Erro ao excluir cartão:', err);
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Erro',
+              message: 'Não foi possível excluir o cartão. Tente novamente.',
+              type: 'error'
+            });
           }
-        },
-        error: (err) => {
-          console.error('Erro ao excluir cartão:', err);
-          alert('Não foi possível excluir o cartão');
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   limparFiltros() {

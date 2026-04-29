@@ -7,6 +7,7 @@ export interface Cartao {
   _id?: string;
   nome: string;
   bandeira: 'visa' | 'mastercard' | 'elo' | 'amex' | 'outra';
+  dono?: string;
   limite: number;
   diaVencimento: number;
   diaFechamento: number;

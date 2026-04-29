@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
 import { FormsModule } from '@angular/forms';
 import { ReceitaService, Receita as ReceitaAPI } from '../../shared/services/receita.service';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { AlertDialogComponent } from '../../shared/components/alert-dialog/alert-dialog.component';
 
 interface Receita {
   id: string;
@@ -22,12 +24,27 @@ interface Receita {
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [CommonModule, RouterLink, FeatherModule, FormsModule],
+  imports: [CommonModule, RouterLink, FeatherModule, FormsModule, ConfirmDialogComponent, AlertDialogComponent],
   templateUrl: './receitas.component.html',
   styleUrl: './receitas.component.css'
 })
 export class ReceitasComponent implements OnInit {
   private receitaService = inject(ReceitaService);
+
+  // Dialogs
+  confirmDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
+  alertDialog = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info' | 'warning'
+  });
 
   filtroTexto = signal('');
   filtroCategoria = signal('todas');
@@ -84,7 +101,7 @@ export class ReceitasComponent implements OnInit {
       next: (response) => {
         if (response.success && Array.isArray(response.data)) {
           this.receitas.set((response.data as ReceitaAPI[]).map(r => ({
-            id: r.id || '',
+            id: (r as any)._id || r.id || '',
             descricao: r.descricao,
             valor: r.valor,
             data: new Date(r.data),
@@ -206,22 +223,45 @@ export class ReceitasComponent implements OnInit {
 
   excluirReceita(id: string, event: Event) {
     event.stopPropagation();
-    if (confirm('Deseja realmente excluir esta receita?')) {
-      this.receitaService.deletar(id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            const receitas = this.receitas().filter(r => r.id !== id);
-            this.receitas.set(receitas);
-          } else {
-            alert('Erro ao excluir receita: ' + (response.error || 'Erro desconhecido'));
+
+    this.confirmDialog.set({
+      isOpen: true,
+      title: 'Excluir Receita',
+      message: 'Tem certeza que deseja excluir esta receita? Esta ação não pode ser desfeita.',
+      onConfirm: () => {
+        this.receitaService.deletar(id).subscribe({
+          next: (response) => {
+            if (response.success) {
+              const receitas = this.receitas().filter(r => r.id !== id);
+              this.receitas.set(receitas);
+
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Sucesso',
+                message: 'Receita excluída com sucesso!',
+                type: 'success'
+              });
+            } else {
+              this.alertDialog.set({
+                isOpen: true,
+                title: 'Erro',
+                message: response.error || 'Não foi possível excluir a receita',
+                type: 'error'
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Erro ao excluir receita:', err);
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Erro',
+              message: 'Não foi possível excluir a receita. Tente novamente.',
+              type: 'error'
+            });
           }
-        },
-        error: (err) => {
-          console.error('Erro ao excluir receita:', err);
-          alert('Não foi possível excluir a receita');
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   formatarData(data: Date): string {

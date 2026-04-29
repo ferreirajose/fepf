@@ -65,7 +65,7 @@
           </div>
           <p class="text-sm text-purple-100 font-inter mb-1">Limite Total</p>
           <p class="text-3xl font-extrabold font-manrope">
-            R$ {{ getLimiteTotal().toFixed(2).replace('.', ',') }}
+            {{ getLimiteTotal() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
           </p>
           <p class="text-xs text-white/80 mt-2 font-inter">
             {{ getQuantidadeCartoes() }} cartões
@@ -84,7 +84,7 @@
           </div>
           <p class="text-sm text-green-100 font-inter mb-1">Limite Disponível</p>
           <p class="text-3xl font-extrabold font-manrope">
-            R$ {{ getLimiteDisponivel().toFixed(2).replace('.', ',') }}
+            {{ getLimiteDisponivel() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
           </p>
           <p class="text-xs text-white/80 mt-2 font-inter">
             {{ (100 - getPercentualUtilizado()).toFixed(0) }}% disponível
@@ -103,7 +103,7 @@
           </div>
           <p class="text-sm text-red-100 font-inter mb-1">Limite Utilizado</p>
           <p class="text-3xl font-extrabold font-manrope">
-            R$ {{ getLimiteUtilizado().toFixed(2).replace('.', ',') }}
+            {{ getLimiteUtilizado() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
           </p>
           <p class="text-xs text-white/80 mt-2 font-inter">
             {{ getPercentualUtilizado().toFixed(0) }}% utilizado
@@ -163,13 +163,13 @@
               <div>
                 <p class="text-xs text-[#515981] font-inter mb-1">Limite Total</p>
                 <p class="text-lg font-bold text-on-surface font-manrope">
-                  R$ {{ cartao.limite.toFixed(2).replace('.', ',') }}
+                  {{ cartao.limite | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
                 </p>
               </div>
               <div>
                 <p class="text-xs text-[#515981] font-inter mb-1">Limite Disponível</p>
                 <p class="text-lg font-bold text-[#006947] font-manrope">
-                  R$ {{ cartao.limiteDisponivel.toFixed(2).replace('.', ',') }}
+                  {{ cartao.limiteDisponivel | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
                 </p>
               </div>
             </div>
@@ -267,3 +267,23 @@
 
   </div>
 </div>
+
+<!-- Dialogs -->
+<app-confirm-dialog
+  [isOpen]="confirmDialog().isOpen"
+  [title]="confirmDialog().title"
+  [message]="confirmDialog().message"
+  [type]="'danger'"
+  [confirmText]="'Excluir'"
+  [cancelText]="'Cancelar'"
+  (confirm)="confirmDialog().onConfirm()"
+  (cancel)="confirmDialog.set({...confirmDialog(), isOpen: false})">
+</app-confirm-dialog>
+
+<app-alert-dialog
+  [isOpen]="alertDialog().isOpen"
+  [title]="alertDialog().title"
+  [message]="alertDialog().message"
+  [type]="alertDialog().type"
+  (close)="alertDialog.set({...alertDialog(), isOpen: false})">
+</app-alert-dialog>
