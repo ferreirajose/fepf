@@ -13,7 +13,7 @@ export interface Subcategoria {
 export interface Categoria {
   _id?: string;
   nome: string;
-  tipo: 'receita' | 'despesa';
+  tipo?: 'receita' | 'despesa';
   cor?: string;
   icone?: string;
   subcategorias?: Subcategoria[];

@@ -81,7 +81,7 @@ export class OrcamentosFormComponent implements OnInit {
       next: (response) => {
         if (response.success && Array.isArray(response.data)) {
           this.categorias = (response.data as CategoriaAPI[])
-            .filter(c => c.tipo === 'despesa' && c.ativo)
+            .filter(c => c.ativo)
             .map(c => ({
               id: c._id || '',
               nome: c.nome,

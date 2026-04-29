@@ -33,7 +33,6 @@ export class CategoriasFormComponent {
   ) {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
-      tipo: ['receita', Validators.required],
       cor: ['#0057bd', Validators.required],
       icone: [''],
       ativo: [true]
@@ -58,7 +57,6 @@ export class CategoriasFormComponent {
           const categoria = response.data;
           this.form.patchValue({
             nome: categoria.nome,
-            tipo: categoria.tipo,
             cor: categoria.cor || '#0057bd',
             icone: categoria.icone || '',
             ativo: categoria.ativo
@@ -81,7 +79,6 @@ export class CategoriasFormComponent {
 
       const categoriaData = {
         nome: this.form.value.nome,
-        tipo: this.form.value.tipo,
         cor: this.form.value.cor,
         icone: this.form.value.icone || undefined,
         ativo: this.form.value.ativo

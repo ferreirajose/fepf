@@ -1,7 +1,7 @@
 export interface Categoria {
   id: string;
   nome: string;
-  tipo: 'receita' | 'despesa';
+  tipo?: 'receita' | 'despesa';
   cor?: string;
   icone?: string;
   subcategorias?: Subcategoria[];
