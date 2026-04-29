@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
+import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
 
 interface Categoria {
   id: string;
@@ -18,33 +19,23 @@ interface Categoria {
   templateUrl: './receitas-form.component.html',
   styleUrl: './receitas-form.component.css'
 })
-export class ReceitasFormComponent {
+export class ReceitasFormComponent implements OnInit {
   form: FormGroup;
   receitaId = signal<string | null>(null);
   isEdicao = signal(false);
-
-  categorias: Categoria[] = [
-    { id: '1', nome: 'Salário', icone: 'briefcase', cor: '#006947' },
-    { id: '2', nome: 'Freelance', icone: 'code', cor: '#0057bd' },
-    { id: '3', nome: 'Aluguel', icone: 'home', cor: '#69f6b8' },
-    { id: '4', nome: 'Investimentos', icone: 'trending-up', cor: '#6e9fff' },
-    { id: '5', nome: 'Vendas', icone: 'shopping-bag', cor: '#ff928b' },
-    { id: '6', nome: 'Bônus', icone: 'award', cor: '#006947' },
-    { id: '7', nome: 'Outros', icone: 'dollar-sign', cor: '#69f6b8' }
-  ];
+  categorias: Categoria[] = [];
 
   formasRecebimento = [
     { id: 'dinheiro', nome: 'Dinheiro', icone: 'dollar-sign' },
     { id: 'pix', nome: 'PIX', icone: 'smartphone' },
-    { id: 'transferencia', nome: 'Transferência', icone: 'send' },
-    { id: 'cheque', nome: 'Cheque', icone: 'file-text' },
-    { id: 'credito-conta', nome: 'Crédito em Conta', icone: 'credit-card' }
+    { id: 'transferencia', nome: 'Transferência', icone: 'send' }
   ];
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private categoriaService: CategoriaService
   ) {
     this.form = this.fb.group({
       descricao: ['', [Validators.required, Validators.minLength(3)]],
@@ -76,6 +67,30 @@ export class ReceitasFormComponent {
       }
       this.form.get('frequenciaRecorrencia')?.updateValueAndValidity();
       this.form.get('dataRecorrenciaFim')?.updateValueAndValidity();
+    });
+  }
+
+  ngOnInit() {
+    this.carregarCategorias();
+  }
+
+  carregarCategorias() {
+    this.categoriaService.listar().subscribe({
+      next: (response) => {
+        if (response.success && Array.isArray(response.data)) {
+          this.categorias = (response.data as CategoriaAPI[])
+            .filter(c => c.tipo === 'receita' && c.ativo)
+            .map(c => ({
+              id: c._id || '',
+              nome: c.nome,
+              icone: c.icone || 'dollar-sign',
+              cor: c.cor || '#006947'
+            }));
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao carregar categorias:', error);
+      }
     });
   }
 
@@ -121,7 +136,7 @@ export class ReceitasFormComponent {
 
   getCategoriaSelecionada(): Categoria | undefined {
     const categoriaId = this.form.get('categoriaId')?.value;
-    return this.categorias.find(c => c.id === categoriaId);
+    return this.categorias.find(c => c._id === categoriaId);
   }
 
   selecionarCategoria(categoriaId: string) {
