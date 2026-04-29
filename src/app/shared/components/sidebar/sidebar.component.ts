@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
+import { SidebarService } from '../../services/sidebar.service';
 
 interface MenuItem {
   label: string;
@@ -17,7 +18,7 @@ interface MenuItem {
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent {
-  isCollapsed = signal(false);
+  sidebarService = inject(SidebarService);
 
   menuItems: MenuItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: 'bar-chart-2' },
@@ -29,6 +30,10 @@ export class SidebarComponent {
   ];
 
   toggleSidebar() {
-    this.isCollapsed.set(!this.isCollapsed());
+    this.sidebarService.toggle();
+  }
+
+  get isCollapsed() {
+    return this.sidebarService.isCollapsed;
   }
 }
