@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, ActivatedRoute } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
 import { CartaoService } from '../../shared/services/cartao.service';
+import { CurrencyMaskDirective } from '../../shared/directives/currency-mask.directive';
 
 interface Bandeira {
   id: string;
@@ -14,7 +15,7 @@ interface Bandeira {
 @Component({
   selector: 'app-cartoes-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FeatherModule],
+  imports: [CommonModule, ReactiveFormsModule, FeatherModule, CurrencyMaskDirective],
   templateUrl: './cartoes-form.component.html',
   styleUrl: './cartoes-form.component.css'
 })

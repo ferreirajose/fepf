@@ -128,9 +128,9 @@
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#820AD1] font-inter font-bold">R$</span>
                 <input
                   id="limite"
-                  type="number"
-                  step="0.01"
+                  type="text"
                   formControlName="limite"
+                  appCurrencyMask
                   placeholder="0,00"
                   class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-[#820AD1] placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter font-bold text-xl transition-all"
                   [ngClass]="form.get('limite')?.invalid && form.get('limite')?.touched ? 'ring-2 ring-[#b31b25]' : ''"

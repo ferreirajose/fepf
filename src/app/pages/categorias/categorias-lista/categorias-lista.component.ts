@@ -91,6 +91,27 @@ export class CategoriasListaComponent implements OnInit {
     }
   }
 
+  adicionarSubcategoria(categoriaId: string, event: Event) {
+    event.stopPropagation();
+    const nome = prompt('Digite o nome da subcategoria:');
+    if (nome && nome.trim()) {
+      this.categoriaService.adicionarSubcategoria(categoriaId, nome.trim()).subscribe({
+        next: (response) => {
+          if (response.success && response.data && !Array.isArray(response.data)) {
+            // Atualizar a lista de categorias
+            this.carregarCategorias();
+          } else {
+            alert('Erro ao adicionar subcategoria: ' + (response.error || 'Erro desconhecido'));
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao adicionar subcategoria:', err);
+          alert('Não foi possível adicionar a subcategoria');
+        }
+      });
+    }
+  }
+
   excluirSubcategoria(categoriaId: string, subcategoriaId: string, event: Event) {
     event.stopPropagation();
     if (confirm('Deseja realmente excluir esta subcategoria?')) {

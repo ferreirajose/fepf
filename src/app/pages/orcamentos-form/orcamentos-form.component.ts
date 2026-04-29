@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
 import { OrcamentoService } from '../../shared/services/orcamento.service';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
+import { CurrencyMaskDirective } from '../../shared/directives/currency-mask.directive';
 
 interface Categoria {
   id: string;
@@ -16,7 +17,7 @@ interface Categoria {
 @Component({
   selector: 'app-orcamentos-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FeatherModule],
+  imports: [CommonModule, ReactiveFormsModule, FeatherModule, CurrencyMaskDirective],
   templateUrl: './orcamentos-form.component.html',
   styleUrl: './orcamentos-form.component.css'
 })

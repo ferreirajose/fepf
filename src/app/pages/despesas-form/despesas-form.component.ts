@@ -1,12 +1,13 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 import { DespesaService } from '../../shared/services/despesa.service';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
 import { CartaoService, Cartao as CartaoAPI } from '../../shared/services/cartao.service';
+import { CurrencyMaskDirective } from '../../shared/directives/currency-mask.directive';
 
 interface Categoria {
   id: string;
@@ -24,7 +25,7 @@ interface Cartao {
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FeatherModule, SafeUrlPipe],
+  imports: [CommonModule, ReactiveFormsModule, FeatherModule, SafeUrlPipe, RouterLink, CurrencyMaskDirective],
   templateUrl: './despesas-form.component.html',
   styleUrl: './despesas-form.component.css'
 })
