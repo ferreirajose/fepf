@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
+import { NgxMaskDirective } from 'ngx-mask';
 import { CartaoService } from '../../shared/services/cartao.service';
-import { CurrencyMaskDirective } from '../../shared/directives/currency-mask.directive';
 
 interface Bandeira {
   id: string;
@@ -15,7 +15,7 @@ interface Bandeira {
 @Component({
   selector: 'app-cartoes-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FeatherModule, CurrencyMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, FeatherModule, NgxMaskDirective],
   templateUrl: './cartoes-form.component.html',
   styleUrl: './cartoes-form.component.css'
 })
@@ -97,11 +97,19 @@ export class CartoesFormComponent {
       this.erro.set(null);
 
       const formValue = this.form.value;
+
+      // Converter valor formatado para número
+      let limiteNumerico = 0;
+      if (formValue.limite) {
+        const valorString = String(formValue.limite);
+        limiteNumerico = parseFloat(valorString.replace(/\./g, '').replace(',', '.'));
+      }
+
       const cartaoData = {
         nome: formValue.nome,
         bandeira: formValue.bandeira,
         dono: formValue.dono || undefined,
-        limite: parseFloat(formValue.limite),
+        limite: limiteNumerico,
         diaVencimento: parseInt(formValue.diaVencimento),
         diaFechamento: parseInt(formValue.diaFechamento),
         ativo: formValue.ativo

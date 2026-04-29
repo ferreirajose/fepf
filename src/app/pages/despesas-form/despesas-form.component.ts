@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
+import { NgxMaskDirective } from 'ngx-mask';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 import { DespesaService } from '../../shared/services/despesa.service';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
 import { CartaoService, Cartao as CartaoAPI } from '../../shared/services/cartao.service';
-import { CurrencyMaskDirective } from '../../shared/directives/currency-mask.directive';
+import { environment } from '../../../environments/environment';
 
 interface Categoria {
   id: string;
@@ -25,7 +26,7 @@ interface Cartao {
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, FeatherModule, SafeUrlPipe, RouterLink, CurrencyMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, FeatherModule, SafeUrlPipe, RouterLink, NgxMaskDirective],
   templateUrl: './despesas-form.component.html',
   styleUrl: './despesas-form.component.css'
 })
@@ -210,9 +211,16 @@ export class DespesasFormComponent implements OnInit {
         };
       }
 
+      // Converter valor formatado para número
+      let valorNumerico = 0;
+      if (formValue.valor) {
+        const valorString = String(formValue.valor);
+        valorNumerico = parseFloat(valorString.replace(/\./g, '').replace(',', '.'));
+      }
+
       const despesaData = {
         descricao: formValue.descricao,
-        valor: parseFloat(formValue.valor),
+        valor: valorNumerico,
         data: formValue.data,
         categoriaId: formValue.categoriaId,
         cartaoId: formValue.cartaoId || undefined,
@@ -270,13 +278,6 @@ export class DespesasFormComponent implements OnInit {
     return this.formasPagamento.find(f => f.id === formaPagamento);
   }
 
-  formatarValorMoeda(event: any) {
-    let valor = event.target.value;
-    valor = valor.replace(/\D/g, '');
-    valor = (parseFloat(valor) / 100).toFixed(2);
-    this.form.patchValue({ valor: parseFloat(valor) }, { emitEvent: false });
-  }
-
   capturarLocalizacao() {
     if (!navigator.geolocation) {
       this.erroLocalizacao.set('Geolocalização não suportada pelo navegador');
@@ -328,26 +329,32 @@ export class DespesasFormComponent implements OnInit {
   }
 
   obterEndereco(latitude: number, longitude: number) {
-    // Usar API do Nominatim (OpenStreetMap) para reverse geocoding
-    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+    const apiKey = environment.googleMapsApiKey;
+
+    if (!apiKey) {
+      console.warn('Google Maps API key não configurada');
+      return;
+    }
+
+    fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`)
       .then(response => response.json())
       .then(data => {
-        if (data && data.display_name) {
-          // Usar setTimeout para evitar ExpressionChangedAfterItHasBeenCheckedError
+        if (data && data.status === 'OK' && data.results && data.results.length > 0) {
+          const endereco = data.results[0].formatted_address;
+
           setTimeout(() => {
             this.form.patchValue({
               localizacao: {
                 latitude,
                 longitude,
-                endereco: data.display_name
+                endereco: endereco
               }
             });
           }, 0);
         }
       })
-      .catch(() => {
-        // Se falhar, manter apenas as coordenadas
-        console.warn('Não foi possível obter o endereço');
+      .catch((error) => {
+        console.warn('Não foi possível obter o endereço:', error);
       });
   }
 
@@ -371,21 +378,27 @@ export class DespesasFormComponent implements OnInit {
       return;
     }
 
+    const apiKey = environment.googleMapsApiKey;
+
+    if (!apiKey) {
+      this.erroLocalizacao.set('Google Maps API key não configurada');
+      return;
+    }
+
     this.buscandoCoordenadas.set(true);
     this.erroLocalizacao.set(null);
 
-    // Usar API do Nominatim (OpenStreetMap) para geocoding
     const enderecoEncoded = encodeURIComponent(endereco.trim());
-    fetch(`https://nominatim.openstreetmap.org/search?q=${enderecoEncoded}&format=json&limit=1`)
+    fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${enderecoEncoded}&key=${apiKey}`)
       .then(response => response.json())
       .then(data => {
         this.buscandoCoordenadas.set(false);
 
-        if (data && data.length > 0) {
-          const resultado = data[0];
-          const latitude = parseFloat(resultado.lat);
-          const longitude = parseFloat(resultado.lon);
-          const enderecoCompleto = resultado.display_name;
+        if (data && data.status === 'OK' && data.results && data.results.length > 0) {
+          const resultado = data.results[0];
+          const latitude = resultado.geometry.location.lat;
+          const longitude = resultado.geometry.location.lng;
+          const enderecoCompleto = resultado.formatted_address;
 
           setTimeout(() => {
             this.form.patchValue({
@@ -396,8 +409,10 @@ export class DespesasFormComponent implements OnInit {
               }
             });
           }, 0);
-        } else {
+        } else if (data && data.status === 'ZERO_RESULTS') {
           this.erroLocalizacao.set('Endereço não encontrado. Tente ser mais específico (ex: "Rua X, Cidade, Estado")');
+        } else {
+          this.erroLocalizacao.set(`Erro: ${data?.error_message || data?.status || 'Erro ao buscar o endereço'}`);
         }
       })
       .catch((error) => {

@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
+import { NgxMaskDirective } from 'ngx-mask';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
 import { ReceitaService } from '../../shared/services/receita.service';
-import { CurrencyMaskDirective } from '../../shared/directives/currency-mask.directive';
 
 interface Categoria {
   id: string;
@@ -17,7 +17,7 @@ interface Categoria {
 @Component({
   selector: 'app-receitas-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FeatherModule, RouterLink, CurrencyMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, FeatherModule, RouterLink, NgxMaskDirective],
   templateUrl: './receitas-form.component.html',
   styleUrl: './receitas-form.component.css'
 })
@@ -138,9 +138,17 @@ export class ReceitasFormComponent implements OnInit {
       this.erro.set(null);
 
       const formValue = this.form.value;
+
+      // Converter valor formatado para número
+      let valorNumerico = 0;
+      if (formValue.valor) {
+        const valorString = String(formValue.valor);
+        valorNumerico = parseFloat(valorString.replace(/\./g, '').replace(',', '.'));
+      }
+
       const receitaData = {
         descricao: formValue.descricao,
-        valor: parseFloat(formValue.valor),
+        valor: valorNumerico,
         data: formValue.data,
         categoriaId: formValue.categoriaId,
         recorrente: formValue.recorrente,

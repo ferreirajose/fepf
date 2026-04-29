@@ -4,7 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:local": "NG_APP_API_URL=http://localhost:3000 NG_APP_ENVIRONMENT=development ng serve",
+    "start:prod": "NG_APP_API_URL=https://fepf-api.vercel.app NG_APP_ENVIRONMENT=production ng serve",
     "build": "ng build",
+    "build:prod": "NG_APP_API_URL=https://fepf-api.vercel.app NG_APP_ENVIRONMENT=production ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -19,10 +22,10 @@
     "@angular/router": "^21.2.0",
     "@googlemaps/markerclusterer": "^2.6.2",
     "angular-feather": "^6.5.1",
-    "@vercel/analytics": "^2.0.1",
     "chart.js": "^4.5.1",
     "feather-icons": "^4.29.2",
     "ng2-charts": "^10.0.0",
+    "ngx-mask": "^21.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

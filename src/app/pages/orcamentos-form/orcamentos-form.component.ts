@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FeatherModule } from 'angular-feather';
+import { NgxMaskDirective } from 'ngx-mask';
 import { OrcamentoService } from '../../shared/services/orcamento.service';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
-import { CurrencyMaskDirective } from '../../shared/directives/currency-mask.directive';
 
 interface Categoria {
   id: string;
@@ -17,7 +17,7 @@ interface Categoria {
 @Component({
   selector: 'app-orcamentos-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FeatherModule, CurrencyMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, FeatherModule, NgxMaskDirective],
   templateUrl: './orcamentos-form.component.html',
   styleUrl: './orcamentos-form.component.css'
 })
@@ -127,9 +127,17 @@ export class OrcamentosFormComponent implements OnInit {
       this.erro.set(null);
 
       const formValue = this.form.value;
+
+      // Converter valor formatado para número
+      let valorNumerico = 0;
+      if (formValue.valorPlanejado) {
+        const valorString = String(formValue.valorPlanejado);
+        valorNumerico = parseFloat(valorString.replace(/\./g, '').replace(',', '.'));
+      }
+
       const orcamentoData = {
         categoriaId: formValue.categoriaId,
-        valor: parseFloat(formValue.valorPlanejado),
+        valor: valorNumerico,
         mes: formValue.mes,
         ano: formValue.ano,
         observacoes: formValue.descricao || undefined
