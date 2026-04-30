@@ -5,8 +5,9 @@
     <div class="mb-8">
       <div class="flex items-center space-x-4 mb-4">
         <button
-          (click)="cancelar()" class="p-2 text-[#515981] hover:bg-white rounded-xl transition-colors">
-          <i class="ri-arrow-left-line"></i>
+          (click)="cancelar()"
+          class="p-2 text-[#515981] hover:bg-white rounded-xl transition-colors">
+          <i-feather name="arrow-left" class="w-6 h-6"></i-feather>
         </button>
         <div>
           <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
@@ -27,7 +28,7 @@
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center">
-              <i class="ri-file-text-line text-white"></i>
+              <i-feather name="file-text" class="w-5 h-5 text-white"></i-feather>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Informações Básicas</h2>
           </div>
@@ -42,11 +43,13 @@
                 id="descricao"
                 type="text"
                 formControlName="descricao"
-                placeholder="Ex: Supermercado Extra" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
+                placeholder="Ex: Supermercado Extra"
+                class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
                 [ngClass]="form.get('descricao')?.invalid && form.get('descricao')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
               />
-              <p *ngIf="form.get('descricao')?.invalid && form.get('descricao')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
-                <i class="ri-alert-line"></i>
+              <p *ngIf="form.get('descricao')?.invalid && form.get('descricao')?.touched"
+                 class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+                <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
                 <span>A descrição deve ter no mínimo 3 caracteres</span>
               </p>
             </div>
@@ -66,12 +69,14 @@
                   thousandSeparator="."
                   decimalMarker=","
                   [dropSpecialCharacters]="false"
-                  placeholder="0,00" class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter font-bold text-2xl transition-all"
+                  placeholder="0,00"
+                  class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter font-bold text-2xl transition-all"
                   [ngClass]="form.get('valor')?.invalid && form.get('valor')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
                 />
               </div>
-              <p *ngIf="form.get('valor')?.invalid && form.get('valor')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
-                <i class="ri-alert-line"></i>
+              <p *ngIf="form.get('valor')?.invalid && form.get('valor')?.touched"
+                 class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+                <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
                 <span>Informe um valor válido</span>
               </p>
             </div>
@@ -85,7 +90,8 @@
                 <input
                   id="data"
                   type="date"
-                  formControlName="data" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
+                  formControlName="data"
+                  class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
                   [ngClass]="form.get('data')?.invalid && form.get('data')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
                 />
               </div>
@@ -97,7 +103,7 @@
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
-              <i class="ri-price-tag-line text-white"></i>
+              <i-feather name="tag" class="w-5 h-5 text-white"></i-feather>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Categoria</h2>
           </div>
@@ -106,7 +112,8 @@
             <button
               type="button"
               *ngFor="let categoria of categorias"
-              (click)="selecionarCategoria(categoria.id)" class="p-4 rounded-xl transition-all hover:scale-105"
+              (click)="selecionarCategoria(categoria.id)"
+              class="p-4 rounded-xl transition-all hover:scale-105"
               [ngClass]="form.get('categoriaId')?.value === categoria.id
                 ? 'bg-gradient-to-br shadow-lg ring-2 ring-offset-2'
                 : 'bg-[#efefff] hover:bg-[#dde1ff]'"
@@ -114,8 +121,10 @@
               [style.color]="form.get('categoriaId')?.value === categoria.id ? 'white' : '#515981'"
               [style.border-color]="form.get('categoriaId')?.value === categoria.id ? categoria.cor : 'transparent'">
               <div class="flex flex-col items-center space-y-2">
-                <i [class]="'ri-' + categoria.icone + '-line w-6 h-6'">
-                </i>
+                <i-feather
+                  [name]="categoria.icone"
+                  class="w-6 h-6">
+                </i-feather>
                 <span class="text-xs font-bold font-inter">{{ categoria.nome }}</span>
               </div>
             </button>
@@ -125,8 +134,9 @@
             <p class="text-[#515981] font-inter">Nenhuma categoria encontrada. <a routerLink="/categorias" class="text-primary font-bold hover:underline">Cadastre uma categoria</a></p>
           </div>
 
-          <p *ngIf="form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched" class="text-[#b31b25] text-xs mt-4 font-inter flex items-center space-x-1">
-            <i class="ri-alert-line"></i>
+          <p *ngIf="form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched"
+             class="text-[#b31b25] text-xs mt-4 font-inter flex items-center space-x-1">
+            <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
             <span>Selecione uma categoria</span>
           </p>
         </div>
@@ -135,22 +145,24 @@
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl flex items-center justify-center">
-              <i class="ri-bank-card-line text-white"></i>
+              <i-feather name="credit-card" class="w-5 h-5 text-white"></i-feather>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Forma de Pagamento</h2>
           </div>
 
           <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
             <label
-              *ngFor="let forma of formasPagamento" class="relative cursor-pointer">
+              *ngFor="let forma of formasPagamento"
+              class="relative cursor-pointer">
               <input
                 type="radio"
                 formControlName="formaPagamento"
-                [value]="forma.id" class="peer sr-only"
+                [value]="forma.id"
+                class="peer sr-only"
               />
               <div class="p-4 bg-[#efefff] rounded-xl text-center font-inter transition-all hover:bg-[#dde1ff] peer-checked:bg-gradient-to-br peer-checked:from-[#006947] peer-checked:to-[#69f6b8] peer-checked:text-white peer-checked:shadow-lg">
                 <img *ngIf="forma.id === 'pix'" src="/icons/pix.svg" class="w-5 h-5 mx-auto mb-2" alt="PIX">
-                <i *ngIf="forma.id !== 'pix'" [class]="'ri-' + forma.icone + '-line'" class="w-5 h-5 mx-auto mb-2"></i>
+                <i-feather *ngIf="forma.id !== 'pix'" [name]="forma.icone" class="w-5 h-5 mx-auto mb-2"></i-feather>
                 <span class="text-xs font-bold block">{{ forma.nome }}</span>
               </div>
             </label>
@@ -163,15 +175,17 @@
             </label>
             <select
               id="cartaoId"
-              formControlName="cartaoId" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
+              formControlName="cartaoId"
+              class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
               [ngClass]="form.get('cartaoId')?.invalid && form.get('cartaoId')?.touched ? 'ring-2 ring-[#b31b25]' : ''">
               <option value="">Selecione um cartão</option>
               <option *ngFor="let cartao of cartoes" [value]="cartao.id">
                 {{ cartao.nome }} ({{ cartao.bandeira }})
               </option>
             </select>
-            <p *ngIf="form.get('cartaoId')?.invalid && form.get('cartaoId')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
-              <i class="ri-alert-line"></i>
+            <p *ngIf="form.get('cartaoId')?.invalid && form.get('cartaoId')?.touched"
+               class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+              <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
               <span>Selecione um cartão</span>
             </p>
           </div>
@@ -181,7 +195,7 @@
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center">
-              <i class="ri-settings-line text-white"></i>
+              <i-feather name="settings" class="w-5 h-5 text-white"></i-feather>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Configurações</h2>
           </div>
@@ -190,7 +204,7 @@
             <!-- Status de Pagamento -->
             <div class="flex items-center justify-between p-4 bg-[#efefff] rounded-xl">
               <div class="flex items-center space-x-3">
-                <i class="ri-checkbox-circle-line text-[#006947]"></i>
+                <i-feather name="check-circle" class="w-5 h-5 text-[#006947]"></i-feather>
                 <div>
                   <p class="text-sm font-bold text-on-surface font-inter">Despesa já paga?</p>
                   <p class="text-xs text-[#515981] font-inter">Marque se a despesa já foi quitada</p>
@@ -205,7 +219,7 @@
             <!-- Recorrente -->
             <div class="flex items-center justify-between p-4 bg-[#efefff] rounded-xl">
               <div class="flex items-center space-x-3">
-                <i class="ri-repeat-line text-primary"></i>
+                <i-feather name="repeat" class="w-5 h-5 text-primary"></i-feather>
                 <div>
                   <p class="text-sm font-bold text-on-surface font-inter">Despesa recorrente?</p>
                   <p class="text-xs text-[#515981] font-inter">A despesa se repete mensalmente</p>
@@ -225,7 +239,8 @@
                 </label>
                 <select
                   id="frequenciaRecorrencia"
-                  formControlName="frequenciaRecorrencia" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter">
+                  formControlName="frequenciaRecorrencia"
+                  class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter">
                   <option value="semanal">Semanal</option>
                   <option value="mensal">Mensal</option>
                   <option value="anual">Anual</option>
@@ -238,7 +253,8 @@
                 <input
                   id="dataRecorrenciaFim"
                   type="date"
-                  formControlName="dataRecorrenciaFim" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter"
+                  formControlName="dataRecorrenciaFim"
+                  class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter"
                 />
               </div>
             </div>
@@ -252,7 +268,8 @@
                 id="observacoes"
                 formControlName="observacoes"
                 rows="3"
-                placeholder="Adicione observações adicionais sobre esta despesa..." class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter resize-none">
+                placeholder="Adicione observações adicionais sobre esta despesa..."
+                class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter resize-none">
               </textarea>
             </div>
           </div>
@@ -262,7 +279,7 @@
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
-              <i class="ri-map-pin-line text-white"></i>
+              <i-feather name="map-pin" class="w-5 h-5 text-white"></i-feather>
             </div>
             <div class="flex-1">
               <h2 class="text-xl font-bold text-on-surface font-manrope">Localização</h2>
@@ -274,14 +291,15 @@
             <!-- Opção 1: GPS Automático -->
             <div class="p-4 bg-[#efefff] rounded-xl">
               <div class="flex items-center space-x-2 mb-3">
-                <i class="ri-navigation-line text-[#0057bd]"></i>
+                <i-feather name="navigation" class="w-4 h-4 text-[#0057bd]"></i-feather>
                 <h3 class="text-sm font-bold text-on-surface font-inter">Opção 1: GPS Automático</h3>
               </div>
               <button
                 type="button"
                 (click)="capturarLocalizacao()"
-                [disabled]="capturandoLocalizacao()" class="w-full bg-gradient-to-r from-[#0057bd] to-[#6e9fff] text-white px-4 py-3 rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-2">
-                <i [class]="capturandoLocalizacao() ? 'ri-loader-line' : 'ri-map-pin-line'" class="w-4 h-4" [ngClass]="{'animate-spin': capturandoLocalizacao()}"></i>
+                [disabled]="capturandoLocalizacao()"
+                class="w-full bg-gradient-to-r from-[#0057bd] to-[#6e9fff] text-white px-4 py-3 rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-2">
+                <i-feather [name]="capturandoLocalizacao() ? 'loader' : 'map-pin'" class="w-4 h-4" [ngClass]="{'animate-spin': capturandoLocalizacao()}"></i-feather>
                 <span>{{ capturandoLocalizacao() ? 'Capturando...' : 'Capturar Localização Atual' }}</span>
               </button>
             </div>
@@ -299,7 +317,7 @@
             <!-- Opção 2: Endereço Manual -->
             <div class="p-4 bg-[#efefff] rounded-xl">
               <div class="flex items-center space-x-2 mb-3">
-                <i class="ri-edit-2-line text-[#0057bd]"></i>
+                <i-feather name="edit-3" class="w-4 h-4 text-[#0057bd]"></i-feather>
                 <h3 class="text-sm font-bold text-on-surface font-inter">Opção 2: Digite o Endereço</h3>
               </div>
               <div class="space-y-3">
@@ -307,12 +325,14 @@
                   type="text"
                   [(ngModel)]="enderecoManual"
                   [ngModelOptions]="{standalone: true}"
-                  placeholder="Ex: Rua XV de Novembro, 123, Centro, João Pessoa, PB" class="w-full px-4 py-3 bg-white border-2 border-[#a3abd7]/30 rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:border-[#0057bd] font-inter text-sm">
+                  placeholder="Ex: Rua XV de Novembro, 123, Centro, João Pessoa, PB"
+                  class="w-full px-4 py-3 bg-white border-2 border-[#a3abd7]/30 rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:border-[#0057bd] font-inter text-sm">
                 <button
                   type="button"
                   (click)="buscarCoordenadasPorEndereco()"
-                  [disabled]="buscandoCoordenadas() || !enderecoManual() || enderecoManual().length < 5" class="w-full bg-white border-2 border-[#0057bd] text-[#0057bd] px-4 py-3 rounded-xl font-bold text-sm hover:bg-[#0057bd] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-[#0057bd] font-inter flex items-center justify-center space-x-2">
-                  <i [class]="buscandoCoordenadas() ? 'ri-loader-line' : 'ri-search-line'" class="w-4 h-4" [ngClass]="{'animate-spin': buscandoCoordenadas()}"></i>
+                  [disabled]="buscandoCoordenadas() || !enderecoManual() || enderecoManual().length < 5"
+                  class="w-full bg-white border-2 border-[#0057bd] text-[#0057bd] px-4 py-3 rounded-xl font-bold text-sm hover:bg-[#0057bd] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-[#0057bd] font-inter flex items-center justify-center space-x-2">
+                  <i-feather [name]="buscandoCoordenadas() ? 'loader' : 'search'" class="w-4 h-4" [ngClass]="{'animate-spin': buscandoCoordenadas()}"></i-feather>
                   <span>{{ buscandoCoordenadas() ? 'Buscando...' : 'Buscar Coordenadas' }}</span>
                 </button>
               </div>
@@ -322,15 +342,16 @@
             <button
               type="button"
               (click)="limparLocalizacao()"
-              *ngIf="getLocalizacao().latitude" class="w-full bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-4 py-3 rounded-xl font-bold text-sm hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-2">
-              <i class="ri-close-line"></i>
+              *ngIf="getLocalizacao().latitude"
+              class="w-full bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-4 py-3 rounded-xl font-bold text-sm hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-2">
+              <i-feather name="x" class="w-4 h-4"></i-feather>
               <span>Limpar Localização</span>
             </button>
 
             <!-- Erro -->
             <div *ngIf="erroLocalizacao()" class="p-4 bg-[#ff928b]/10 border border-[#ff928b] rounded-xl">
               <div class="flex items-center space-x-2 text-[#b51621]">
-                <i class="ri-alert-line"></i>
+                <i-feather name="alert-circle" class="w-4 h-4"></i-feather>
                 <p class="text-sm font-inter font-bold">{{ erroLocalizacao() }}</p>
               </div>
             </div>
@@ -340,7 +361,7 @@
               <!-- Título da Seção de Localização Capturada -->
               <div class="flex items-center justify-between p-3 bg-gradient-to-r from-[#006947] to-[#69f6b8] rounded-xl">
                 <div class="flex items-center space-x-2">
-                  <i class="ri-checkbox-circle-line text-white"></i>
+                  <i-feather name="check-circle" class="w-5 h-5 text-white"></i-feather>
                   <span class="text-sm font-bold text-white font-inter">Localização Capturada com Sucesso!</span>
                 </div>
               </div>
@@ -348,7 +369,7 @@
               <!-- Endereço Completo (Destaque) -->
               <div *ngIf="getLocalizacao().endereco" class="p-4 bg-gradient-to-br from-[#0057bd]/5 to-[#6e9fff]/5 border-2 border-[#0057bd]/20 rounded-xl">
                 <div class="flex items-start space-x-3">
-                  <i class="ri-map-pin-line text-[#0057bd] mt-0.5 flex-shrink-0"></i>
+                  <i-feather name="map-pin" class="w-6 h-6 text-[#0057bd] mt-0.5 flex-shrink-0"></i-feather>
                   <div class="flex-1">
                     <p class="text-xs text-[#515981] font-inter mb-2 font-bold uppercase tracking-wide">Endereço Registrado</p>
                     <p class="text-base font-bold text-on-surface font-inter leading-relaxed">
@@ -374,7 +395,7 @@
               <!-- Coordenadas -->
               <div class="p-4 bg-[#efefff] rounded-xl">
                 <div class="flex items-start space-x-3">
-                  <i class="ri-navigation-line text-[#515981] mt-0.5"></i>
+                  <i-feather name="navigation" class="w-5 h-5 text-[#515981] mt-0.5"></i-feather>
                   <div class="flex-1">
                     <p class="text-xs text-[#515981] font-inter mb-1">Coordenadas GPS</p>
                     <p class="text-sm font-mono font-bold text-on-surface font-inter">
@@ -387,15 +408,16 @@
               <!-- Link do Google Maps -->
               <a
                 [href]="'https://www.google.com/maps?q=' + getLocalizacao().latitude + ',' + getLocalizacao().longitude"
-                target="_blank" class="flex items-center justify-center space-x-2 p-3 bg-white border-2 border-[#0057bd]/30 text-[#0057bd] rounded-xl font-bold text-sm hover:bg-[#0057bd] hover:text-white hover:border-[#0057bd] transition-all font-inter">
-                <i class="ri-external-link-line"></i>
+                target="_blank"
+                class="flex items-center justify-center space-x-2 p-3 bg-white border-2 border-[#0057bd]/30 text-[#0057bd] rounded-xl font-bold text-sm hover:bg-[#0057bd] hover:text-white hover:border-[#0057bd] transition-all font-inter">
+                <i-feather name="external-link" class="w-4 h-4"></i-feather>
                 <span>Abrir no Google Maps</span>
               </a>
             </div>
 
             <!-- Estado Vazio -->
             <div *ngIf="!getLocalizacao().latitude && !erroLocalizacao()" class="p-6 bg-[#efefff] rounded-xl text-center">
-              <i class="ri-map-pin-line text-[#515981]/30 mx-auto mb-3"></i>
+              <i-feather name="map-pin" class="w-8 h-8 text-[#515981]/30 mx-auto mb-3"></i-feather>
               <p class="text-sm text-[#515981] font-inter mb-2">
                 <span class="font-bold">Localização Opcional</span>
               </p>
@@ -404,7 +426,7 @@
               </p>
               <div class="p-3 bg-white rounded-lg border border-[#a3abd7]/20">
                 <p class="text-xs text-[#515981] font-inter mb-1">
-                  <i class="ri-information-line inline mr-1"></i>
+                  <i-feather name="info" class="w-3 h-3 inline mr-1"></i-feather>
                   Se não informar nenhuma localização, será usada a localização padrão:
                 </p>
                 <p class="text-xs font-mono text-[#0057bd] font-bold">
@@ -419,14 +441,16 @@
         <div class="flex flex-col md:flex-row gap-4">
           <button
             type="submit"
-            [disabled]="form.invalid" class="flex-1 bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#b51621]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-3">
-            <i [class]="isEdicao() ? 'ri-checkbox-circle-line' : 'ri-save-line'" class="w-6 h-6"></i>
+            [disabled]="form.invalid"
+            class="flex-1 bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#b51621]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-3">
+            <i-feather [name]="isEdicao() ? 'check-circle' : 'save'" class="w-6 h-6"></i-feather>
             <span>{{ isEdicao() ? 'Atualizar Despesa' : 'Salvar Despesa' }}</span>
           </button>
           <button
             type="button"
-            (click)="cancelar()" class="flex-1 bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-3">
-            <i class="ri-close-line"></i>
+            (click)="cancelar()"
+            class="flex-1 bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-3">
+            <i-feather name="x" class="w-6 h-6"></i-feather>
             <span>Cancelar</span>
           </button>
         </div>

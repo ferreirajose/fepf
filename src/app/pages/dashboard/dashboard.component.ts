@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FeatherModule } from 'angular-feather';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { DespesaService } from '../../shared/services/despesa.service';
 import { ReceitaService } from '../../shared/services/receita.service';
@@ -15,7 +16,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MapClustererComponent],
+  imports: [CommonModule, FeatherModule, MapClustererComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

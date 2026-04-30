@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FeatherModule } from 'angular-feather';
 
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FeatherModule],
   template: `
     <div *ngIf="isOpen" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <!-- Backdrop -->
@@ -18,7 +19,7 @@ import { CommonModule } from '@angular/common';
           <div class="p-6 pb-4">
             <div class="flex items-start">
               <div [ngClass]="getIconClass()" class="mx-auto flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full">
-                <i [class]="getIconName() + ' h-7 w-7 text-white'"></i>
+                <i-feather [name]="getIconName()" class="h-7 w-7 text-white"></i-feather>
               </div>
             </div>
             <div class="mt-4 text-center">
@@ -79,14 +80,14 @@ export class ConfirmDialogComponent {
   getIconName(): string {
     switch (this.type) {
       case 'danger':
-        return 'ri-delete-bin-line';
+        return 'trash-2';
       case 'warning':
-        return 'ri-alert-line';
+        return 'alert-triangle';
       case 'success':
-        return 'ri-checkbox-circle-line';
+        return 'check-circle';
       case 'info':
       default:
-        return 'ri-information-line';
+        return 'info';
     }
   }
 

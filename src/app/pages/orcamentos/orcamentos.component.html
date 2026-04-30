@@ -12,8 +12,9 @@
         </p>
       </div>
       <a
-        routerLink="/orcamentos/novo" class="bg-gradient-to-r from-primary to-[#6e9fff] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
-        <i class="ri-add-circle-line" class="w-5 h-5"></i>
+        routerLink="/orcamentos/novo"
+        class="bg-gradient-to-r from-primary to-[#6e9fff] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+        <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
         <span>Criar Novo Orçamento</span>
       </a>
     </section>
@@ -22,7 +23,7 @@
     <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
-          <i class="ri-calendar-line" class="w-6 h-6 text-primary"></i>
+          <i-feather name="calendar" class="w-6 h-6 text-primary"></i-feather>
           <div>
             <p class="text-xs text-[#515981] font-inter">Período Selecionado</p>
             <h2 class="text-2xl font-extrabold text-on-surface font-manrope">
@@ -32,12 +33,14 @@
         </div>
         <div class="flex items-center space-x-2">
           <button
-            (click)="mesAnterior()" class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
-            <i class="ri-arrow-left-s-line" class="w-5 h-5"></i>
+            (click)="mesAnterior()"
+            class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+            <i-feather name="chevron-left" class="w-5 h-5"></i-feather>
           </button>
           <button
-            (click)="proximoMes()" class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
-            <i class="ri-arrow-right-s-line" class="w-5 h-5"></i>
+            (click)="proximoMes()"
+            class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+            <i-feather name="chevron-right" class="w-5 h-5"></i-feather>
           </button>
         </div>
       </div>
@@ -50,7 +53,7 @@
         <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="ri-money-dollar-circle-line" class="w-6 h-6"></i>
+              <i-feather name="dollar-sign" class="w-6 h-6"></i-feather>
             </div>
           </div>
           <p class="text-sm text-blue-100 font-inter mb-1">Total Planejado</p>
@@ -66,7 +69,7 @@
         <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="ri-arrow-down-line" class="w-6 h-6"></i>
+              <i-feather name="trending-down" class="w-6 h-6"></i-feather>
             </div>
           </div>
           <p class="text-sm text-red-100 font-inter mb-1">Total Gasto</p>
@@ -85,7 +88,7 @@
         <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="ri-arrow-up-line" class="w-6 h-6"></i>
+              <i-feather name="trending-up" class="w-6 h-6"></i-feather>
             </div>
           </div>
           <p class="text-sm text-green-100 font-inter mb-1">Saldo Restante</p>
@@ -117,16 +120,20 @@
 
       <!-- Budget Item -->
       <div
-        *ngFor="let orcamento of getOrcamentosDoMes()" class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-[0_8px_30px_rgba(36,44,81,0.06)] transition-shadow">
+        *ngFor="let orcamento of getOrcamentosDoMes()"
+        class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-[0_8px_30px_rgba(36,44,81,0.06)] transition-shadow">
 
         <div class="flex items-start justify-between mb-4">
           <!-- Category Info -->
           <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+            <div
+              class="w-12 h-12 rounded-xl flex items-center justify-center"
               [style.background-color]="orcamento.categoriaCor + '30'"
               [style.color]="orcamento.categoriaCor">
-              <i [class]="'ri-' + orcamento.categoriaIcone + '-line w-6 h-6'">
-              </i>
+              <i-feather
+                [name]="orcamento.categoriaIcone"
+                class="w-6 h-6">
+              </i-feather>
             </div>
             <div>
               <h3 class="font-bold text-lg text-on-surface font-manrope">
@@ -141,20 +148,24 @@
           <!-- Actions -->
           <div class="flex items-center space-x-2">
             <span
-              *ngIf="isExcedido(orcamento)" class="bg-[#ff928b]/20 text-[#b51621] px-3 py-1 rounded-lg text-xs font-bold font-inter">
+              *ngIf="isExcedido(orcamento)"
+              class="bg-[#ff928b]/20 text-[#b51621] px-3 py-1 rounded-lg text-xs font-bold font-inter">
               Excedido
             </span>
             <span
-              *ngIf="!isExcedido(orcamento) && getPercentualGasto(orcamento) >= 90" class="bg-[#fff3cd] text-[#856404] px-3 py-1 rounded-lg text-xs font-bold font-inter">
+              *ngIf="!isExcedido(orcamento) && getPercentualGasto(orcamento) >= 90"
+              class="bg-[#fff3cd] text-[#856404] px-3 py-1 rounded-lg text-xs font-bold font-inter">
               Alerta
             </span>
             <a
-              [routerLink]="['/orcamentos', orcamento.id, 'editar']" class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
-              <i class="ri-edit-line" class="w-5 h-5"></i>
+              [routerLink]="['/orcamentos', orcamento.id, 'editar']"
+              class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+              <i-feather name="edit-2" class="w-5 h-5"></i-feather>
             </a>
             <button
-              (click)="excluirOrcamento(orcamento.id, $event)" class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
-              <i class="ri-delete-bin-line" class="w-5 h-5"></i>
+              (click)="excluirOrcamento(orcamento.id, $event)"
+              class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
+              <i-feather name="trash-2" class="w-5 h-5"></i-feather>
             </button>
           </div>
         </div>
@@ -172,7 +183,8 @@
             </span>
           </div>
           <div class="w-full bg-[#efefff] rounded-full h-3 overflow-hidden">
-            <div class="h-full rounded-full transition-all duration-300"
+            <div
+              class="h-full rounded-full transition-all duration-300"
               [ngClass]="{
                 'bg-gradient-to-r from-[#006947] to-[#69f6b8]': !isExcedido(orcamento) && getPercentualGasto(orcamento) < 90,
                 'bg-gradient-to-r from-[#ffa500] to-[#ffcc00]': !isExcedido(orcamento) && getPercentualGasto(orcamento) >= 90,
@@ -186,9 +198,10 @@
 
       <!-- Empty State -->
       <div
-        *ngIf="getOrcamentosDoMes().length === 0" class="bg-white rounded-xl p-12 text-center border-2 border-dashed border-[#a3abd7]/30">
+        *ngIf="getOrcamentosDoMes().length === 0"
+        class="bg-white rounded-xl p-12 text-center border-2 border-dashed border-[#a3abd7]/30">
         <div class="w-16 h-16 bg-[#efefff] rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="ri-pie-chart-line" class="w-8 h-8 text-[#515981]"></i>
+          <i-feather name="pie-chart" class="w-8 h-8 text-[#515981]"></i-feather>
         </div>
         <h3 class="text-lg font-bold text-on-surface mb-2 font-manrope">
           Nenhum orçamento definido para este mês
@@ -197,8 +210,9 @@
           Crie orçamentos para acompanhar seus gastos por categoria.
         </p>
         <a
-          routerLink="/orcamentos/novo" class="inline-flex items-center space-x-2 bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-primary/90 transition-colors font-inter">
-          <i class="ri-add-circle-line" class="w-5 h-5"></i>
+          routerLink="/orcamentos/novo"
+          class="inline-flex items-center space-x-2 bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-primary/90 transition-colors font-inter">
+          <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
           <span>Criar Primeiro Orçamento</span>
         </a>
       </div>
@@ -233,7 +247,7 @@
       <div class="bg-white rounded-3xl p-8 flex flex-col justify-center space-y-6 border border-[#a3abd7]/10">
         <div class="flex items-center space-x-4">
           <div class="w-16 h-16 rounded-full bg-[#69f6b8]/20 flex items-center justify-center text-[#006947]">
-            <i class="ri-bar-chart-line" class="w-8 h-8"></i>
+            <i-feather name="bar-chart-2" class="w-8 h-8"></i-feather>
           </div>
           <div>
             <p class="text-sm text-[#515981] font-inter">Desempenho Geral</p>

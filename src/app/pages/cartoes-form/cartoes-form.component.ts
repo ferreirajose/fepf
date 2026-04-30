@@ -2,6 +2,7 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { FeatherModule } from 'angular-feather';
 import { NgxMaskDirective } from 'ngx-mask';
 import { CartaoService } from '../../shared/services/cartao.service';
 
@@ -14,7 +15,7 @@ interface Bandeira {
 @Component({
   selector: 'app-cartoes-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, FeatherModule, NgxMaskDirective],
   templateUrl: './cartoes-form.component.html',
   styleUrl: './cartoes-form.component.css'
 })

@@ -99,31 +99,4 @@ export class ReceitaService {
 
     return this.http.get<{ success: boolean; data: ReceitaEstatisticas }>(`${this.apiUrl}/estatisticas`, { params });
   }
-
-  exportar(filtros?: FiltrosReceita): Observable<Blob> {
-    let params = new HttpParams();
-
-    if (filtros) {
-      if (filtros.dataInicio) {
-        params = params.set('dataInicio', filtros.dataInicio);
-      }
-      if (filtros.dataFim) {
-        params = params.set('dataFim', filtros.dataFim);
-      }
-      if (filtros.categoriaId) {
-        params = params.set('categoriaId', filtros.categoriaId);
-      }
-    }
-
-    return this.http.get(`${environment.apiUrl}/api/export/receitas`, {
-      params,
-      responseType: 'blob'
-    });
-  }
-
-  importar(arquivo: File): Observable<ReceitaResponse> {
-    const formData = new FormData();
-    formData.append('file', arquivo);
-    return this.http.post<ReceitaResponse>(`${environment.apiUrl}/api/import/receitas`, formData);
-  }
 }

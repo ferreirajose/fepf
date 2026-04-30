@@ -113,34 +113,4 @@ export class DespesaService {
 
     return this.http.get<{ success: boolean; data: DespesaEstatisticas }>(`${this.apiUrl}/estatisticas`, { params });
   }
-
-  exportar(filtros?: FiltrosDespesa): Observable<Blob> {
-    let params = new HttpParams();
-
-    if (filtros) {
-      if (filtros.dataInicio) {
-        params = params.set('dataInicio', filtros.dataInicio);
-      }
-      if (filtros.dataFim) {
-        params = params.set('dataFim', filtros.dataFim);
-      }
-      if (filtros.categoriaId) {
-        params = params.set('categoriaId', filtros.categoriaId);
-      }
-      if (filtros.cartaoId) {
-        params = params.set('cartaoId', filtros.cartaoId);
-      }
-    }
-
-    return this.http.get(`${environment.apiUrl}/api/export/despesas`, {
-      params,
-      responseType: 'blob'
-    });
-  }
-
-  importar(arquivo: File): Observable<DespesaResponse> {
-    const formData = new FormData();
-    formData.append('file', arquivo);
-    return this.http.post<DespesaResponse>(`${environment.apiUrl}/api/import/despesas`, formData);
-  }
 }

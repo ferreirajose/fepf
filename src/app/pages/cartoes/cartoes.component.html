@@ -12,8 +12,9 @@
         </p>
       </div>
       <a
-        routerLink="/cartoes/novo" class="bg-gradient-to-r from-[#820AD1] to-[#B47EDE] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-[#820AD1]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
-        <i class="ri-add-circle-line"></i>
+        routerLink="/cartoes/novo"
+        class="bg-gradient-to-r from-[#820AD1] to-[#B47EDE] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-[#820AD1]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+        <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
         <span>Novo Cartão</span>
       </a>
     </section>
@@ -26,8 +27,9 @@
           <input
             type="text"
             [(ngModel)]="filtroTexto"
-            placeholder="Buscar por nome ou bandeira..." class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter">
-          <i class="ri-search-line text-[#515981] absolute left-4 top-1/2 -translate-y-1/2"></i>
+            placeholder="Buscar por nome ou bandeira..."
+            class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter">
+          <i-feather name="search" class="w-5 h-5 text-[#515981] absolute left-4 top-1/2 -translate-y-1/2"></i-feather>
         </div>
       </div>
 
@@ -35,12 +37,14 @@
       <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
         <div class="flex items-center space-x-4">
           <select
-            [(ngModel)]="filtroBandeira" class="flex-1 px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter text-sm">
+            [(ngModel)]="filtroBandeira"
+            class="flex-1 px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter text-sm">
             <option *ngFor="let bandeira of bandeiras" [value]="bandeira.id">{{ bandeira.nome }}</option>
           </select>
 
           <select
-            [(ngModel)]="filtroStatus" class="flex-1 px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter text-sm">
+            [(ngModel)]="filtroStatus"
+            class="flex-1 px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter text-sm">
             <option value="todos">Todos Status</option>
             <option value="ativos">Ativos</option>
             <option value="inativos">Inativos</option>
@@ -56,7 +60,7 @@
         <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="ri-bank-card-line"></i>
+              <i-feather name="credit-card" class="w-6 h-6"></i-feather>
             </div>
           </div>
           <p class="text-sm text-purple-100 font-inter mb-1">Limite Total</p>
@@ -75,7 +79,7 @@
         <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="ri-checkbox-circle-line"></i>
+              <i-feather name="check-circle" class="w-6 h-6"></i-feather>
             </div>
           </div>
           <p class="text-sm text-green-100 font-inter mb-1">Limite Disponível</p>
@@ -94,7 +98,7 @@
         <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="ri-arrow-up-line"></i>
+              <i-feather name="trending-up" class="w-6 h-6"></i-feather>
             </div>
           </div>
           <p class="text-sm text-red-100 font-inter mb-1">Limite Utilizado</p>
@@ -116,22 +120,25 @@
           Meus Cartões
         </h2>
         <button
-          (click)="limparFiltros()" class="px-4 py-2 text-[#515981] hover:bg-[#efefff] rounded-xl transition-colors font-inter text-sm font-bold">
+          (click)="limparFiltros()"
+          class="px-4 py-2 text-[#515981] hover:bg-[#efefff] rounded-xl transition-colors font-inter text-sm font-bold">
           Limpar Filtros
         </button>
       </div>
 
       <!-- Card Item -->
       <div
-        *ngFor="let cartao of getCartoesFiltrados()" class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-[0_8px_30px_rgba(36,44,81,0.06)] transition-shadow">
+        *ngFor="let cartao of getCartoesFiltrados()"
+        class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-[0_8px_30px_rgba(36,44,81,0.06)] transition-shadow">
 
         <div class="flex flex-col md:flex-row md:items-center gap-6">
           <!-- Card Visual -->
-          <div class="w-full md:w-80 h-48 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden shadow-xl"
+          <div
+            class="w-full md:w-80 h-48 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden shadow-xl"
             [style.background]="'linear-gradient(135deg, ' + cartao.cor + ' 0%, ' + cartao.cor + 'DD 100%)'">
             <div class="relative z-10">
               <div class="flex items-center justify-between mb-8">
-                <i class="ri-bank-card-line text-white/80"></i>
+                <i-feather name="credit-card" class="w-8 h-8 text-white/80"></i-feather>
                 <span class="text-white/90 font-bold font-inter text-sm uppercase">{{ getBandeiraNome(cartao.bandeira) }}</span>
               </div>
               <p class="text-white font-mono text-xl mb-4 tracking-wider">•••• •••• •••• ••••</p>
@@ -176,7 +183,8 @@
                 </span>
               </div>
               <div class="w-full bg-[#efefff] rounded-full h-2 overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-300"
+                <div
+                  class="h-full rounded-full transition-all duration-300"
                   [style.width.%]="getPercentualUtilizadoCartao(cartao)"
                   [ngClass]="{
                     'bg-gradient-to-r from-[#006947] to-[#69f6b8]': getPercentualUtilizadoCartao(cartao) < 50,
@@ -195,18 +203,21 @@
                   [ngClass]="{
                     'bg-[#69f6b8]/20 text-[#006947]': cartao.ativo,
                     'bg-[#ff928b]/20 text-[#b51621]': !cartao.ativo
-                  }" class="px-3 py-1 rounded-lg text-xs font-bold font-inter transition-colors">
+                  }"
+                  class="px-3 py-1 rounded-lg text-xs font-bold font-inter transition-colors">
                   {{ cartao.ativo ? 'Ativo' : 'Inativo' }}
                 </button>
               </div>
               <div class="flex items-center space-x-2">
                 <a
-                  [routerLink]="['/cartoes', cartao.id, 'editar']" class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
-                  <i class="ri-edit-line"></i>
+                  [routerLink]="['/cartoes', cartao.id, 'editar']"
+                  class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+                  <i-feather name="edit-2" class="w-5 h-5"></i-feather>
                 </a>
                 <button
-                  (click)="excluirCartao(cartao.id, $event)" class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
-                  <i class="ri-delete-bin-line"></i>
+                  (click)="excluirCartao(cartao.id, $event)"
+                  class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
+                  <i-feather name="trash-2" class="w-5 h-5"></i-feather>
                 </button>
               </div>
             </div>
@@ -216,9 +227,10 @@
 
       <!-- Empty State -->
       <div
-        *ngIf="getCartoesFiltrados().length === 0" class="bg-white rounded-xl p-12 text-center border-2 border-dashed border-[#a3abd7]/30">
+        *ngIf="getCartoesFiltrados().length === 0"
+        class="bg-white rounded-xl p-12 text-center border-2 border-dashed border-[#a3abd7]/30">
         <div class="w-16 h-16 bg-[#efefff] rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="ri-bank-card-line text-[#515981]"></i>
+          <i-feather name="credit-card" class="w-8 h-8 text-[#515981]"></i-feather>
         </div>
         <h3 class="text-lg font-bold text-on-surface mb-2 font-manrope">
           Nenhum cartão encontrado
@@ -227,8 +239,9 @@
           Não há cartões cadastrados ou nenhum corresponde aos filtros aplicados.
         </p>
         <a
-          routerLink="/cartoes/novo" class="inline-flex items-center space-x-2 bg-gradient-to-r from-[#820AD1] to-[#B47EDE] text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity font-inter">
-          <i class="ri-add-circle-line"></i>
+          routerLink="/cartoes/novo"
+          class="inline-flex items-center space-x-2 bg-gradient-to-r from-[#820AD1] to-[#B47EDE] text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity font-inter">
+          <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
           <span>Adicionar Primeiro Cartão</span>
         </a>
       </div>

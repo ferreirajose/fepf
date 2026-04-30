@@ -2,12 +2,13 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { FeatherModule } from 'angular-feather';
 import { CategoriaService } from '../../../shared/services/categoria.service';
 
 @Component({
   selector: 'app-categorias-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FeatherModule],
   templateUrl: './categorias-form.component.html',
   styleUrl: './categorias-form.component.css'
 })

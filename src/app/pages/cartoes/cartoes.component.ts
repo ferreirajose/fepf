@@ -1,6 +1,7 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FeatherModule } from 'angular-feather';
 import { FormsModule } from '@angular/forms';
 import { CartaoService, Cartao as CartaoAPI } from '../../shared/services/cartao.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -21,7 +22,7 @@ interface Cartao {
 @Component({
   selector: 'app-cartoes',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, ConfirmDialogComponent, AlertDialogComponent],
+  imports: [CommonModule, RouterLink, FeatherModule, FormsModule, ConfirmDialogComponent, AlertDialogComponent],
   templateUrl: './cartoes.component.html',
   styleUrl: './cartoes.component.css'
 })

@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FeatherModule } from 'angular-feather';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FeatherModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })

@@ -1,15 +1,18 @@
 <aside
-  [ngClass]="isCollapsed() ? 'w-20' : 'w-64'" class="fixed left-0 top-0 h-screen bg-white shadow-lg transition-all duration-300 z-40 flex flex-col">
+  [ngClass]="isCollapsed() ? 'w-20' : 'w-64'"
+  class="fixed left-0 top-0 h-screen bg-white shadow-lg transition-all duration-300 z-40 flex flex-col">
 
   <!-- Header -->
   <div class="p-6 border-b border-gray-100">
     <div class="flex items-center justify-between">
       <h1
-        *ngIf="!isCollapsed()" class="text-2xl font-manrope font-bold text-primary">
+        *ngIf="!isCollapsed()"
+        class="text-2xl font-manrope font-bold text-primary">
         FePF
       </h1>
       <span
-        *ngIf="isCollapsed()" class="text-2xl font-manrope font-bold text-primary mx-auto">
+        *ngIf="isCollapsed()"
+        class="text-2xl font-manrope font-bold text-primary mx-auto">
         F
       </span>
     </div>
@@ -17,9 +20,12 @@
 
   <!-- Toggle Button -->
   <button
-    (click)="toggleSidebar()" class="absolute -right-3 top-20 bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-[#004ca6] transition-colors shadow-md">
-    <i [class]="isCollapsed() ? 'ri-arrow-right-s-line' : 'ri-arrow-left-s-line'">
-    </i>
+    (click)="toggleSidebar()"
+    class="absolute -right-3 top-20 bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-[#004ca6] transition-colors shadow-md">
+    <i-feather
+      [name]="isCollapsed() ? 'chevron-right' : 'chevron-left'"
+      class="w-3 h-3">
+    </i-feather>
   </button>
 
   <!-- Navigation -->
@@ -29,12 +35,16 @@
         <a
           [routerLink]="item.route"
           routerLinkActive="bg-[#e4e7ff] text-primary font-semibold"
-          [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface transition-colors group"
+          [routerLinkActiveOptions]="{exact: false}"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface transition-colors group"
           [ngClass]="isCollapsed() ? 'justify-center' : ''">
-          <i [class]="'ri-' + item.icon + '-line w-5 h-5 group-hover:scale-110 transition-transform'">
-          </i>
+          <i-feather
+            [name]="item.icon"
+            class="w-5 h-5 group-hover:scale-110 transition-transform">
+          </i-feather>
           <span
-            *ngIf="!isCollapsed()" class="font-inter text-on-surface">
+            *ngIf="!isCollapsed()"
+            class="font-inter text-on-surface">
             {{ item.label }}
           </span>
         </a>
@@ -45,13 +55,15 @@
   <!-- Footer -->
   <div class="p-4 border-t border-gray-100">
     <div
-      *ngIf="!isCollapsed()" class="text-xs text-gray-500 font-inter text-center">
+      *ngIf="!isCollapsed()"
+      class="text-xs text-gray-500 font-inter text-center">
       <p class="mb-1">FePF v1.0.0</p>
       <p class="text-[10px]">Sistema de Gestão Financeira</p>
     </div>
     <div
-      *ngIf="isCollapsed()" class="flex justify-center">
-      <i class="ri-briefcase-line text-gray-500"></i>
+      *ngIf="isCollapsed()"
+      class="flex justify-center">
+      <i-feather name="briefcase" class="w-4 h-4 text-gray-500"></i-feather>
     </div>
   </div>
 </aside>
