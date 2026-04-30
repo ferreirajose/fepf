@@ -12,9 +12,8 @@
         </p>
       </div>
       <a
-        routerLink="/categorias/novo"
-        class="bg-gradient-to-r from-primary to-[#6e9fff] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
-        <i-feather name="plus-circle" class="w-5 h-5"></i-feather>
+        routerLink="/categorias/novo" class="bg-gradient-to-r from-primary to-[#6e9fff] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+        <i class="ri-add-circle-line"></i>
         <span>Adicionar Nova Categoria</span>
       </a>
     </section>
@@ -24,25 +23,20 @@
 
       <!-- Category Card -->
       <div
-        *ngFor="let categoria of categorias()"
-        class="bg-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        *ngFor="let categoria of categorias()" class="bg-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
 
         <!-- Category Header -->
         <div
           (click)="categoria.subcategorias?.length ? toggleCategory(categoria.id) : null"
-          [ngClass]="categoria.subcategorias?.length ? 'cursor-pointer' : ''"
-          class="p-6 flex items-center justify-between hover:bg-[#efefff] transition-colors group">
+          [ngClass]="categoria.subcategorias?.length ? 'cursor-pointer' : ''" class="p-6 flex items-center justify-between hover:bg-[#efefff] transition-colors group">
 
           <div class="flex items-center space-x-5">
             <!-- Icon -->
-            <div
-              class="w-12 h-12 rounded-xl flex items-center justify-center"
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center"
               [style.background-color]="categoria.cor + '30'"
               [style.color]="categoria.cor">
-              <i-feather
-                [name]="categoria.icone || 'tag'"
-                class="w-6 h-6">
-              </i-feather>
+              <i [class]="'ri-' + (categoria.icone || 'tag') + '-line w-6 h-6'">
+              </i>
             </div>
 
             <!-- Info -->
@@ -60,33 +54,25 @@
           <div class="flex items-center space-x-2">
             <a
               [routerLink]="['/categorias', categoria.id, 'editar']"
-              (click)="$event.stopPropagation()"
-              class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
-              <i-feather name="edit-2" class="w-5 h-5"></i-feather>
+              (click)="$event.stopPropagation()" class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+              <i class="ri-edit-line"></i>
             </a>
             <button
-              (click)="excluirCategoria(categoria.id, $event)"
-              class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
-              <i-feather name="trash-2" class="w-5 h-5"></i-feather>
+              (click)="excluirCategoria(categoria.id, $event)" class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
+              <i class="ri-delete-bin-line"></i>
             </button>
-            <i-feather
-              *ngIf="categoria.subcategorias?.length"
-              [name]="isExpanded(categoria.id) ? 'chevron-down' : 'chevron-right'"
-              class="w-5 h-5 text-[#515981] ml-2 transition-transform"
-              [ngClass]="{'rotate-0': isExpanded(categoria.id)}">
-            </i-feather>
+            <i *ngIf="categoria.subcategorias?.length" [class]="isExpanded(categoria.id) ? 'ri-arrow-down-s-line w-5 h-5 text-[#515981] ml-2 transition-transform' : 'ri-arrow-right-s-line w-5 h-5 text-[#515981] ml-2 transition-transform'" [ngClass]="{'rotate-0': isExpanded(categoria.id)}">
+            </i>
           </div>
         </div>
 
         <!-- Subcategories List (Expandable) -->
         <div
-          *ngIf="categoria.subcategorias?.length && isExpanded(categoria.id)"
-          class="bg-[#efefff]/50 px-6 py-4 border-t border-[#a3abd7]/10 space-y-3">
+          *ngIf="categoria.subcategorias?.length && isExpanded(categoria.id)" class="bg-[#efefff]/50 px-6 py-4 border-t border-[#a3abd7]/10 space-y-3">
 
           <!-- Subcategory Item -->
           <div
-            *ngFor="let sub of categoria.subcategorias"
-            class="flex items-center justify-between py-2 border-b border-[#a3abd7]/5">
+            *ngFor="let sub of categoria.subcategorias" class="flex items-center justify-between py-2 border-b border-[#a3abd7]/5">
             <div class="flex items-center space-x-3">
               <div class="w-1.5 h-1.5 rounded-full bg-[#006947]"></div>
               <span class="text-sm font-medium text-on-surface font-inter">
@@ -94,23 +80,20 @@
               </span>
             </div>
             <div class="flex space-x-1">
-              <button
-                class="p-1.5 text-[#515981] hover:text-primary transition-colors">
-                <i-feather name="edit-2" class="w-4 h-4"></i-feather>
+              <button class="p-1.5 text-[#515981] hover:text-primary transition-colors">
+                <i class="ri-edit-line"></i>
               </button>
               <button
-                (click)="excluirSubcategoria(categoria.id, sub.id, $event)"
-                class="p-1.5 text-[#515981] hover:text-[#b31b25] transition-colors">
-                <i-feather name="trash-2" class="w-4 h-4"></i-feather>
+                (click)="excluirSubcategoria(categoria.id, sub.id, $event)" class="p-1.5 text-[#515981] hover:text-[#b31b25] transition-colors">
+                <i class="ri-delete-bin-line"></i>
               </button>
             </div>
           </div>
 
           <!-- Add Subcategory Button -->
           <button
-            (click)="adicionarSubcategoria(categoria.id, $event)"
-            class="w-full mt-2 py-3 border-2 border-dashed border-[#a3abd7]/30 rounded-xl text-primary text-xs font-bold hover:bg-primary/5 transition-colors flex items-center justify-center space-x-2 font-inter">
-            <i-feather name="plus" class="w-4 h-4"></i-feather>
+            (click)="adicionarSubcategoria(categoria.id, $event)" class="w-full mt-2 py-3 border-2 border-dashed border-[#a3abd7]/30 rounded-xl text-primary text-xs font-bold hover:bg-primary/5 transition-colors flex items-center justify-center space-x-2 font-inter">
+            <i class="ri-add-line"></i>
             <span>Adicionar Subcategoria</span>
           </button>
         </div>
@@ -147,7 +130,7 @@
       <!-- Stats Card -->
       <div class="bg-white rounded-3xl p-8 flex flex-col justify-center items-center text-center space-y-4 border border-[#a3abd7]/10">
         <div class="w-16 h-16 rounded-full bg-[#69f6b8] flex items-center justify-center text-[#005a3c]">
-          <i-feather name="bar-chart-2" class="w-8 h-8"></i-feather>
+          <i class="ri-bar-chart-line"></i>
         </div>
         <div>
           <p class="text-3xl font-extrabold text-on-surface font-manrope">

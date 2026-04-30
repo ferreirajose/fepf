@@ -5,9 +5,8 @@
     <div class="mb-8">
       <div class="flex items-center space-x-4 mb-4">
         <button
-          (click)="cancelar()"
-          class="p-2 text-[#515981] hover:bg-white rounded-xl transition-colors">
-          <i-feather name="arrow-left" class="w-6 h-6"></i-feather>
+          (click)="cancelar()" class="p-2 text-[#515981] hover:bg-white rounded-xl transition-colors">
+          <i class="ri-arrow-left-line"></i>
         </button>
         <div>
           <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
@@ -28,18 +27,17 @@
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-br from-[#820AD1] to-[#B47EDE] rounded-xl flex items-center justify-center">
-              <i-feather name="eye" class="w-5 h-5 text-white"></i-feather>
+              <i class="ri-eye-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Visualização do Cartão</h2>
           </div>
 
           <!-- Card Visual Preview -->
-          <div
-            class="w-full max-w-md mx-auto h-56 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden shadow-2xl"
+          <div class="w-full max-w-md mx-auto h-56 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden shadow-2xl"
             [style.background]="'linear-gradient(135deg, ' + form.get('cor')?.value + ' 0%, ' + form.get('cor')?.value + 'DD 100%)'">
             <div class="relative z-10">
               <div class="flex items-center justify-between mb-10">
-                <i-feather name="credit-card" class="w-10 h-10 text-white/80"></i-feather>
+                <i class="ri-bank-card-line text-white/80"></i>
                 <span class="text-white/90 font-bold font-inter text-sm uppercase">
                   {{ getBandeiraSelecionada()?.nome || 'Bandeira' }}
                 </span>
@@ -71,7 +69,7 @@
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-br from-[#820AD1] to-[#B47EDE] rounded-xl flex items-center justify-center">
-              <i-feather name="file-text" class="w-5 h-5 text-white"></i-feather>
+              <i class="ri-file-text-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Informações do Cartão</h2>
           </div>
@@ -86,13 +84,11 @@
                 id="nome"
                 type="text"
                 formControlName="nome"
-                placeholder="Ex: Nubank Ultravioleta"
-                class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
+                placeholder="Ex: Nubank Ultravioleta" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
                 [ngClass]="form.get('nome')?.invalid && form.get('nome')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
               />
-              <p *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched"
-                 class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
-                <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
+              <p *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+                <i class="ri-alert-line"></i>
                 <span>O nome deve ter no mínimo 3 caracteres</span>
               </p>
             </div>
@@ -106,11 +102,10 @@
                 id="dono"
                 type="text"
                 formControlName="dono"
-                placeholder="Ex: Ana, João, Maria..."
-                class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
+                placeholder="Ex: Ana, João, Maria..." class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
               />
               <p class="text-[#515981] text-xs mt-2 font-inter flex items-center space-x-1">
-                <i-feather name="info" class="w-3 h-3"></i-feather>
+                <i class="ri-information-line"></i>
                 <span>Campo opcional - Útil para identificar de quem é o cartão (ex: Nubank da Ana)</span>
               </p>
             </div>
@@ -130,14 +125,12 @@
                   thousandSeparator="."
                   decimalMarker=","
                   [dropSpecialCharacters]="false"
-                  placeholder="0,00"
-                  class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-[#820AD1] placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter font-bold text-xl transition-all"
+                  placeholder="0,00" class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-[#820AD1] placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter font-bold text-xl transition-all"
                   [ngClass]="form.get('limite')?.invalid && form.get('limite')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
                 />
               </div>
-              <p *ngIf="form.get('limite')?.invalid && form.get('limite')?.touched"
-                 class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
-                <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
+              <p *ngIf="form.get('limite')?.invalid && form.get('limite')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+                <i class="ri-alert-line"></i>
                 <span>Informe um limite válido</span>
               </p>
             </div>
@@ -148,15 +141,13 @@
                 Bandeira (vazio se personalizado) *
               </label>
               <select
-                formControlName="bandeira"
-                class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
+                formControlName="bandeira" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
                 [ngClass]="form.get('bandeira')?.invalid && form.get('bandeira')?.touched ? 'ring-2 ring-[#b31b25]' : ''">
                 <option value="">Selecione a bandeira</option>
                 <option *ngFor="let bandeira of bandeiras" [value]="bandeira.id">{{ bandeira.nome }}</option>
               </select>
-              <p *ngIf="form.get('bandeira')?.invalid && form.get('bandeira')?.touched"
-                 class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
-                <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
+              <p *ngIf="form.get('bandeira')?.invalid && form.get('bandeira')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+                <i class="ri-alert-line"></i>
                 <span>Selecione uma bandeira</span>
               </p>
             </div>
@@ -167,7 +158,7 @@
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
-              <i-feather name="calendar" class="w-5 h-5 text-white"></i-feather>
+              <i class="ri-calendar-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Datas de Cobrança</h2>
           </div>
@@ -184,13 +175,11 @@
                 min="1"
                 max="31"
                 formControlName="diaVencimento"
-                placeholder="Ex: 15"
-                class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
+                placeholder="Ex: 15" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
                 [ngClass]="form.get('diaVencimento')?.invalid && form.get('diaVencimento')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
               />
-              <p *ngIf="form.get('diaVencimento')?.invalid && form.get('diaVencimento')?.touched"
-                 class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
-                <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
+              <p *ngIf="form.get('diaVencimento')?.invalid && form.get('diaVencimento')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+                <i class="ri-alert-line"></i>
                 <span>Dia entre 1 e 31</span>
               </p>
             </div>
@@ -206,13 +195,11 @@
                 min="1"
                 max="31"
                 formControlName="diaFechamento"
-                placeholder="Ex: 10"
-                class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
+                placeholder="Ex: 10" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
                 [ngClass]="form.get('diaFechamento')?.invalid && form.get('diaFechamento')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
               />
-              <p *ngIf="form.get('diaFechamento')?.invalid && form.get('diaFechamento')?.touched"
-                 class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
-                <i-feather name="alert-circle" class="w-3 h-3"></i-feather>
+              <p *ngIf="form.get('diaFechamento')?.invalid && form.get('diaFechamento')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+                <i class="ri-alert-line"></i>
                 <span>Dia entre 1 e 31</span>
               </p>
             </div>
@@ -220,7 +207,7 @@
 
           <div class="mt-4 p-4 bg-[#efefff] rounded-xl">
             <p class="text-xs text-[#515981] font-inter">
-              <i-feather name="info" class="w-4 h-4 inline mr-1"></i-feather>
+              <i class="ri-information-line inline mr-1"></i>
               O dia de fechamento é quando o período de compras do mês se encerra. O dia de vencimento é a data limite para pagamento.
             </p>
           </div>
@@ -230,7 +217,7 @@
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center">
-              <i-feather name="droplet" class="w-5 h-5 text-white"></i-feather>
+              <i class="ri-drop-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Personalização</h2>
           </div>
@@ -246,8 +233,7 @@
                   type="button"
                   *ngFor="let cor of cores"
                   (click)="selecionarCor(cor)"
-                  [style.background-color]="cor"
-                  class="w-12 h-12 rounded-xl cursor-pointer hover:scale-110 transition-transform shadow-md"
+                  [style.background-color]="cor" class="w-12 h-12 rounded-xl cursor-pointer hover:scale-110 transition-transform shadow-md"
                   [ngClass]="form.get('cor')?.value === cor ? 'ring-4 ring-primary ring-offset-2' : ''">
                 </button>
               </div>
@@ -256,7 +242,7 @@
             <!-- Status Ativo -->
             <div class="flex items-center justify-between p-4 bg-[#efefff] rounded-xl">
               <div class="flex items-center space-x-3">
-                <i-feather name="toggle-right" class="w-5 h-5 text-[#820AD1]"></i-feather>
+                <i class="ri-toggle-line text-[#820AD1]"></i>
                 <div>
                   <p class="text-sm font-bold text-on-surface font-inter">Cartão ativo?</p>
                   <p class="text-xs text-[#515981] font-inter">Cartões inativos não aparecem nas opções de pagamento</p>
@@ -274,16 +260,14 @@
         <div class="flex flex-col md:flex-row gap-4">
           <button
             type="submit"
-            [disabled]="form.invalid"
-            class="flex-1 bg-gradient-to-r from-[#820AD1] to-[#B47EDE] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#820AD1]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-3">
-            <i-feather [name]="isEdicao() ? 'check-circle' : 'save'" class="w-6 h-6"></i-feather>
+            [disabled]="form.invalid" class="flex-1 bg-gradient-to-r from-[#820AD1] to-[#B47EDE] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#820AD1]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-3">
+            <i [class]="isEdicao() ? 'ri-checkbox-circle-line' : 'ri-save-line'" class="w-6 h-6"></i>
             <span>{{ isEdicao() ? 'Atualizar Cartão' : 'Salvar Cartão' }}</span>
           </button>
           <button
             type="button"
-            (click)="cancelar()"
-            class="flex-1 bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-3">
-            <i-feather name="x" class="w-6 h-6"></i-feather>
+            (click)="cancelar()" class="flex-1 bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-3">
+            <i class="ri-close-line"></i>
             <span>Cancelar</span>
           </button>
         </div>

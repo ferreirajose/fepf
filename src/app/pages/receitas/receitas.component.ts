@@ -1,7 +1,6 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FeatherModule } from 'angular-feather';
 import { FormsModule } from '@angular/forms';
 import { ReceitaService, Receita as ReceitaAPI } from '../../shared/services/receita.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -24,12 +23,14 @@ interface Receita {
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [CommonModule, RouterLink, FeatherModule, FormsModule, ConfirmDialogComponent, AlertDialogComponent],
+  imports: [CommonModule, RouterLink, FormsModule, ConfirmDialogComponent, AlertDialogComponent],
   templateUrl: './receitas.component.html',
   styleUrl: './receitas.component.css'
 })
 export class ReceitasComponent implements OnInit {
   private receitaService = inject(ReceitaService);
+
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   // Dialogs
   confirmDialog = signal({
@@ -52,6 +53,7 @@ export class ReceitasComponent implements OnInit {
   mesAtual = signal(new Date().getMonth() + 1);
   anoAtual = signal(new Date().getFullYear());
   carregando = signal(false);
+  carregandoImportExport = signal(false);
   erro = signal<string | null>(null);
 
   meses = [
@@ -273,5 +275,111 @@ export class ReceitasComponent implements OnInit {
     this.filtroTexto.set('');
     this.filtroCategoria.set('todas');
     this.filtroStatus.set('todas');
+  }
+
+  exportarReceitas() {
+    this.carregandoImportExport.set(true);
+
+    const primeiroDia = new Date(this.anoAtual(), this.mesAtual() - 1, 1);
+    const ultimoDia = new Date(this.anoAtual(), this.mesAtual(), 0);
+
+    const filtros = {
+      dataInicio: primeiroDia.toISOString().split('T')[0],
+      dataFim: ultimoDia.toISOString().split('T')[0],
+      categoriaId: this.filtroCategoria() !== 'todas' ? this.filtroCategoria() : undefined
+    };
+
+    this.receitaService.exportar(filtros).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `receitas-${this.getMesNome()}-${this.anoAtual()}.xlsx`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.carregandoImportExport.set(false);
+
+        this.alertDialog.set({
+          isOpen: true,
+          title: 'Sucesso',
+          message: 'Receitas exportadas com sucesso!',
+          type: 'success'
+        });
+      },
+      error: (err) => {
+        console.error('Erro ao exportar:', err);
+        this.carregandoImportExport.set(false);
+        this.alertDialog.set({
+          isOpen: true,
+          title: 'Erro',
+          message: 'Não foi possível exportar as receitas.',
+          type: 'error'
+        });
+      }
+    });
+  }
+
+  triggerFileInput() {
+    this.fileInput.nativeElement.click();
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const arquivo = input.files[0];
+
+    if (!arquivo.name.match(/\.(xlsx|xls)$/)) {
+      this.alertDialog.set({
+        isOpen: true,
+        title: 'Erro',
+        message: 'Por favor, selecione um arquivo Excel (.xlsx ou .xls)',
+        type: 'error'
+      });
+      return;
+    }
+
+    if (arquivo.size > 5 * 1024 * 1024) {
+      this.alertDialog.set({
+        isOpen: true,
+        title: 'Erro',
+        message: 'O arquivo deve ter no máximo 5MB',
+        type: 'error'
+      });
+      return;
+    }
+
+    this.carregandoImportExport.set(true);
+    this.receitaService.importar(arquivo).subscribe({
+      next: (response) => {
+        if (response.success) {
+          const result = response.data as any;
+          const mensagem = `Importação concluída!\nTotal: ${result.total}\nSucesso: ${result.success}\nFalhas: ${result.failed}`;
+
+          this.alertDialog.set({
+            isOpen: true,
+            title: 'Importação Concluída',
+            message: mensagem,
+            type: result.failed > 0 ? 'warning' : 'success'
+          });
+
+          this.carregarReceitas();
+        }
+        this.carregandoImportExport.set(false);
+        input.value = '';
+      },
+      error: (err) => {
+        console.error('Erro ao importar:', err);
+        this.carregandoImportExport.set(false);
+        input.value = '';
+
+        this.alertDialog.set({
+          isOpen: true,
+          title: 'Erro',
+          message: 'Não foi possível importar o arquivo.',
+          type: 'error'
+        });
+      }
+    });
   }
 }

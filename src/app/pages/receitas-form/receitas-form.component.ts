@@ -2,7 +2,6 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { FeatherModule } from 'angular-feather';
 import { NgxMaskDirective } from 'ngx-mask';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
 import { ReceitaService } from '../../shared/services/receita.service';
@@ -17,7 +16,7 @@ interface Categoria {
 @Component({
   selector: 'app-receitas-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FeatherModule, RouterLink, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxMaskDirective],
   templateUrl: './receitas-form.component.html',
   styleUrl: './receitas-form.component.css'
 })
@@ -33,10 +32,11 @@ export class ReceitasFormComponent implements OnInit {
   categorias: Categoria[] = [];
 
   formasRecebimento = [
-    { id: 'dinheiro', nome: 'Dinheiro', icone: 'dollar-sign' },
+    { id: 'dinheiro', nome: 'Dinheiro', icone: 'money-dollar-box' },
     { id: 'pix', nome: 'PIX', icone: 'smartphone' },
-    { id: 'transferencia', nome: 'Transferência', icone: 'send' }
+    { id: 'transferencia', nome: 'Transferência', icone: 'send-plane' }
   ];
+
 
   constructor(
     private fb: FormBuilder,
