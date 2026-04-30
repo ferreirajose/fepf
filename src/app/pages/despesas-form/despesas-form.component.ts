@@ -2,7 +2,6 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { FeatherModule } from 'angular-feather';
 import { NgxMaskDirective } from 'ngx-mask';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 import { DespesaService } from '../../shared/services/despesa.service';
@@ -26,7 +25,7 @@ interface Cartao {
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, FeatherModule, SafeUrlPipe, RouterLink, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SafeUrlPipe, RouterLink, NgxMaskDirective],
   templateUrl: './despesas-form.component.html',
   styleUrl: './despesas-form.component.css'
 })
@@ -45,9 +44,9 @@ export class DespesasFormComponent implements OnInit {
   cartoes: Cartao[] = [];
 
   formasPagamento = [
-    { id: 'dinheiro', nome: 'Dinheiro', icone: 'dollar-sign' },
-    { id: 'debito', nome: 'Débito', icone: 'credit-card' },
-    { id: 'credito', nome: 'Crédito', icone: 'credit-card' },
+    { id: 'dinheiro', nome: 'Dinheiro', icone: 'money-dollar-box' },
+    { id: 'debito', nome: 'Débito', icone: 'bank-card' },
+    { id: 'credito', nome: 'Crédito', icone: 'bank-card' },
     { id: 'pix', nome: 'PIX', icone: 'smartphone' }
   ];
 

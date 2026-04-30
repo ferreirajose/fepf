@@ -2,7 +2,6 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FeatherModule } from 'angular-feather';
 import { NgxMaskDirective } from 'ngx-mask';
 import { OrcamentoService } from '../../shared/services/orcamento.service';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
@@ -17,7 +16,7 @@ interface Categoria {
 @Component({
   selector: 'app-orcamentos-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FeatherModule, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
   templateUrl: './orcamentos-form.component.html',
   styleUrl: './orcamentos-form.component.css'
 })

@@ -1,7 +1,6 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FeatherModule } from 'angular-feather';
 import { OrcamentoService, Orcamento as OrcamentoAPI } from '../../shared/services/orcamento.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AlertDialogComponent } from '../../shared/components/alert-dialog/alert-dialog.component';
@@ -22,7 +21,7 @@ interface Orcamento {
 @Component({
   selector: 'app-orcamentos',
   standalone: true,
-  imports: [CommonModule, RouterLink, FeatherModule, ConfirmDialogComponent, AlertDialogComponent],
+  imports: [CommonModule, RouterLink, ConfirmDialogComponent, AlertDialogComponent],
   templateUrl: './orcamentos.component.html',
   styleUrl: './orcamentos.component.css'
 })

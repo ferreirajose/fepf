@@ -1,21 +1,35 @@
 <div class="min-h-screen p-6">
   <div class="max-w-7xl mx-auto">
     <!-- Header -->
-    <header class="mb-8">
-      <h1 class="text-4xl font-manrope font-bold text-on-surface mb-2">Dashboard Financeiro</h1>
-      <p class="text-gray-600 font-inter">Visão geral das suas finanças</p>
+    <header class="mb-8 flex items-center justify-between">
+      <div>
+        <div class="flex items-center space-x-3 mb-2">
+          <div class="w-12 h-12 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+            <i class="ri-dashboard-line text-white"></i>
+          </div>
+          <h1 class="text-4xl font-manrope font-bold text-on-surface">Dashboard Financeiro</h1>
+        </div>
+        <p class="text-gray-600 font-inter ml-15">Visão geral das suas finanças</p>
+      </div>
+      <div class="flex items-center space-x-2 text-sm text-gray-500 font-inter">
+        <i class="ri-time-line"></i>
+        <span>Atualizado agora</span>
+      </div>
     </header>
 
     <!-- Cards de Resumo -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <!-- Card Saldo Atual -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-xl transition-shadow">
         <div class="flex items-center space-x-3 mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center">
-            <i-feather name="dollar-sign" class="w-6 h-6 text-white"></i-feather>
+          <div class="w-12 h-12 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center shadow-lg">
+            <i class="ri-wallet-3-line text-white"></i>
           </div>
-          <div>
-            <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Saldo Atual</p>
+          <div class="flex-1">
+            <div class="flex items-center space-x-1 mb-1">
+              <i class="ri-funds-line text-[#515981]"></i>
+              <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Saldo Atual</p>
+            </div>
             <h2 class="text-2xl font-manrope font-extrabold text-on-surface">
               {{ saldoAtual() | currency:'BRL' }}
             </h2>
@@ -27,13 +41,16 @@
       </div>
 
       <!-- Card Receitas -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-xl transition-shadow">
         <div class="flex items-center space-x-3 mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl flex items-center justify-center">
-            <i-feather name="trending-up" class="w-6 h-6 text-white"></i-feather>
+          <div class="w-12 h-12 bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl flex items-center justify-center shadow-lg">
+            <i class="ri-arrow-up-circle-line text-white"></i>
           </div>
-          <div>
-            <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Receitas do Mês</p>
+          <div class="flex-1">
+            <div class="flex items-center space-x-1 mb-1">
+              <i class="ri-hand-coin-line text-[#515981]"></i>
+              <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Receitas do Mês</p>
+            </div>
             <h2 class="text-2xl font-manrope font-extrabold text-[#006947]">
               {{ receitasMes() | currency:'BRL' }}
             </h2>
@@ -45,13 +62,16 @@
       </div>
 
       <!-- Card Despesas -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-xl transition-shadow">
         <div class="flex items-center space-x-3 mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center">
-            <i-feather name="trending-down" class="w-6 h-6 text-white"></i-feather>
+          <div class="w-12 h-12 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center shadow-lg">
+            <i class="ri-arrow-down-circle-line text-white"></i>
           </div>
-          <div>
-            <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Despesas do Mês</p>
+          <div class="flex-1">
+            <div class="flex items-center space-x-1 mb-1">
+              <i class="ri-shopping-cart-line text-[#515981]"></i>
+              <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Despesas do Mês</p>
+            </div>
             <h2 class="text-2xl font-manrope font-extrabold text-[#b51621]">
               {{ despesasMes() | currency:'BRL' }}
             </h2>
@@ -69,7 +89,7 @@
       <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
         <div class="flex items-center space-x-3 mb-6">
           <div class="w-10 h-10 bg-gradient-to-br from-[#006947] to-[#b51621] rounded-xl flex items-center justify-center">
-            <i-feather name="trending-up" class="w-5 h-5 text-white"></i-feather>
+            <i class="ri-line-chart-line text-white"></i>
           </div>
           <h3 class="text-xl font-manrope font-bold text-on-surface">Evolução Mensal</h3>
         </div>
@@ -82,7 +102,7 @@
       <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
         <div class="flex items-center space-x-3 mb-6">
           <div class="w-10 h-10 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center">
-            <i-feather name="pie-chart" class="w-5 h-5 text-white"></i-feather>
+            <i class="ri-pie-chart-line text-white"></i>
           </div>
           <h3 class="text-xl font-manrope font-bold text-on-surface">Despesas por Categoria</h3>
         </div>
@@ -95,7 +115,7 @@
       <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
         <div class="flex items-center space-x-3 mb-6">
           <div class="w-10 h-10 bg-gradient-to-br from-[#b51621] to-[#006947] rounded-xl flex items-center justify-center">
-            <i-feather name="credit-card" class="w-5 h-5 text-white"></i-feather>
+            <i class="ri-bank-card-line text-white"></i>
           </div>
           <h3 class="text-xl font-manrope font-bold text-on-surface">Utilização de Cartões</h3>
         </div>
@@ -108,7 +128,7 @@
       <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
         <div class="flex items-center space-x-3 mb-6">
           <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
-            <i-feather name="bar-chart-2" class="w-5 h-5 text-white"></i-feather>
+            <i class="ri-bar-chart-line text-white"></i>
           </div>
           <h3 class="text-xl font-manrope font-bold text-on-surface">Status dos Orçamentos</h3>
         </div>
@@ -124,7 +144,7 @@
       <div class="lg:col-span-2 bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
         <div class="flex items-center space-x-3 mb-6">
           <div class="w-10 h-10 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center">
-            <i-feather name="map-pin" class="w-5 h-5 text-white"></i-feather>
+            <i class="ri-map-pin-line text-white"></i>
           </div>
           <div class="flex-1">
             <h3 class="text-xl font-manrope font-bold text-on-surface">Locais das Despesas</h3>
@@ -148,9 +168,8 @@
           <a
             *ngIf="gruposDespesas().length > 0"
             [href]="getMapUrlComMarcadores()"
-            target="_blank"
-            class="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
-            <i-feather name="external-link" class="w-4 h-4"></i-feather>
+            target="_blank" class="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+            <i class="ri-external-link-line"></i>
             <span>Ver Todos os Locais no Google Maps</span>
           </a>
         </div>
@@ -158,7 +177,7 @@
         <!-- Estado Vazio -->
         <div *ngIf="despesasComLocalizacao().length === 0" class="p-12 bg-[#efefff] rounded-xl text-center">
           <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-            <i-feather name="map-pin" class="w-8 h-8 text-[#515981]/30"></i-feather>
+            <i class="ri-map-pin-line text-[#515981]/30"></i>
           </div>
           <h3 class="text-lg font-bold text-on-surface mb-2 font-manrope">
             Nenhuma despesa com localização
@@ -174,7 +193,7 @@
       <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
         <div class="flex items-center space-x-3 mb-6">
           <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
-            <i-feather name="list" class="w-5 h-5 text-white"></i-feather>
+            <i class="ri-list-check text-white"></i>
           </div>
           <div class="flex-1">
             <h3 class="text-xl font-manrope font-bold text-on-surface">Todas as Despesas</h3>
@@ -183,15 +202,13 @@
         </div>
 
         <div *ngIf="despesasComLocalizacao().length > 0" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
-          <div *ngFor="let despesa of despesasComLocalizacao().slice(0, 10)"
-               class="p-4 bg-[#efefff] hover:bg-[#dde1ff] rounded-xl transition-all group">
+          <div *ngFor="let despesa of despesasComLocalizacao().slice(0, 10)" class="p-4 bg-[#efefff] hover:bg-[#dde1ff] rounded-xl transition-all group">
             <div class="flex items-start justify-between mb-2">
               <div class="flex items-center space-x-2 flex-1">
-                <div
-                  class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                   [style.background-color]="despesa.categoriaCor + '30'"
                   [style.color]="despesa.categoriaCor">
-                  <i-feather name="shopping-bag" class="w-4 h-4"></i-feather>
+                  <i class="ri-shopping-bag-line"></i>
                 </div>
                 <div class="min-w-0 flex-1">
                   <p class="font-inter font-bold text-sm text-on-surface truncate">{{ despesa.descricao }}</p>
@@ -204,14 +221,14 @@
             </div>
 
             <div class="flex items-start space-x-2 mt-3 pt-3 border-t border-[#a3abd7]/10">
-              <i-feather name="map-pin" class="w-3 h-3 text-[#0057bd] mt-0.5 flex-shrink-0"></i-feather>
+              <i class="ri-map-pin-line text-[#0057bd] mt-0.5 flex-shrink-0"></i>
               <p class="text-xs text-[#515981] font-inter truncate flex-1" [title]="despesa.endereco">
                 {{ despesa.endereco }}
               </p>
             </div>
 
             <div class="flex items-center space-x-2 mt-2">
-              <i-feather name="calendar" class="w-3 h-3 text-[#515981]"></i-feather>
+              <i class="ri-calendar-line text-[#515981]"></i>
               <p class="text-xs text-[#515981] font-inter">
                 {{ despesa.data | date:'dd/MM/yyyy' }}
               </p>
@@ -220,16 +237,15 @@
             <!-- Link para ver no mapa -->
             <a
               [href]="'https://www.google.com/maps?q=' + despesa.latitude + ',' + despesa.longitude"
-              target="_blank"
-              class="mt-3 flex items-center justify-center space-x-1 p-2 bg-white border border-[#0057bd]/30 text-[#0057bd] rounded-lg text-xs font-bold hover:bg-[#0057bd] hover:text-white transition-colors opacity-0 group-hover:opacity-100 font-inter">
-              <i-feather name="external-link" class="w-3 h-3"></i-feather>
+              target="_blank" class="mt-3 flex items-center justify-center space-x-1 p-2 bg-white border border-[#0057bd]/30 text-[#0057bd] rounded-lg text-xs font-bold hover:bg-[#0057bd] hover:text-white transition-colors opacity-0 group-hover:opacity-100 font-inter">
+              <i class="ri-external-link-line"></i>
               <span>Ver no Maps</span>
             </a>
           </div>
         </div>
 
         <div *ngIf="despesasComLocalizacao().length === 0" class="text-center py-8">
-          <i-feather name="inbox" class="w-12 h-12 text-[#515981]/30 mx-auto mb-3"></i-feather>
+          <i class="ri-inbox-line text-[#515981]/30 mx-auto mb-3"></i>
           <p class="text-sm text-[#515981] font-inter">
             Nenhuma despesa com localização
           </p>
@@ -241,27 +257,26 @@
     <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
       <div class="flex items-center space-x-3 mb-6">
         <div class="w-10 h-10 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center">
-          <i-feather name="activity" class="w-5 h-5 text-white"></i-feather>
+          <i class="ri-history-line text-white"></i>
         </div>
-        <h3 class="text-xl font-manrope font-bold text-on-surface">Transações Recentes</h3>
+        <div class="flex-1">
+          <h3 class="text-xl font-manrope font-bold text-on-surface">Transações Recentes</h3>
+          <p class="text-xs text-gray-500 font-inter">Últimas movimentações financeiras</p>
+        </div>
       </div>
       <div class="space-y-3">
-        <div *ngFor="let transacao of transacoesRecentes"
-             class="flex justify-between items-center p-4 bg-[#efefff] hover:bg-[#dde1ff] rounded-xl transition-all">
+        <div *ngFor="let transacao of transacoesRecentes" class="flex justify-between items-center p-4 bg-[#efefff] hover:bg-[#dde1ff] rounded-xl transition-all">
           <div class="flex items-center gap-3">
             <div [ngClass]="transacao.tipo === 'receita'
                 ? 'bg-gradient-to-br from-[#006947] to-[#69f6b8]'
-                : 'bg-gradient-to-br from-[#b51621] to-[#ff928b]'"
-                 class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm">
-              <i-feather
-                [name]="transacao.tipo === 'receita' ? 'trending-up' : 'trending-down'"
-                class="w-5 h-5 text-white">
-              </i-feather>
+                : 'bg-gradient-to-br from-[#b51621] to-[#ff928b]'" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm">
+              <i [class]="transacao.tipo === 'receita' ? 'ri-arrow-up-line w-5 h-5 text-white' : 'ri-arrow-down-line w-5 h-5 text-white'">
+              </i>
             </div>
             <div>
               <p class="font-inter font-bold text-on-surface">{{ transacao.descricao }}</p>
               <div class="flex items-center gap-1 text-xs text-[#515981] font-inter">
-                <i-feather name="calendar" class="w-3 h-3"></i-feather>
+                <i class="ri-calendar-line"></i>
                 <span>{{ transacao.data | date:'dd/MM/yyyy' }}</span>
               </div>
             </div>
