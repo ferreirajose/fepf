@@ -358,8 +358,29 @@
 
             <!-- Informações da Localização -->
             <div *ngIf="getLocalizacao().latitude" class="space-y-3">
+              <!-- Título da Seção de Localização Capturada -->
+              <div class="flex items-center justify-between p-3 bg-gradient-to-r from-[#006947] to-[#69f6b8] rounded-xl">
+                <div class="flex items-center space-x-2">
+                  <i-feather name="check-circle" class="w-5 h-5 text-white"></i-feather>
+                  <span class="text-sm font-bold text-white font-inter">Localização Capturada com Sucesso!</span>
+                </div>
+              </div>
+
+              <!-- Endereço Completo (Destaque) -->
+              <div *ngIf="getLocalizacao().endereco" class="p-4 bg-gradient-to-br from-[#0057bd]/5 to-[#6e9fff]/5 border-2 border-[#0057bd]/20 rounded-xl">
+                <div class="flex items-start space-x-3">
+                  <i-feather name="map-pin" class="w-6 h-6 text-[#0057bd] mt-0.5 flex-shrink-0"></i-feather>
+                  <div class="flex-1">
+                    <p class="text-xs text-[#515981] font-inter mb-2 font-bold uppercase tracking-wide">Endereço Registrado</p>
+                    <p class="text-base font-bold text-on-surface font-inter leading-relaxed">
+                      {{ getLocalizacao().endereco }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <!-- Mapa -->
-              <div class="rounded-xl overflow-hidden border-2 border-[#a3abd7]/20">
+              <div class="rounded-xl overflow-hidden border-2 border-[#0057bd]/20 shadow-lg">
                 <iframe
                   [src]="'https://maps.google.com/maps?q=' + getLocalizacao().latitude + ',' + getLocalizacao().longitude + '&z=16&output=embed' | safeUrl"
                   width="100%"
@@ -374,24 +395,11 @@
               <!-- Coordenadas -->
               <div class="p-4 bg-[#efefff] rounded-xl">
                 <div class="flex items-start space-x-3">
-                  <i-feather name="navigation" class="w-5 h-5 text-[#0057bd] mt-0.5"></i-feather>
+                  <i-feather name="navigation" class="w-5 h-5 text-[#515981] mt-0.5"></i-feather>
                   <div class="flex-1">
-                    <p class="text-xs text-[#515981] font-inter mb-1">Coordenadas</p>
-                    <p class="text-sm font-bold text-on-surface font-inter">
+                    <p class="text-xs text-[#515981] font-inter mb-1">Coordenadas GPS</p>
+                    <p class="text-sm font-mono font-bold text-on-surface font-inter">
                       {{ getLocalizacao().latitude.toFixed(6) }}, {{ getLocalizacao().longitude.toFixed(6) }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Endereço -->
-              <div *ngIf="getLocalizacao().endereco" class="p-4 bg-[#efefff] rounded-xl">
-                <div class="flex items-start space-x-3">
-                  <i-feather name="map" class="w-5 h-5 text-[#0057bd] mt-0.5"></i-feather>
-                  <div class="flex-1">
-                    <p class="text-xs text-[#515981] font-inter mb-1">Endereço</p>
-                    <p class="text-sm font-bold text-on-surface font-inter">
-                      {{ getLocalizacao().endereco }}
                     </p>
                   </div>
                 </div>
@@ -401,7 +409,7 @@
               <a
                 [href]="'https://www.google.com/maps?q=' + getLocalizacao().latitude + ',' + getLocalizacao().longitude"
                 target="_blank"
-                class="flex items-center justify-center space-x-2 p-3 bg-white border-2 border-[#0057bd]/30 text-[#0057bd] rounded-xl font-bold text-sm hover:bg-[#efefff] transition-colors font-inter">
+                class="flex items-center justify-center space-x-2 p-3 bg-white border-2 border-[#0057bd]/30 text-[#0057bd] rounded-xl font-bold text-sm hover:bg-[#0057bd] hover:text-white hover:border-[#0057bd] transition-all font-inter">
                 <i-feather name="external-link" class="w-4 h-4"></i-feather>
                 <span>Abrir no Google Maps</span>
               </a>

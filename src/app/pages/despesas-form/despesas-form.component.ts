@@ -340,14 +340,15 @@ export class DespesasFormComponent implements OnInit {
       .then(response => response.json())
       .then(data => {
         if (data && data.status === 'OK' && data.results && data.results.length > 0) {
-          const endereco = data.results[0].formatted_address;
+          const resultado = data.results[0];
+          const enderecoFormatado = resultado.formatted_address;
 
           setTimeout(() => {
             this.form.patchValue({
               localizacao: {
                 latitude,
                 longitude,
-                endereco: endereco
+                endereco: enderecoFormatado
               }
             });
           }, 0);
@@ -398,16 +399,17 @@ export class DespesasFormComponent implements OnInit {
           const resultado = data.results[0];
           const latitude = resultado.geometry.location.lat;
           const longitude = resultado.geometry.location.lng;
-          const enderecoCompleto = resultado.formatted_address;
+          const enderecoFormatado = resultado.formatted_address;
 
           setTimeout(() => {
             this.form.patchValue({
               localizacao: {
                 latitude,
                 longitude,
-                endereco: enderecoCompleto
+                endereco: enderecoFormatado
               }
             });
+            this.enderecoManual.set('');
           }, 0);
         } else if (data && data.status === 'ZERO_RESULTS') {
           this.erroLocalizacao.set('Endereço não encontrado. Tente ser mais específico (ex: "Rua X, Cidade, Estado")');

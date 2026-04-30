@@ -7,7 +7,6 @@ import { ReceitaService } from '../../shared/services/receita.service';
 import { CartaoService } from '../../shared/services/cartao.service';
 import { OrcamentoService } from '../../shared/services/orcamento.service';
 import { CategoriaService } from '../../shared/services/categoria.service';
-import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 import { MapClustererComponent } from '../../shared/components/map-clusterer/map-clusterer.component';
 import { environment } from '../../../environments/environment';
 import { forkJoin } from 'rxjs';
@@ -17,7 +16,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FeatherModule, SafeUrlPipe, MapClustererComponent],
+  imports: [CommonModule, FeatherModule, MapClustererComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
