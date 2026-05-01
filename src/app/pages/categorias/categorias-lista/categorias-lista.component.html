@@ -35,7 +35,7 @@
             <div class="w-12 h-12 rounded-xl flex items-center justify-center"
               [style.background-color]="categoria.cor + '30'"
               [style.color]="categoria.cor">
-              <i [class]="'ri-' + (categoria.icone || 'tag') + '-line w-6 h-6'">
+              <i [class]="'ri-' + (categoria.icone || 'tag') + '-line'">
               </i>
             </div>
 
@@ -74,13 +74,17 @@
           <div
             *ngFor="let sub of categoria.subcategorias" class="flex items-center justify-between py-2 border-b border-[#a3abd7]/5">
             <div class="flex items-center space-x-3">
-              <div class="w-1.5 h-1.5 rounded-full bg-[#006947]"></div>
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
+                <i [class]="'ri-' + (sub.icone || 'tag') + '-line'"></i>
+              </div>
               <span class="text-sm font-medium text-on-surface font-inter">
                 {{ sub.nome }}
               </span>
             </div>
             <div class="flex space-x-1">
-              <button class="p-1.5 text-[#515981] hover:text-primary transition-colors">
+              <button
+                (click)="editarSubcategoria(categoria.id, sub.id, sub.nome, sub.icone, $event)"
+                class="p-1.5 text-[#515981] hover:text-primary transition-colors">
                 <i class="ri-edit-line"></i>
               </button>
               <button
@@ -170,3 +174,67 @@
   [type]="alertDialog().type"
   (close)="alertDialog.set({...alertDialog(), isOpen: false})">
 </app-alert-dialog>
+
+<!-- Dialog de Edição de Subcategoria -->
+<div *ngIf="subcategoriaDialog().isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-2xl font-bold text-on-surface font-manrope">
+        {{ subcategoriaDialog().subcategoriaId ? 'Editar' : 'Adicionar' }} Subcategoria
+      </h2>
+    </div>
+
+    <div class="p-6 space-y-6">
+      <!-- Nome -->
+      <div>
+        <label class="block text-sm font-inter font-medium text-on-surface mb-2">
+          Nome da Subcategoria *
+        </label>
+        <input
+          type="text"
+          [value]="subcategoriaDialog().nome"
+          (input)="atualizarNomeSubcategoria($event)"
+          placeholder="Ex: Restaurantes"
+          class="w-full px-4 py-3 bg-surface border-0 rounded-lg font-inter focus:ring-2 focus:ring-primary outline-none"
+        />
+      </div>
+
+      <!-- Ícone -->
+      <div>
+        <label class="block text-sm font-inter font-medium text-on-surface mb-3">
+          Ícone *
+        </label>
+        <div class="max-h-64 overflow-y-auto bg-surface rounded-lg p-4 border border-gray-200">
+          <div class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2">
+            <button
+              type="button"
+              *ngFor="let icone of icones"
+              (click)="selecionarIconeSubcategoria(icone.nome)"
+              [title]="icone.label"
+              class="w-12 h-12 rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary/10 transition-all"
+              [ngClass]="subcategoriaDialog().icone === icone.nome ? 'bg-primary text-white' : 'bg-white text-gray-700'"
+            >
+              <i [class]="'ri-' + icone.nome + '-line text-2xl'"></i>
+            </button>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-2 font-inter">
+          Ícone selecionado: <strong>{{ icones.find(i => i.nome === subcategoriaDialog().icone)?.label || 'Tag' }}</strong>
+        </p>
+      </div>
+    </div>
+
+    <div class="p-6 border-t border-gray-200 flex gap-3">
+      <button
+        (click)="fecharSubcategoriaDialog()"
+        class="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-inter font-medium hover:bg-gray-200 transition-colors">
+        Cancelar
+      </button>
+      <button
+        (click)="salvarSubcategoria()"
+        class="flex-1 bg-primary text-white px-6 py-3 rounded-lg font-inter font-medium hover:bg-[#004ca6] transition-colors">
+        {{ subcategoriaDialog().subcategoriaId ? 'Atualizar' : 'Adicionar' }}
+      </button>
+    </div>
+  </div>
+</div>

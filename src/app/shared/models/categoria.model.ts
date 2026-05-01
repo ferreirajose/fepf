@@ -12,6 +12,7 @@ export interface Categoria {
 export interface Subcategoria {
   id: string;
   nome: string;
+  icone?: string;
   categoriaId: string;
   ativo: boolean;
 }

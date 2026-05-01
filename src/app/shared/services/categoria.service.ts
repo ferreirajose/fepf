@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 export interface Subcategoria {
   id: string;
   nome: string;
+  icone?: string;
   categoriaId: string;
   ativo: boolean;
 }
@@ -55,11 +56,11 @@ export class CategoriaService {
     return this.http.delete<CategoriaResponse>(`${this.apiUrl}/${id}`);
   }
 
-  adicionarSubcategoria(categoriaId: string, nome: string): Observable<CategoriaResponse> {
-    return this.http.post<CategoriaResponse>(`${this.apiUrl}/${categoriaId}/subcategorias`, { nome });
+  adicionarSubcategoria(categoriaId: string, nome: string, icone?: string): Observable<CategoriaResponse> {
+    return this.http.post<CategoriaResponse>(`${this.apiUrl}/${categoriaId}/subcategorias`, { nome, icone });
   }
 
-  atualizarSubcategoria(categoriaId: string, subcategoriaId: string, dados: { nome?: string; ativo?: boolean }): Observable<CategoriaResponse> {
+  atualizarSubcategoria(categoriaId: string, subcategoriaId: string, dados: { nome?: string; icone?: string; ativo?: boolean }): Observable<CategoriaResponse> {
     return this.http.put<CategoriaResponse>(`${this.apiUrl}/${categoriaId}/subcategorias/${subcategoriaId}`, dados);
   }
 

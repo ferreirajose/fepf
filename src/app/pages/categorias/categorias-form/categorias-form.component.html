@@ -44,8 +44,33 @@
         <input type="hidden" formControlName="cor" />
       </div>
 
+      <!-- Ícone -->
+      <div class="mb-6">
+        <label class="block text-sm font-inter font-medium text-on-surface mb-3">
+          Ícone *
+        </label>
+        <div class="max-h-64 overflow-y-auto bg-surface rounded-lg p-4 border border-gray-200">
+          <div class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2">
+            <button
+              type="button"
+              *ngFor="let icone of icones"
+              (click)="selecionarIcone(icone.nome)"
+              [title]="icone.label"
+              class="w-12 h-12 rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary/10 transition-all"
+              [ngClass]="form.get('icone')?.value === icone.nome ? 'bg-primary text-white' : 'bg-white text-gray-700'"
+            >
+              <i [class]="'ri-' + icone.nome + '-line text-2xl'"></i>
+            </button>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-2 font-inter">
+          Ícone selecionado: <strong>{{ icones.find(i => i.nome === form.get('icone')?.value)?.label || 'Tag' }}</strong>
+        </p>
+        <input type="hidden" formControlName="icone" />
+      </div>
+
       <!-- Ativo -->
-      <div class="mb-8">
+      <div class="mb-6">
         <label class="flex items-center cursor-pointer">
           <input
             type="checkbox"
@@ -53,6 +78,83 @@
           />
           <span class="ml-2 text-sm font-inter text-on-surface">Categoria ativa</span>
         </label>
+      </div>
+
+      <!-- Subcategorias -->
+      <div class="mb-8">
+        <label class="block text-sm font-inter font-medium text-on-surface mb-3">
+          Subcategorias
+        </label>
+
+        <!-- Lista de Subcategorias -->
+        <div *ngIf="subcategorias().length > 0" class="mb-4 space-y-2">
+          <div
+            *ngFor="let sub of subcategorias(); let i = index"
+            class="flex items-center justify-between bg-surface px-4 py-3 rounded-lg">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
+                <i [class]="'ri-' + (sub.icone || 'tag') + '-line'"></i>
+              </div>
+              <span class="text-sm font-inter text-on-surface font-medium">{{ sub.nome }}</span>
+            </div>
+            <button
+              type="button"
+              (click)="removerSubcategoria(i)"
+              class="text-red-500 hover:text-red-700 transition-colors p-1">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Adicionar Nova Subcategoria -->
+        <div class="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div class="flex gap-2">
+            <input
+              type="text"
+              [value]="novaSubcategoria()"
+              (input)="atualizarNovaSubcategoria($event)"
+              placeholder="Nome da subcategoria"
+              class="flex-1 px-4 py-3 bg-white border-0 rounded font-inter focus:ring-2 focus:ring-primary outline-none"
+            />
+          </div>
+
+          <!-- Seletor de Ícone para Subcategoria -->
+          <div>
+            <label class="block text-xs font-inter font-medium text-gray-600 mb-2">
+              Ícone da Subcategoria
+            </label>
+            <div class="max-h-48 overflow-y-auto bg-white rounded-lg p-3 border border-gray-200">
+              <div class="grid grid-cols-8 sm:grid-cols-10 gap-2">
+                <button
+                  type="button"
+                  *ngFor="let icone of icones"
+                  (click)="selecionarIconeSubcategoria(icone.nome)"
+                  [title]="icone.label"
+                  class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary/10 transition-all"
+                  [ngClass]="novoIconeSubcategoria() === icone.nome ? 'bg-primary text-white' : 'bg-gray-50 text-gray-700'"
+                >
+                  <i [class]="'ri-' + icone.nome + '-line text-xl'"></i>
+                </button>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 font-inter">
+              Selecionado: <strong>{{ icones.find(i => i.nome === novoIconeSubcategoria())?.label || 'Tag' }}</strong>
+            </p>
+          </div>
+
+          <button
+            type="button"
+            (click)="adicionarSubcategoria()"
+            [disabled]="!novaSubcategoria().trim()"
+            class="w-full bg-primary text-white px-6 py-3 rounded font-inter font-medium hover:bg-[#004ca6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <i class="ri-add-line"></i>
+            <span>Adicionar Subcategoria</span>
+          </button>
+        </div>
+
+        <p class="text-xs text-gray-500 mt-2 font-inter">
+          As subcategorias ajudam a organizar melhor suas transações dentro de cada categoria.
+        </p>
       </div>
 
       <!-- Ações -->

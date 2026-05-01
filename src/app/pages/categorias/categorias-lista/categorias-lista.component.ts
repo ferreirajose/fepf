@@ -21,6 +21,66 @@ export class CategoriasListaComponent implements OnInit {
   carregando = signal(false);
   erro = signal<string | null>(null);
 
+  // Dialog de edição de subcategoria
+  subcategoriaDialog = signal({
+    isOpen: false,
+    categoriaId: '',
+    subcategoriaId: '',
+    nome: '',
+    icone: 'tag'
+  });
+
+  icones = [
+    { nome: 'tag', label: 'Tag' },
+    { nome: 'shopping-bag', label: 'Compras' },
+    { nome: 'restaurant', label: 'Alimentação' },
+    { nome: 'home', label: 'Casa' },
+    { nome: 'car', label: 'Transporte' },
+    { nome: 'heart', label: 'Saúde' },
+    { nome: 'book', label: 'Educação' },
+    { nome: 'shirt', label: 'Vestuário' },
+    { nome: 'phone', label: 'Telefone' },
+    { nome: 'lightbulb', label: 'Energia' },
+    { nome: 'drop', label: 'Água' },
+    { nome: 'football', label: 'Lazer' },
+    { nome: 'briefcase', label: 'Trabalho' },
+    { nome: 'bank', label: 'Banco' },
+    { nome: 'wallet', label: 'Carteira' },
+    { nome: 'gift', label: 'Presente' },
+    { nome: 'flight-takeoff', label: 'Viagem' },
+    { nome: 'hotel', label: 'Hotel' },
+    { nome: 'gas-station', label: 'Gasolina' },
+    { nome: 'hospital', label: 'Hospital' },
+    { nome: 'stethoscope', label: 'Médico' },
+    { nome: 'capsule', label: 'Remédio' },
+    { nome: 'bill', label: 'Conta' },
+    { nome: 'shopping-cart', label: 'Mercado' },
+    { nome: 'taxi', label: 'Táxi' },
+    { nome: 'bus', label: 'Ônibus' },
+    { nome: 'subway', label: 'Metrô' },
+    { nome: 'movie', label: 'Cinema' },
+    { nome: 'music', label: 'Música' },
+    { nome: 'gamepad', label: 'Games' },
+    { nome: 'tools', label: 'Ferramentas' },
+    { nome: 'paint-brush', label: 'Arte' },
+    { nome: 'scissors', label: 'Salão' },
+    { nome: 'barbell', label: 'Academia' },
+    { nome: 'pizza', label: 'Pizza' },
+    { nome: 'cup', label: 'Café' },
+    { nome: 'goblet', label: 'Bebida' },
+    { nome: 'cake', label: 'Doce' },
+    { nome: 'restaurant-2', label: 'Restaurante' },
+    { nome: 'computer', label: 'Computador' },
+    { nome: 'smartphone', label: 'Celular' },
+    { nome: 'tv', label: 'TV' },
+    { nome: 'headphone', label: 'Fone' },
+    { nome: 'camera', label: 'Câmera' },
+    { nome: 'printer', label: 'Impressora' },
+    { nome: 'plug', label: 'Eletrônicos' },
+    { nome: 'home-wifi', label: 'Internet' },
+    { nome: 'flashlight', label: 'Lanterna' }
+  ];
+
   // Dialogs
   confirmDialog = signal({
     isOpen: false,
@@ -58,6 +118,7 @@ export class CategoriasListaComponent implements OnInit {
             subcategorias: c.subcategorias?.map(s => ({
               id: s.id || '',
               nome: s.nome,
+              icone: s.icone || 'tag',
               categoriaId: c._id || '',
               ativo: s.ativo
             }))
@@ -93,10 +154,18 @@ export class CategoriasListaComponent implements OnInit {
     this.confirmDialog.set({
       isOpen: true,
       title: 'Excluir Categoria',
-      message: 'Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita.',
+      message: 'Tem certeza que deseja excluir esta categoria? ATENÇÃO: Todas as subcategorias, receitas e despesas associadas a esta categoria também serão permanentemente removidas. Esta ação não pode ser desfeita.',
       onConfirm: () => {
         this.categoriaService.deletar(id).subscribe({
           next: (response) => {
+            // Fechar o diálogo de confirmação
+            this.confirmDialog.set({
+              isOpen: false,
+              title: '',
+              message: '',
+              onConfirm: () => {}
+            });
+
             if (response.success) {
               const categorias = this.categorias().filter(c => c.id !== id);
               this.categorias.set(categorias);
@@ -117,6 +186,14 @@ export class CategoriasListaComponent implements OnInit {
             }
           },
           error: (err) => {
+            // Fechar o diálogo de confirmação
+            this.confirmDialog.set({
+              isOpen: false,
+              title: '',
+              message: '',
+              onConfirm: () => {}
+            });
+
             console.error('Erro ao excluir categoria:', err);
             this.alertDialog.set({
               isOpen: true,
@@ -132,12 +209,58 @@ export class CategoriasListaComponent implements OnInit {
 
   adicionarSubcategoria(categoriaId: string, event: Event) {
     event.stopPropagation();
-    const nome = prompt('Digite o nome da subcategoria:');
-    if (nome && nome.trim()) {
-      this.categoriaService.adicionarSubcategoria(categoriaId, nome.trim()).subscribe({
+    this.subcategoriaDialog.set({
+      isOpen: true,
+      categoriaId: categoriaId,
+      subcategoriaId: '',
+      nome: '',
+      icone: 'tag'
+    });
+  }
+
+  editarSubcategoria(categoriaId: string, subcategoriaId: string, nomeAtual: string, iconeAtual: string | undefined, event: Event) {
+    event.stopPropagation();
+    this.subcategoriaDialog.set({
+      isOpen: true,
+      categoriaId: categoriaId,
+      subcategoriaId: subcategoriaId,
+      nome: nomeAtual,
+      icone: iconeAtual || 'tag'
+    });
+  }
+
+  selecionarIconeSubcategoria(icone: string) {
+    const dialog = this.subcategoriaDialog();
+    this.subcategoriaDialog.set({ ...dialog, icone });
+  }
+
+  atualizarNomeSubcategoria(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const dialog = this.subcategoriaDialog();
+    this.subcategoriaDialog.set({ ...dialog, nome: input.value });
+  }
+
+  salvarSubcategoria() {
+    const dialog = this.subcategoriaDialog();
+    const nome = dialog.nome.trim();
+
+    if (!nome) {
+      this.alertDialog.set({
+        isOpen: true,
+        title: 'Erro',
+        message: 'O nome da subcategoria é obrigatório',
+        type: 'error'
+      });
+      return;
+    }
+
+    // Se é nova subcategoria (sem ID)
+    if (!dialog.subcategoriaId) {
+      this.categoriaService.adicionarSubcategoria(dialog.categoriaId, nome, dialog.icone).subscribe({
         next: (response) => {
           if (response.success && response.data && !Array.isArray(response.data)) {
             this.carregarCategorias();
+            this.fecharSubcategoriaDialog();
             this.alertDialog.set({
               isOpen: true,
               title: 'Sucesso',
@@ -163,7 +286,53 @@ export class CategoriasListaComponent implements OnInit {
           });
         }
       });
+    } else {
+      // Editar subcategoria existente
+      this.categoriaService.atualizarSubcategoria(
+        dialog.categoriaId,
+        dialog.subcategoriaId,
+        { nome: nome, icone: dialog.icone }
+      ).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.carregarCategorias();
+            this.fecharSubcategoriaDialog();
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Sucesso',
+              message: 'Subcategoria atualizada com sucesso!',
+              type: 'success'
+            });
+          } else {
+            this.alertDialog.set({
+              isOpen: true,
+              title: 'Erro',
+              message: response.error || 'Não foi possível atualizar a subcategoria',
+              type: 'error'
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao atualizar subcategoria:', err);
+          this.alertDialog.set({
+            isOpen: true,
+            title: 'Erro',
+            message: 'Não foi possível atualizar a subcategoria. Tente novamente.',
+            type: 'error'
+          });
+        }
+      });
     }
+  }
+
+  fecharSubcategoriaDialog() {
+    this.subcategoriaDialog.set({
+      isOpen: false,
+      categoriaId: '',
+      subcategoriaId: '',
+      nome: '',
+      icone: 'tag'
+    });
   }
 
   excluirSubcategoria(categoriaId: string, subcategoriaId: string, event: Event) {
@@ -172,10 +341,18 @@ export class CategoriasListaComponent implements OnInit {
     this.confirmDialog.set({
       isOpen: true,
       title: 'Excluir Subcategoria',
-      message: 'Tem certeza que deseja excluir esta subcategoria?',
+      message: 'Tem certeza que deseja excluir esta subcategoria? ATENÇÃO: Todas as receitas e despesas associadas a esta subcategoria também serão permanentemente removidas. Esta ação não pode ser desfeita.',
       onConfirm: () => {
         this.categoriaService.deletarSubcategoria(categoriaId, subcategoriaId).subscribe({
           next: (response) => {
+            // Fechar o diálogo de confirmação
+            this.confirmDialog.set({
+              isOpen: false,
+              title: '',
+              message: '',
+              onConfirm: () => {}
+            });
+
             if (response.success) {
               const categorias = this.categorias().map(cat => {
                 if (cat.id === categoriaId && cat.subcategorias) {
@@ -204,6 +381,14 @@ export class CategoriasListaComponent implements OnInit {
             }
           },
           error: (err) => {
+            // Fechar o diálogo de confirmação
+            this.confirmDialog.set({
+              isOpen: false,
+              title: '',
+              message: '',
+              onConfirm: () => {}
+            });
+
             console.error('Erro ao excluir subcategoria:', err);
             this.alertDialog.set({
               isOpen: true,
