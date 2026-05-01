@@ -115,6 +115,11 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'more',
+    loadComponent: () =>
+      import('./pages/more-menu/more-menu.component').then(m => m.MoreMenuComponent)
+  },
+  {
     path: '**',
     redirectTo: '/dashboard'
   }

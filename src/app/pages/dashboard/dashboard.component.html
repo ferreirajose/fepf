@@ -1,19 +1,43 @@
-<div class="min-h-screen p-6">
+<div class="min-h-screen p-4 md:p-6">
   <div class="max-w-7xl mx-auto">
     <!-- Header -->
-    <header class="mb-8 flex items-center justify-between">
-      <div>
-        <div class="flex items-center space-x-3 mb-2">
-          <div class="w-12 h-12 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
-            <i class="ri-dashboard-line text-white"></i>
+    <header class="mb-6 md:mb-8">
+      <!-- Mobile Layout -->
+      <div class="md:hidden space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center flex-shrink-0">
+            <i class="ri-dashboard-line text-white text-xl"></i>
           </div>
-          <h1 class="text-4xl font-manrope font-bold text-on-surface">Dashboard Financeiro</h1>
+          <div class="flex-1 min-w-0">
+            <h1 class="text-2xl font-manrope font-bold text-on-surface leading-tight">
+              Dashboard Financeiro
+            </h1>
+          </div>
         </div>
-        <p class="text-gray-600 font-inter ml-15">Visão geral das suas finanças</p>
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-600 font-inter">Visão geral das suas finanças</p>
+          <div class="flex items-center gap-1.5 text-xs text-gray-500 font-inter">
+            <i class="ri-time-line"></i>
+            <span>Agora</span>
+          </div>
+        </div>
       </div>
-      <div class="flex items-center space-x-2 text-sm text-gray-500 font-inter">
-        <i class="ri-time-line"></i>
-        <span>Atualizado agora</span>
+
+      <!-- Desktop Layout -->
+      <div class="hidden md:flex items-center justify-between">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-12 h-12 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+              <i class="ri-dashboard-line text-white"></i>
+            </div>
+            <h1 class="text-4xl font-manrope font-bold text-on-surface">Dashboard Financeiro</h1>
+          </div>
+          <p class="text-gray-600 font-inter ml-15">Visão geral das suas finanças</p>
+        </div>
+        <div class="flex items-center space-x-2 text-sm text-gray-500 font-inter">
+          <i class="ri-time-line"></i>
+          <span>Atualizado agora</span>
+        </div>
       </div>
     </header>
 
