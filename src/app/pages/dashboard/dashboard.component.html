@@ -42,22 +42,48 @@
     </header>
 
     <!-- Cards de Resumo -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <!-- Card Saldo Atual -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Card Saldo Anterior -->
       <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-xl transition-shadow">
         <div class="flex items-center space-x-3 mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center shadow-lg">
-            <i class="ri-wallet-3-line text-white"></i>
+          <div class="w-12 h-12 bg-gradient-to-br from-[#820AD1] to-[#a855f7] rounded-xl flex items-center justify-center shadow-lg">
+            <i class="ri-history-line text-white"></i>
           </div>
           <div class="flex-1">
             <div class="flex items-center space-x-1 mb-1">
-              <i class="ri-funds-line text-[#515981]"></i>
-              <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Saldo Atual</p>
+              <i class="ri-calendar-check-line text-[#515981]"></i>
+              <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Saldo Anterior</p>
             </div>
-            <h2 class="text-2xl font-manrope font-extrabold text-on-surface">
-              {{ saldoAtual() | currency:'BRL' }}
+            <h2 class="text-2xl font-manrope font-extrabold" [class.text-[#006947]]="saldoAnterior() >= 0" [class.text-[#b51621]]="saldoAnterior() < 0">
+              {{ saldoAnterior() | currency:'BRL' }}
             </h2>
           </div>
+        </div>
+        <div class="w-full h-2 bg-[#efefff] rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-[#820AD1] to-[#a855f7]" style="width: 60%"></div>
+        </div>
+      </div>
+
+      <!-- Card Saldo Atual -->
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-xl transition-shadow">
+        <div class="flex flex-col mb-4">
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-12 h-12 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center shadow-lg">
+              <i class="ri-wallet-3-line text-white"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center space-x-1 mb-1">
+                <i class="ri-funds-line text-[#515981]"></i>
+                <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Saldo Atual</p>
+              </div>
+              <h2 class="text-2xl font-manrope font-extrabold" [class.text-[#006947]]="saldoAtual() >= 0" [class.text-[#b51621]]="saldoAtual() < 0">
+                {{ saldoAtual() | currency:'BRL' }}
+              </h2>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 font-inter ml-15">
+            {{ saldoAnterior() | currency:'BRL' }} + {{ receitasMes() | currency:'BRL' }} - {{ despesasMes() | currency:'BRL' }}
+          </p>
         </div>
         <div class="w-full h-2 bg-[#efefff] rounded-full overflow-hidden">
           <div class="h-full bg-gradient-to-r from-[#515981] to-[#a3abd7]" style="width: 75%"></div>

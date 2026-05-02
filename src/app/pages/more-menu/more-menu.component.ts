@@ -55,7 +55,7 @@ export class MoreMenuComponent {
     },
     {
       title: 'Nova Receita',
-      icon: 'add',
+      icon: 'money-dollar',
       route: '/receitas/novo',
       color: '#006947'
     },

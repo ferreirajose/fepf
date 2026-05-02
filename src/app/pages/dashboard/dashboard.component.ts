@@ -6,6 +6,7 @@ import { ReceitaService } from '../../shared/services/receita.service';
 import { CartaoService } from '../../shared/services/cartao.service';
 import { OrcamentoService } from '../../shared/services/orcamento.service';
 import { CategoriaService } from '../../shared/services/categoria.service';
+import { FinanceiroService } from '../../shared/services/financeiro.service';
 import { MapClustererComponent } from '../../shared/components/map-clusterer/map-clusterer.component';
 import { environment } from '../../../environments/environment';
 import { forkJoin } from 'rxjs';
@@ -25,12 +26,14 @@ export class DashboardComponent implements OnInit {
   private cartaoService = inject(CartaoService);
   private orcamentoService = inject(OrcamentoService);
   private categoriaService = inject(CategoriaService);
+  private financeiroService = inject(FinanceiroService);
 
   @ViewChild('evolucaoChart') evolucaoChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('categoriasChart') categoriasChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('cartoesChart') cartoesChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('orcamentosChart') orcamentosChartRef!: ElementRef<HTMLCanvasElement>;
 
+  saldoAnterior = signal(0);
   saldoAtual = signal(0);
   receitasMes = signal(0);
   despesasMes = signal(0);
@@ -75,14 +78,24 @@ export class DashboardComponent implements OnInit {
       despesasLista: this.despesaService.listar(),
       cartoes: this.cartaoService.listar(),
       orcamentos: this.orcamentoService.listar({ mes: mesAtual, ano: anoAtual }),
-      categorias: this.categoriaService.listar()
+      categorias: this.categoriaService.listar(),
+      saldoAcumulado: this.financeiroService.obterSaldoAcumulado(mesAtual, anoAtual)
     }).subscribe({
       next: (response) => {
-        if (response.receitas.success && response.receitas.data) {
-          this.receitasMes.set(response.receitas.data.total || 0);
-        }
-        if (response.despesas.success && response.despesas.data) {
-          this.despesasMes.set(response.despesas.data.total || 0);
+        if (response.saldoAcumulado.success && response.saldoAcumulado.data) {
+          const saldo = response.saldoAcumulado.data;
+          this.saldoAnterior.set(saldo.saldoAnterior);
+          this.receitasMes.set(saldo.receitasMes);
+          this.despesasMes.set(saldo.despesasMes);
+          this.saldoAtual.set(saldo.saldoAtual);
+        } else {
+          if (response.receitas.success && response.receitas.data) {
+            this.receitasMes.set(response.receitas.data.total || 0);
+          }
+          if (response.despesas.success && response.despesas.data) {
+            this.despesasMes.set(response.despesas.data.total || 0);
+          }
+          this.saldoAtual.set(this.receitasMes() - this.despesasMes());
         }
         if (response.cartoes.success && Array.isArray(response.cartoes.data)) {
           this.cartoes.set(response.cartoes.data);
@@ -93,8 +106,6 @@ export class DashboardComponent implements OnInit {
         if (response.categorias.success && Array.isArray(response.categorias.data)) {
           this.categorias.set(response.categorias.data);
         }
-
-        this.saldoAtual.set(this.receitasMes() - this.despesasMes());
 
         // Armazenar estatísticas completas
         this.dadosEstatisticos.set({
@@ -124,7 +135,7 @@ export class DashboardComponent implements OnInit {
   }
 
   calcularSaldo(): number {
-    return this.receitasMes() - this.despesasMes();
+    return this.saldoAnterior() + this.receitasMes() - this.despesasMes();
   }
 
   processarTransacoesRecentes(receitas: any, despesas: any) {
