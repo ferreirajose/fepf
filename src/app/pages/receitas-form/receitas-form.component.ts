@@ -110,17 +110,22 @@ export class ReceitasFormComponent implements OnInit {
     this.receitaService.buscarPorId(id).subscribe({
       next: (response) => {
         if (response.success && response.data && !Array.isArray(response.data)) {
-          const receita = response.data;
+          const receita = response.data as any;
           // Extrair apenas a parte da data sem conversão de timezone
           const dataFormatada = typeof receita.data === 'string'
             ? receita.data.split('T')[0]
             : new Date(receita.data).toISOString().split('T')[0];
 
+          // Extrair ID de objeto populado ou usar valor direto
+          const categoriaId = typeof receita.categoriaId === 'object' && receita.categoriaId?._id
+            ? receita.categoriaId._id
+            : receita.categoriaId;
+
           this.form.patchValue({
             descricao: receita.descricao,
             valor: receita.valor,
             data: dataFormatada,
-            categoriaId: receita.categoriaId,
+            categoriaId: categoriaId,
             recorrente: receita.recorrente,
             observacoes: receita.observacoes || ''
           });

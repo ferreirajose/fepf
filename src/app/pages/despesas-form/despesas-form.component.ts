@@ -163,18 +163,27 @@ export class DespesasFormComponent implements OnInit {
     this.despesaService.buscarPorId(id).subscribe({
       next: (response) => {
         if (response.success && response.data && !Array.isArray(response.data)) {
-          const despesa = response.data;
+          const despesa = response.data as any;
           // Extrair apenas a parte da data sem conversão de timezone
           const dataFormatada = typeof despesa.data === 'string'
             ? despesa.data.split('T')[0]
             : new Date(despesa.data).toISOString().split('T')[0];
 
+          // Extrair IDs de objetos populados ou usar valores diretos
+          const categoriaId = typeof despesa.categoriaId === 'object' && despesa.categoriaId?._id
+            ? despesa.categoriaId._id
+            : despesa.categoriaId;
+
+          const cartaoId = typeof despesa.cartaoId === 'object' && despesa.cartaoId?._id
+            ? despesa.cartaoId._id
+            : despesa.cartaoId || '';
+
           this.form.patchValue({
             descricao: despesa.descricao,
             valor: despesa.valor,
             data: dataFormatada,
-            categoriaId: despesa.categoriaId,
-            cartaoId: despesa.cartaoId || '',
+            categoriaId: categoriaId,
+            cartaoId: cartaoId,
             formaPagamento: despesa.formaPagamento || 'dinheiro',
             recorrente: despesa.recorrente,
             pago: despesa.pago || false,

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ReceitaService, Receita as ReceitaAPI } from '../../shared/services/receita.service';
+import { CategoriaService, Categoria } from '../../shared/services/categoria.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AlertDialogComponent } from '../../shared/components/alert-dialog/alert-dialog.component';
 
@@ -29,6 +30,7 @@ interface Receita {
 })
 export class ReceitasComponent implements OnInit {
   private receitaService = inject(ReceitaService);
+  private categoriaService = inject(CategoriaService);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -73,18 +75,40 @@ export class ReceitasComponent implements OnInit {
 
   receitas = signal<Receita[]>([]);
 
-  categorias = [
-    { id: 'todas', nome: 'Todas Categorias' },
-    { id: '1', nome: 'Salário' },
-    { id: '2', nome: 'Freelance' },
-    { id: '3', nome: 'Aluguel' },
-    { id: '4', nome: 'Investimentos' },
-    { id: '5', nome: 'Vendas' },
-    { id: '6', nome: 'Bônus' }
-  ];
+  categorias = signal<Array<{ id: string; nome: string }>>([
+    { id: 'todas', nome: 'Todas Categorias' }
+  ]);
 
   ngOnInit() {
+    this.carregarCategorias();
     this.carregarReceitas();
+  }
+
+  carregarCategorias() {
+    this.categoriaService.listar().subscribe({
+      next: (response) => {
+        if (response.success && Array.isArray(response.data)) {
+          const categoriasApi = response.data as Categoria[];
+
+          // Filtrar apenas categorias ativas
+          // Note: campo 'tipo' será adicionado futuramente para separar despesa/receita
+          const categoriasAtivas = categoriasApi
+            .filter(c => c.ativo)
+            .map(c => ({
+              id: c._id || '',
+              nome: c.nome
+            }));
+
+          this.categorias.set([
+            { id: 'todas', nome: 'Todas Categorias' },
+            ...categoriasAtivas
+          ]);
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao carregar categorias:', err);
+      }
+    });
   }
 
   carregarReceitas() {
@@ -112,7 +136,7 @@ export class ReceitasComponent implements OnInit {
               descricao: r.descricao,
               valor: r.valor,
               data: dataLocal,
-              categoriaId: r.categoriaId,
+              categoriaId: (r as any).categoriaId?._id || (r as any).categoriaId?.id || r.categoriaId,
               categoriaNome: (r as any).categoriaId?.nome || 'Sem categoria',
               categoriaIcone: (r as any).categoriaId?.icone || 'circle',
               categoriaCor: (r as any).categoriaId?.cor || '#69f6b8',

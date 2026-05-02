@@ -23,9 +23,27 @@ export interface Despesa {
   localizacao?: Localizacao;
 }
 
+export interface DespesaPopulada {
+  id?: string;
+  _id?: string;
+  descricao: string;
+  valor: number;
+  data: Date | string;
+  categoriaId: string | { _id: string; nome: string; cor: string; icone?: string };
+  cartaoId?: string | { _id: string; nome: string; bandeira: string };
+  recorrente: boolean;
+  observacoes?: string;
+  formaPagamento?: 'dinheiro' | 'debito' | 'credito' | 'pix';
+  pago?: boolean;
+  localizacao?: Localizacao;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+}
+
 export interface DespesaResponse {
   success: boolean;
-  data?: Despesa | Despesa[];
+  data?: Despesa | Despesa[] | DespesaPopulada;
   error?: string;
   details?: any;
 }
