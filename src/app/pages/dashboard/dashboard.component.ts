@@ -45,6 +45,7 @@ export class DashboardComponent implements OnInit {
   despesasMes = signal(0);
   carregando = signal(false);
   erro = signal<string | null>(null);
+  tipoVisualizacao = signal<'mensal' | 'anual'>('mensal');
 
   dadosEstatisticos = signal<any>(null);
   cartoes = signal<any[]>([]);
@@ -63,18 +64,21 @@ export class DashboardComponent implements OnInit {
     this.carregando.set(true);
     this.erro.set(null);
 
-    const primeiroDia = new Date();
-    primeiroDia.setDate(1);
-    primeiroDia.setHours(0, 0, 0, 0); // Zerar hora para início do dia
+    // Para o gráfico de evolução, buscar dados dos últimos 5 anos (para ter dados suficientes para visualização anual)
+    const dataFim = new Date();
+    dataFim.setMonth(dataFim.getMonth() + 1);
+    dataFim.setDate(0);
+    dataFim.setHours(23, 59, 59, 999); // Final do mês atual
 
-    const ultimoDia = new Date();
-    ultimoDia.setMonth(ultimoDia.getMonth() + 1);
-    ultimoDia.setDate(0);
-    ultimoDia.setHours(23, 59, 59, 999); // Final do dia
+    const dataInicio = new Date();
+    dataInicio.setFullYear(dataInicio.getFullYear() - 4); // 5 anos atrás (ano atual + 4 anteriores)
+    dataInicio.setMonth(0); // Janeiro
+    dataInicio.setDate(1);
+    dataInicio.setHours(0, 0, 0, 0); // Início do ano
 
     const filtros = {
-      dataInicio: primeiroDia.toISOString().split('T')[0],
-      dataFim: ultimoDia.toISOString().split('T')[0]
+      dataInicio: dataInicio.toISOString().split('T')[0],
+      dataFim: dataFim.toISOString().split('T')[0]
     };
 
     const mesAtual = new Date().getMonth() + 1;
@@ -375,6 +379,14 @@ export class DashboardComponent implements OnInit {
     return url;
   }
 
+  setTipoVisualizacao(tipo: 'mensal' | 'anual') {
+    this.tipoVisualizacao.set(tipo);
+    // Recriar apenas o gráfico de evolução
+    setTimeout(() => {
+      this.criarGraficoEvolucao();
+    }, 50);
+  }
+
   criarGraficos() {
     this.criarGraficoEvolucao();
     this.criarGraficoCategorias();
@@ -406,19 +418,64 @@ export class DashboardComponent implements OnInit {
     const receitasPorMes = stats?.receitas?.porMes || [];
     const despesasPorMes = stats?.despesas?.porMes || [];
 
-    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    const labels = receitasPorMes.map((item: any) => meses[item._id.mes - 1] || '').slice(0, 6);
-    const receitasData = receitasPorMes.map((item: any) => item.total).slice(0, 6);
-    const despesasData = despesasPorMes.map((item: any) => item.total).slice(0, 6);
+    let labels: string[] = [];
+    let receitasData: number[] = [];
+    let despesasData: number[] = [];
+
+    if (this.tipoVisualizacao() === 'mensal') {
+      // Visualização mensal - últimos 12 meses
+      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const hoje = new Date();
+      const anoAtualCompleto = hoje.getFullYear();
+
+      for (let i = 11; i >= 0; i--) {
+        const data = new Date();
+        data.setMonth(hoje.getMonth() - i);
+        const mes = data.getMonth() + 1;
+        const ano = data.getFullYear();
+
+        // Incluir ano no label se for diferente do ano atual
+        const label = ano !== anoAtualCompleto ? `${meses[mes - 1]}/${ano}` : meses[mes - 1];
+        labels.push(label);
+
+        // Buscar receita do mês
+        const receitaMes = receitasPorMes.find((r: any) => r._id.mes === mes && r._id.ano === ano);
+        receitasData.push(receitaMes?.total || 0);
+
+        // Buscar despesa do mês
+        const despesaMes = despesasPorMes.find((d: any) => d._id.mes === mes && d._id.ano === ano);
+        despesasData.push(despesaMes?.total || 0);
+      }
+    } else {
+      // Visualização anual - últimos 5 anos
+      const anoAtual = new Date().getFullYear();
+
+      for (let i = 4; i >= 0; i--) {
+        const ano = anoAtual - i;
+        labels.push(ano.toString());
+
+        // Somar todas as receitas do ano
+        const receitaAno = receitasPorMes
+          .filter((r: any) => r._id.ano === ano)
+          .reduce((sum: number, r: any) => sum + r.total, 0);
+        receitasData.push(receitaAno);
+
+        // Somar todas as despesas do ano
+        const despesaAno = despesasPorMes
+          .filter((d: any) => d._id.ano === ano)
+          .reduce((sum: number, d: any) => sum + d.total, 0);
+        despesasData.push(despesaAno);
+      }
+    }
 
     this.evolucaoChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: labels.length > 0 ? labels : ['Mês Atual'],
+        labels: labels,
         datasets: [
           {
             label: 'Receitas',
-            data: receitasData.length > 0 ? receitasData : [this.receitasMes()],
+            data: receitasData,
             borderColor: '#006947',
             backgroundColor: receitasGradient,
             borderWidth: 3,
@@ -432,7 +489,7 @@ export class DashboardComponent implements OnInit {
           },
           {
             label: 'Despesas',
-            data: despesasData.length > 0 ? despesasData : [this.despesasMes()],
+            data: despesasData,
             borderColor: '#b51621',
             backgroundColor: despesasGradient,
             borderWidth: 3,

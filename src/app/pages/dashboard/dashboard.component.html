@@ -137,11 +137,35 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <!-- Gráfico Evolução Mensal -->
       <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
-        <div class="flex items-center space-x-3 mb-6">
-          <div class="w-10 h-10 bg-gradient-to-br from-[#006947] to-[#b51621] rounded-xl flex items-center justify-center">
-            <i class="ri-line-chart-line text-white"></i>
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#006947] to-[#b51621] rounded-xl flex items-center justify-center">
+              <i class="ri-line-chart-line text-white"></i>
+            </div>
+            <h3 class="text-xl font-manrope font-bold text-on-surface">
+              Evolução {{ tipoVisualizacao() === 'mensal' ? 'Mensal' : 'Anual' }}
+            </h3>
           </div>
-          <h3 class="text-xl font-manrope font-bold text-on-surface">Evolução Mensal</h3>
+          <div class="flex items-center bg-[#efefff] rounded-lg p-1">
+            <button
+              (click)="setTipoVisualizacao('mensal')"
+              [class.bg-white]="tipoVisualizacao() === 'mensal'"
+              [class.shadow-sm]="tipoVisualizacao() === 'mensal'"
+              [class.text-primary]="tipoVisualizacao() === 'mensal'"
+              [class.text-[#515981]]="tipoVisualizacao() !== 'mensal'"
+              class="px-3 py-1.5 rounded-md text-xs font-bold font-inter transition-all">
+              Mensal
+            </button>
+            <button
+              (click)="setTipoVisualizacao('anual')"
+              [class.bg-white]="tipoVisualizacao() === 'anual'"
+              [class.shadow-sm]="tipoVisualizacao() === 'anual'"
+              [class.text-primary]="tipoVisualizacao() === 'anual'"
+              [class.text-[#515981]]="tipoVisualizacao() !== 'anual'"
+              class="px-3 py-1.5 rounded-md text-xs font-bold font-inter transition-all">
+              Anual
+            </button>
+          </div>
         </div>
         <div class="h-64 relative">
           <canvas #evolucaoChart></canvas>
