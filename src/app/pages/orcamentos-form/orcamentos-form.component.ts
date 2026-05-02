@@ -101,9 +101,15 @@ export class OrcamentosFormComponent implements OnInit {
     this.orcamentoService.buscarPorId(id).subscribe({
       next: (response) => {
         if (response.success && response.data && !Array.isArray(response.data)) {
-          const orcamento = response.data;
+          const orcamento = response.data as any;
+
+          // Extrair ID de objeto populado ou usar valor direto
+          const categoriaId = typeof orcamento.categoriaId === 'object' && orcamento.categoriaId?._id
+            ? orcamento.categoriaId._id
+            : orcamento.categoriaId;
+
           this.form.patchValue({
-            categoriaId: orcamento.categoriaId,
+            categoriaId: categoriaId,
             valorPlanejado: orcamento.valor,
             mes: orcamento.mes,
             ano: orcamento.ano,

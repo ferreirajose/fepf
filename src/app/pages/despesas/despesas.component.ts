@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DespesaService, Despesa as DespesaAPI } from '../../shared/services/despesa.service';
+import { CategoriaService, Categoria } from '../../shared/services/categoria.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AlertDialogComponent } from '../../shared/components/alert-dialog/alert-dialog.component';
 
@@ -31,6 +32,7 @@ interface Despesa {
 })
 export class DespesasComponent implements OnInit {
   private despesaService = inject(DespesaService);
+  private categoriaService = inject(CategoriaService);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -75,17 +77,40 @@ export class DespesasComponent implements OnInit {
 
   despesas = signal<Despesa[]>([]);
 
-  categorias = [
-    { id: 'todas', nome: 'Todas Categorias' },
-    { id: '1', nome: 'Alimentação' },
-    { id: '2', nome: 'Lazer' },
-    { id: '3', nome: 'Transporte' },
-    { id: '4', nome: 'Moradia' },
-    { id: '5', nome: 'Saúde' }
-  ];
+  categorias = signal<Array<{ id: string; nome: string }>>([
+    { id: 'todas', nome: 'Todas Categorias' }
+  ]);
 
   ngOnInit() {
+    this.carregarCategorias();
     this.carregarDespesas();
+  }
+
+  carregarCategorias() {
+    this.categoriaService.listar().subscribe({
+      next: (response) => {
+        if (response.success && Array.isArray(response.data)) {
+          const categoriasApi = response.data as Categoria[];
+
+          // Filtrar apenas categorias ativas
+          // Note: campo 'tipo' será adicionado futuramente para separar despesa/receita
+          const categoriasAtivas = categoriasApi
+            .filter(c => c.ativo)
+            .map(c => ({
+              id: c._id || '',
+              nome: c.nome
+            }));
+
+          this.categorias.set([
+            { id: 'todas', nome: 'Todas Categorias' },
+            ...categoriasAtivas
+          ]);
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao carregar categorias:', err);
+      }
+    });
   }
 
   carregarDespesas() {
@@ -113,11 +138,11 @@ export class DespesasComponent implements OnInit {
               descricao: d.descricao,
               valor: d.valor,
               data: dataLocal,
-              categoriaId: d.categoriaId,
+              categoriaId: (d as any).categoriaId?._id || (d as any).categoriaId?.id || d.categoriaId,
               categoriaNome: (d as any).categoriaId?.nome || 'Sem categoria',
               categoriaIcone: (d as any).categoriaId?.icone || 'circle',
               categoriaCor: (d as any).categoriaId?.cor || '#6e9fff',
-              cartaoId: d.cartaoId,
+              cartaoId: (d as any).cartaoId?._id || (d as any).cartaoId?.id || d.cartaoId,
               cartaoNome: (d as any).cartaoId?.nome,
               recorrente: d.recorrente,
               pago: d.pago || false,
