@@ -102,19 +102,25 @@ export class ReceitasComponent implements OnInit {
     this.receitaService.listar(filtros).subscribe({
       next: (response) => {
         if (response.success && Array.isArray(response.data)) {
-          this.receitas.set((response.data as ReceitaAPI[]).map(r => ({
-            id: (r as any)._id || r.id || '',
-            descricao: r.descricao,
-            valor: r.valor,
-            data: new Date(r.data),
-            categoriaId: r.categoriaId,
-            categoriaNome: (r as any).categoriaId?.nome || 'Sem categoria',
-            categoriaIcone: (r as any).categoriaId?.icone || 'circle',
-            categoriaCor: (r as any).categoriaId?.cor || '#69f6b8',
-            recorrente: r.recorrente,
-            recebida: true,
-            observacoes: r.observacoes
-          })));
+          this.receitas.set((response.data as ReceitaAPI[]).map(r => {
+            // Converter data UTC para data local sem timezone
+            const dataUTC = new Date(r.data);
+            const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
+
+            return {
+              id: (r as any)._id || r.id || '',
+              descricao: r.descricao,
+              valor: r.valor,
+              data: dataLocal,
+              categoriaId: r.categoriaId,
+              categoriaNome: (r as any).categoriaId?.nome || 'Sem categoria',
+              categoriaIcone: (r as any).categoriaId?.icone || 'circle',
+              categoriaCor: (r as any).categoriaId?.cor || '#69f6b8',
+              recorrente: r.recorrente,
+              recebida: true,
+              observacoes: r.observacoes
+            };
+          }));
         }
         this.carregando.set(false);
       },

@@ -111,7 +111,10 @@ export class ReceitasFormComponent implements OnInit {
       next: (response) => {
         if (response.success && response.data && !Array.isArray(response.data)) {
           const receita = response.data;
-          const dataFormatada = new Date(receita.data).toISOString().split('T')[0];
+          // Extrair apenas a parte da data sem conversão de timezone
+          const dataFormatada = typeof receita.data === 'string'
+            ? receita.data.split('T')[0]
+            : new Date(receita.data).toISOString().split('T')[0];
 
           this.form.patchValue({
             descricao: receita.descricao,

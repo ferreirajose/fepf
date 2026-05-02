@@ -164,7 +164,10 @@ export class DespesasFormComponent implements OnInit {
       next: (response) => {
         if (response.success && response.data && !Array.isArray(response.data)) {
           const despesa = response.data;
-          const dataFormatada = new Date(despesa.data).toISOString().split('T')[0];
+          // Extrair apenas a parte da data sem conversão de timezone
+          const dataFormatada = typeof despesa.data === 'string'
+            ? despesa.data.split('T')[0]
+            : new Date(despesa.data).toISOString().split('T')[0];
 
           this.form.patchValue({
             descricao: despesa.descricao,

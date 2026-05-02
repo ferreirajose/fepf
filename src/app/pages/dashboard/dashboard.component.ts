@@ -133,11 +133,13 @@ export class DashboardComponent implements OnInit {
     // Adicionar receitas
     if (Array.isArray(receitas)) {
       receitas.forEach((receita: any) => {
+        const dataUTC = new Date(receita.data);
+        const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
         transacoes.push({
           tipo: 'receita',
           descricao: receita.descricao,
           valor: receita.valor,
-          data: new Date(receita.data)
+          data: dataLocal
         });
       });
     }
@@ -145,11 +147,13 @@ export class DashboardComponent implements OnInit {
     // Adicionar despesas
     if (Array.isArray(despesas)) {
       despesas.forEach((despesa: any) => {
+        const dataUTC = new Date(despesa.data);
+        const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
         transacoes.push({
           tipo: 'despesa',
           descricao: despesa.descricao,
           valor: despesa.valor,
-          data: new Date(despesa.data)
+          data: dataLocal
         });
       });
     }
@@ -174,17 +178,21 @@ export class DashboardComponent implements OnInit {
         despesa.localizacao.latitude &&
         despesa.localizacao.longitude
       )
-      .map((despesa: any) => ({
-        id: despesa._id,
-        descricao: despesa.descricao,
-        valor: despesa.valor,
-        data: new Date(despesa.data),
-        latitude: despesa.localizacao.latitude,
-        longitude: despesa.localizacao.longitude,
-        endereco: despesa.localizacao.endereco || `${despesa.localizacao.latitude}, ${despesa.localizacao.longitude}`,
-        categoriaNome: despesa.categoriaId?.nome || 'Sem categoria',
-        categoriaCor: despesa.categoriaId?.cor || '#6e9fff'
-      }))
+      .map((despesa: any) => {
+        const dataUTC = new Date(despesa.data);
+        const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
+        return {
+          id: despesa._id,
+          descricao: despesa.descricao,
+          valor: despesa.valor,
+          data: dataLocal,
+          latitude: despesa.localizacao.latitude,
+          longitude: despesa.localizacao.longitude,
+          endereco: despesa.localizacao.endereco || `${despesa.localizacao.latitude}, ${despesa.localizacao.longitude}`,
+          categoriaNome: despesa.categoriaId?.nome || 'Sem categoria',
+          categoriaCor: despesa.categoriaId?.cor || '#6e9fff'
+        };
+      })
       .sort((a: any, b: any) => b.data.getTime() - a.data.getTime());
 
     this.despesasComLocalizacao.set(despesasComLoc);

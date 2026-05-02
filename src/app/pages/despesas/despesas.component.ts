@@ -103,21 +103,27 @@ export class DespesasComponent implements OnInit {
     this.despesaService.listar(filtros).subscribe({
       next: (response) => {
         if (response.success && Array.isArray(response.data)) {
-          this.despesas.set((response.data as DespesaAPI[]).map(d => ({
-            id: (d as any)._id || d.id || '',
-            descricao: d.descricao,
-            valor: d.valor,
-            data: new Date(d.data),
-            categoriaId: d.categoriaId,
-            categoriaNome: (d as any).categoriaId?.nome || 'Sem categoria',
-            categoriaIcone: (d as any).categoriaId?.icone || 'circle',
-            categoriaCor: (d as any).categoriaId?.cor || '#6e9fff',
-            cartaoId: d.cartaoId,
-            cartaoNome: (d as any).cartaoId?.nome,
-            recorrente: d.recorrente,
-            pago: d.pago || false,
-            observacoes: d.observacoes
-          })));
+          this.despesas.set((response.data as DespesaAPI[]).map(d => {
+            // Converter data UTC para data local sem timezone
+            const dataUTC = new Date(d.data);
+            const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
+
+            return {
+              id: (d as any)._id || d.id || '',
+              descricao: d.descricao,
+              valor: d.valor,
+              data: dataLocal,
+              categoriaId: d.categoriaId,
+              categoriaNome: (d as any).categoriaId?.nome || 'Sem categoria',
+              categoriaIcone: (d as any).categoriaId?.icone || 'circle',
+              categoriaCor: (d as any).categoriaId?.cor || '#6e9fff',
+              cartaoId: d.cartaoId,
+              cartaoNome: (d as any).cartaoId?.nome,
+              recorrente: d.recorrente,
+              pago: d.pago || false,
+              observacoes: d.observacoes
+            };
+          }));
         }
         this.carregando.set(false);
       },
