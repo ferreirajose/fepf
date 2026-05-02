@@ -5,11 +5,12 @@ import { SidebarComponent } from './shared/components/sidebar/sidebar.component'
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
 import { PwaInstallBannerComponent } from './shared/components/pwa-install-banner/pwa-install-banner.component';
+import { PwaUpdatePromptComponent } from './shared/components/pwa-update-prompt/pwa-update-prompt.component';
 import { SidebarService } from './shared/services/sidebar.service';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, SidebarComponent, NavbarComponent, BottomNavComponent, PwaInstallBannerComponent],
+  imports: [CommonModule, RouterOutlet, SidebarComponent, NavbarComponent, BottomNavComponent, PwaInstallBannerComponent, PwaUpdatePromptComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

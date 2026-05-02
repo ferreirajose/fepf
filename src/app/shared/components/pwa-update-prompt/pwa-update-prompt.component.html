@@ -1,0 +1,27 @@
+<!-- Update Notification Banner -->
+<div
+  *ngIf="showUpdatePrompt()"
+  class="fixed top-0 left-0 right-0 z-[100] animate-slide-down">
+  <div class="bg-[#2d3748] shadow-xl border-b border-gray-700">
+    <div class="max-w-6xl mx-auto px-4 py-4 md:py-5 flex items-center justify-between gap-4">
+      <!-- Mensagem -->
+      <p class="text-white font-inter text-sm md:text-base flex-1">
+        Uma nova versão do FePF está disponível
+      </p>
+
+      <!-- Botões -->
+      <div class="flex items-center gap-3 md:gap-6">
+        <button
+          (click)="updateApp()"
+          class="text-[#4299e1] hover:text-[#63b3ed] font-bold text-sm md:text-base transition-colors font-inter uppercase tracking-wider">
+          Atualizar
+        </button>
+        <button
+          (click)="dismiss()"
+          class="w-8 h-8 flex items-center justify-center text-white/80 hover:text-white transition-colors">
+          <i class="ri-close-line text-xl md:text-2xl"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
