@@ -33,6 +33,12 @@ export class DashboardComponent implements OnInit {
   @ViewChild('cartoesChart') cartoesChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('orcamentosChart') orcamentosChartRef!: ElementRef<HTMLCanvasElement>;
 
+  // Instâncias dos gráficos
+  private evolucaoChart?: Chart;
+  private categoriasChart?: Chart;
+  private cartoesChart?: Chart;
+  private orcamentosChart?: Chart;
+
   saldoAnterior = signal(0);
   saldoAtual = signal(0);
   receitasMes = signal(0);
@@ -59,9 +65,12 @@ export class DashboardComponent implements OnInit {
 
     const primeiroDia = new Date();
     primeiroDia.setDate(1);
+    primeiroDia.setHours(0, 0, 0, 0); // Zerar hora para início do dia
+
     const ultimoDia = new Date();
     ultimoDia.setMonth(ultimoDia.getMonth() + 1);
     ultimoDia.setDate(0);
+    ultimoDia.setHours(23, 59, 59, 999); // Final do dia
 
     const filtros = {
       dataInicio: primeiroDia.toISOString().split('T')[0],
@@ -379,6 +388,11 @@ export class DashboardComponent implements OnInit {
     const ctx = this.evolucaoChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
 
+    // Destruir gráfico anterior se existir
+    if (this.evolucaoChart) {
+      this.evolucaoChart.destroy();
+    }
+
     // Criar gradientes para receitas e despesas
     const receitasGradient = ctx.createLinearGradient(0, 0, 0, 300);
     receitasGradient.addColorStop(0, 'rgba(0, 105, 71, 0.3)');
@@ -397,7 +411,7 @@ export class DashboardComponent implements OnInit {
     const receitasData = receitasPorMes.map((item: any) => item.total).slice(0, 6);
     const despesasData = despesasPorMes.map((item: any) => item.total).slice(0, 6);
 
-    new Chart(ctx, {
+    this.evolucaoChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels.length > 0 ? labels : ['Mês Atual'],
@@ -523,6 +537,11 @@ export class DashboardComponent implements OnInit {
     const ctx = this.categoriasChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
 
+    // Destruir gráfico anterior se existir
+    if (this.categoriasChart) {
+      this.categoriasChart.destroy();
+    }
+
     const stats = this.dadosEstatisticos();
     const categorias = stats?.despesas?.porCategoria || [];
 
@@ -530,7 +549,7 @@ export class DashboardComponent implements OnInit {
     const data = categorias.map((c: any) => c.total);
     const cores = ['#6e9fff', '#69f6b8', '#ff928b', '#0057bd', '#006947', '#515981', '#820AD1', '#FFD700'];
 
-    new Chart(ctx, {
+    this.categoriasChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: labels.length > 0 ? labels : ['Sem dados'],
@@ -599,6 +618,11 @@ export class DashboardComponent implements OnInit {
     const ctx = this.cartoesChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
 
+    // Destruir gráfico anterior se existir
+    if (this.cartoesChart) {
+      this.cartoesChart.destroy();
+    }
+
     const cartoes = this.cartoes().filter((c: any) => c.ativo);
 
     const labels = cartoes.length > 0 ? cartoes.map((c: any) => c.nome) : ['Sem cartões cadastrados'];
@@ -606,7 +630,7 @@ export class DashboardComponent implements OnInit {
     const limites = cartoes.length > 0 ? cartoes.map((c: any) => c.limite || 0) : [0];
     const utilizados = cartoes.length > 0 ? cartoes.map(() => 0) : [0]; // Placeholder - pode ser calculado futuramente
 
-    new Chart(ctx, {
+    this.cartoesChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
@@ -720,6 +744,11 @@ export class DashboardComponent implements OnInit {
     const ctx = this.orcamentosChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
 
+    // Destruir gráfico anterior se existir
+    if (this.orcamentosChart) {
+      this.orcamentosChart.destroy();
+    }
+
     const orcamentos = this.orcamentos();
     const stats = this.dadosEstatisticos();
     const categorias = this.categorias();
@@ -743,7 +772,7 @@ export class DashboardComponent implements OnInit {
     const planejados = orcamentos.length > 0 ? orcamentos.map((o: any) => o.valor || 0) : [0];
     const gastos = orcamentos.length > 0 ? orcamentos.map((o: any) => gastosMap.get(o.categoriaId) || 0) : [0];
 
-    new Chart(ctx, {
+    this.orcamentosChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
