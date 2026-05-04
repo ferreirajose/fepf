@@ -339,26 +339,39 @@
         </div>
       </div>
       <div class="space-y-3">
-        <div *ngFor="let transacao of transacoesRecentes" class="flex justify-between items-center p-4 bg-[#efefff] hover:bg-[#dde1ff] rounded-xl transition-all">
+        <a *ngFor="let transacao of transacoesRecentes"
+           [routerLink]="['/transacao', transacao.tipo, transacao.id]"
+           class="flex justify-between items-center p-4 bg-[#efefff] hover:bg-[#dde1ff] rounded-xl transition-all cursor-pointer group">
           <div class="flex items-center gap-3">
             <div [ngClass]="transacao.tipo === 'receita'
                 ? 'bg-gradient-to-br from-[#006947] to-[#69f6b8]'
-                : 'bg-gradient-to-br from-[#b51621] to-[#ff928b]'" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm">
+                : 'bg-gradient-to-br from-[#b51621] to-[#ff928b]'" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
               <i [class]="transacao.tipo === 'receita' ? 'ri-arrow-up-line text-white' : 'ri-arrow-down-line text-white'">
               </i>
             </div>
             <div>
-              <p class="font-inter font-bold text-on-surface">{{ transacao.descricao }}</p>
+              <p class="font-inter font-bold text-on-surface group-hover:text-primary transition-colors">{{ transacao.descricao }}</p>
               <div class="flex items-center gap-1 text-xs text-[#515981] font-inter">
                 <i class="ri-calendar-line"></i>
                 <span>{{ transacao.data | date:'dd/MM/yyyy' }}</span>
               </div>
             </div>
           </div>
-          <p class="font-manrope font-extrabold text-xl"
-             [ngClass]="transacao.tipo === 'receita' ? 'text-[#006947]' : 'text-[#b51621]'">
-            {{ transacao.tipo === 'receita' ? '+' : '' }}{{ transacao.valor | currency:'BRL' }}
-          </p>
+          <div class="flex items-center gap-2">
+            <p class="font-manrope font-extrabold text-xl"
+               [ngClass]="transacao.tipo === 'receita' ? 'text-[#006947]' : 'text-[#b51621]'">
+              {{ transacao.tipo === 'receita' ? '+' : '' }}{{ transacao.valor | currency:'BRL' }}
+            </p>
+            <i class="ri-arrow-right-s-line text-[#515981] group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </a>
+
+        <!-- Empty State -->
+        <div *ngIf="transacoesRecentes.length === 0" class="p-8 text-center">
+          <div class="w-16 h-16 bg-[#efefff] rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="ri-exchange-line text-2xl text-[#515981]"></i>
+          </div>
+          <p class="text-sm text-[#515981] font-inter">Nenhuma transação recente encontrada</p>
         </div>
       </div>
     </div>

@@ -1,0 +1,223 @@
+<div class="min-h-screen p-8 bg-gradient-to-br from-[#f8f9ff] to-white">
+  <div class="max-w-4xl mx-auto w-full space-y-6">
+
+    <!-- Header com Botão Voltar -->
+    <div class="flex items-center justify-between">
+      <button
+        (click)="voltar()"
+        class="flex items-center space-x-2 text-[#515981] hover:text-primary transition-colors font-inter">
+        <i class="ri-arrow-left-line text-xl"></i>
+        <span class="font-semibold">Voltar para Dashboard</span>
+      </button>
+      <button
+        *ngIf="!carregando() && !erro()"
+        (click)="editar()"
+        class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 hover:bg-primary/90 transition-colors font-inter">
+        <i class="ri-edit-line"></i>
+        <span>Editar</span>
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="carregando()" class="bg-white rounded-2xl p-12 text-center shadow-lg">
+      <div class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-[#515981] font-inter">Carregando detalhes...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="erro() && !carregando()" class="bg-white rounded-2xl p-12 text-center shadow-lg border-2 border-[#ff928b]">
+      <div class="w-16 h-16 bg-[#ff928b]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="ri-error-warning-line text-3xl text-[#b51621]"></i>
+      </div>
+      <h3 class="text-xl font-bold text-on-surface mb-2 font-manrope">Erro ao Carregar</h3>
+      <p class="text-[#515981] font-inter">{{ erro() }}</p>
+    </div>
+
+    <!-- Detalhes da Transação -->
+    <div *ngIf="!carregando() && !erro() && transacao()" class="space-y-6">
+
+      <!-- Card Principal -->
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#a3abd7]/10">
+        <!-- Header do Card -->
+        <div class="p-8 pb-6"
+          [ngClass]="{
+            'bg-gradient-to-br from-[#b51621] to-[#ff928b]': tipo() === 'despesa',
+            'bg-gradient-to-br from-[#006947] to-[#69f6b8]': tipo() === 'receita'
+          }">
+          <div class="flex items-start justify-between">
+            <div class="flex items-start space-x-4">
+              <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-white/20 backdrop-blur-sm">
+                <i [class]="getIconeCategoria()" class="text-3xl text-white"></i>
+              </div>
+              <div class="text-white">
+                <p class="text-sm opacity-90 font-inter mb-1">
+                  {{ tipo() === 'despesa' ? 'Despesa' : 'Receita' }}
+                </p>
+                <h1 class="text-3xl font-extrabold font-manrope mb-2">
+                  {{ transacao().descricao }}
+                </h1>
+                <p class="text-xl font-bold font-inter">
+                  {{ transacao().valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Status Badge -->
+            <div class="px-4 py-2 rounded-xl font-bold text-sm bg-white/20 backdrop-blur-sm text-white font-inter">
+              {{ getStatusPagamento().texto }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Corpo do Card -->
+        <div class="p-8 space-y-6">
+          <!-- Data -->
+          <div class="flex items-start space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-[#efefff] flex items-center justify-center flex-shrink-0">
+              <i class="ri-calendar-line text-xl text-primary"></i>
+            </div>
+            <div>
+              <p class="text-sm text-[#515981] font-inter mb-1">Data</p>
+              <p class="text-lg font-bold text-on-surface font-manrope">
+                {{ formatarData(transacao().data) }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Categoria -->
+          <div class="flex items-start space-x-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+              [style.background-color]="getCorCategoria() + '30'">
+              <i [class]="getIconeCategoria()" class="text-xl" [style.color]="getCorCategoria()"></i>
+            </div>
+            <div>
+              <p class="text-sm text-[#515981] font-inter mb-1">Categoria</p>
+              <p class="text-lg font-bold text-on-surface font-manrope">
+                {{ getNomeCategoria() }}
+              </p>
+              <p *ngIf="getNomeSubcategoria()" class="text-sm text-[#515981] font-inter mt-1">
+                <i class="ri-arrow-right-s-line"></i>{{ getNomeSubcategoria() }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Forma de Pagamento (Despesas) -->
+          <div *ngIf="tipo() === 'despesa' && transacao().formaPagamento" class="flex items-start space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-[#efefff] flex items-center justify-center flex-shrink-0">
+              <i class="ri-wallet-line text-xl text-primary"></i>
+            </div>
+            <div>
+              <p class="text-sm text-[#515981] font-inter mb-1">Forma de Pagamento</p>
+              <p class="text-lg font-bold text-on-surface font-manrope capitalize">
+                {{ transacao().formaPagamento }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Cartão de Crédito -->
+          <div *ngIf="getNomeCartao()" class="flex items-start space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-[#efefff] flex items-center justify-center flex-shrink-0">
+              <i class="ri-bank-card-line text-xl text-primary"></i>
+            </div>
+            <div>
+              <p class="text-sm text-[#515981] font-inter mb-1">Cartão de Crédito</p>
+              <p class="text-lg font-bold text-on-surface font-manrope">
+                {{ getNomeCartao() }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Recorrente -->
+          <div *ngIf="transacao().recorrente" class="flex items-start space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-[#efefff] flex items-center justify-center flex-shrink-0">
+              <i class="ri-repeat-line text-xl text-primary"></i>
+            </div>
+            <div>
+              <p class="text-sm text-[#515981] font-inter mb-1">Recorrência</p>
+              <p class="text-lg font-bold text-on-surface font-manrope">
+                Transação Recorrente
+              </p>
+            </div>
+          </div>
+
+          <!-- Observações -->
+          <div *ngIf="transacao().observacoes" class="flex items-start space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-[#efefff] flex items-center justify-center flex-shrink-0">
+              <i class="ri-file-text-line text-xl text-primary"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm text-[#515981] font-inter mb-1">Observações</p>
+              <p class="text-base text-on-surface font-inter leading-relaxed">
+                {{ transacao().observacoes }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card de Localização -->
+      <div *ngIf="temLocalizacao()" class="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#a3abd7]/10">
+        <div class="p-6 border-b border-[#a3abd7]/10">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-[#efefff] flex items-center justify-center">
+                <i class="ri-map-pin-line text-xl text-primary"></i>
+              </div>
+              <h2 class="text-xl font-bold text-on-surface font-manrope">Localização</h2>
+            </div>
+            <a
+              [href]="getMapUrl()"
+              target="_blank"
+              class="text-primary hover:text-primary/80 font-semibold text-sm flex items-center space-x-1 font-inter">
+              <span>Abrir no Maps</span>
+              <i class="ri-external-link-line"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <p class="text-sm text-[#515981] font-inter mb-4">
+            <i class="ri-map-pin-2-fill text-primary mr-2"></i>
+            {{ transacao().localizacao.endereco || 'Endereço não informado' }}
+          </p>
+
+          <!-- Mapa Embed -->
+          <div class="rounded-xl overflow-hidden h-64 border-2 border-[#a3abd7]/10">
+            <iframe
+              [src]="getMapEmbedUrl() | safe:'resourceUrl'"
+              width="100%"
+              height="100%"
+              style="border:0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card de Metadados -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 border border-[#a3abd7]/10">
+        <h3 class="text-sm font-bold text-[#515981] uppercase tracking-wider mb-4 font-inter">
+          Informações do Sistema
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-[#515981] font-inter">Criado em</p>
+            <p class="text-on-surface font-semibold font-inter">
+              {{ transacao().createdAt | date:'dd/MM/yyyy HH:mm':'pt-BR' }}
+            </p>
+          </div>
+          <div>
+            <p class="text-[#515981] font-inter">Última atualização</p>
+            <p class="text-on-surface font-semibold font-inter">
+              {{ transacao().updatedAt | date:'dd/MM/yyyy HH:mm':'pt-BR' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

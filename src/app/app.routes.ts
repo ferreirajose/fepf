@@ -115,6 +115,11 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'transacao/:tipo/:id',
+    loadComponent: () =>
+      import('./pages/transacao-detalhes/transacao-detalhes.component').then(m => m.TransacaoDetalhesComponent)
+  },
+  {
     path: 'more',
     loadComponent: () =>
       import('./pages/more-menu/more-menu.component').then(m => m.MoreMenuComponent)

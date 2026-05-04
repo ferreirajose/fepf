@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { DespesaService } from '../../shared/services/despesa.service';
 import { ReceitaService } from '../../shared/services/receita.service';
@@ -16,7 +17,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MapClustererComponent],
+  imports: [CommonModule, RouterLink, MapClustererComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -160,6 +161,7 @@ export class DashboardComponent implements OnInit {
         const dataUTC = new Date(receita.data);
         const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
         transacoes.push({
+          id: receita._id,
           tipo: 'receita',
           descricao: receita.descricao,
           valor: receita.valor,
@@ -174,6 +176,7 @@ export class DashboardComponent implements OnInit {
         const dataUTC = new Date(despesa.data);
         const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
         transacoes.push({
+          id: despesa._id,
           tipo: 'despesa',
           descricao: despesa.descricao,
           valor: despesa.valor,
