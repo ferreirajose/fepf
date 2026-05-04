@@ -131,6 +131,34 @@
           </p>
         </div>
 
+        <!-- Subcategoria Card -->
+        <div *ngIf="subcategorias.length > 0" class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center">
+              <i class="ri-file-list-line text-white"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-on-surface font-manrope">Subcategoria</h2>
+              <p class="text-xs text-[#515981] font-inter">Opcional - Especifique melhor a categoria</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <button
+              type="button"
+              *ngFor="let subcategoria of subcategorias"
+              (click)="selecionarSubcategoria(subcategoria.id)" class="p-4 rounded-xl transition-all hover:scale-105"
+              [ngClass]="form.get('subcategoriaId')?.value === subcategoria.id
+                ? 'bg-gradient-to-br from-[#515981] to-[#a3abd7] text-white shadow-lg ring-2 ring-offset-2 ring-[#515981]'
+                : 'bg-[#efefff] hover:bg-[#dde1ff] text-[#515981]'">
+              <div class="flex flex-col items-center space-y-2">
+                <i [class]="'ri-' + (subcategoria.icone || 'price-tag-3') + '-line w-6 h-6'"></i>
+                <span class="text-xs font-bold font-inter">{{ subcategoria.nome }}</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
         <!-- Recebimento Card -->
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">

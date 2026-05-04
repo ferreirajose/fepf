@@ -9,11 +9,20 @@ import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/servic
 import { CartaoService, Cartao as CartaoAPI } from '../../shared/services/cartao.service';
 import { environment } from '../../../environments/environment';
 
+interface Subcategoria {
+  id: string;
+  nome: string;
+  icone?: string;
+  categoriaId: string;
+  ativo: boolean;
+}
+
 interface Categoria {
   id: string;
   nome: string;
   icone: string;
   cor: string;
+  subcategorias?: Subcategoria[];
 }
 
 interface Cartao {
@@ -42,6 +51,7 @@ export class DespesasFormComponent implements OnInit {
 
   categorias: Categoria[] = [];
   cartoes: Cartao[] = [];
+  subcategorias: Subcategoria[] = [];
 
   formasPagamento = [
     { id: 'dinheiro', nome: 'Dinheiro', icone: 'money-dollar-box' },
@@ -65,6 +75,7 @@ export class DespesasFormComponent implements OnInit {
       valor: [null, [Validators.required, Validators.min(0.01)]],
       data: [this.getDataHoje(), Validators.required],
       categoriaId: ['', Validators.required],
+      subcategoriaId: [''],
       cartaoId: [''],
       formaPagamento: ['dinheiro', Validators.required],
       recorrente: [false],
@@ -78,6 +89,11 @@ export class DespesasFormComponent implements OnInit {
         longitude: [null],
         endereco: ['']
       })
+    });
+
+    this.form.get('categoriaId')?.valueChanges.subscribe(categoriaId => {
+      this.atualizarSubcategorias(categoriaId);
+      this.form.patchValue({ subcategoriaId: '' });
     });
 
     this.form.get('formaPagamento')?.valueChanges.subscribe(forma => {
@@ -123,7 +139,14 @@ export class DespesasFormComponent implements OnInit {
               id: c._id || '',
               nome: c.nome,
               icone: c.icone || 'circle',
-              cor: c.cor || '#6e9fff'
+              cor: c.cor || '#6e9fff',
+              subcategorias: c.subcategorias?.filter(s => s.ativo).map(s => ({
+                id: s.id,
+                nome: s.nome,
+                icone: s.icone,
+                categoriaId: s.categoriaId,
+                ativo: s.ativo
+              })) || []
             }));
         }
       },
@@ -183,6 +206,7 @@ export class DespesasFormComponent implements OnInit {
             valor: despesa.valor,
             data: dataFormatada,
             categoriaId: categoriaId,
+            subcategoriaId: despesa.subcategoriaId || '',
             cartaoId: cartaoId,
             formaPagamento: despesa.formaPagamento || 'dinheiro',
             recorrente: despesa.recorrente,
@@ -234,6 +258,7 @@ export class DespesasFormComponent implements OnInit {
         valor: valorNumerico,
         data: formValue.data,
         categoriaId: formValue.categoriaId,
+        subcategoriaId: formValue.subcategoriaId || undefined,
         cartaoId: formValue.cartaoId || undefined,
         formaPagamento: formValue.formaPagamento,
         recorrente: formValue.recorrente,
@@ -437,5 +462,19 @@ export class DespesasFormComponent implements OnInit {
 
   getLocalizacao() {
     return this.form.get('localizacao')?.value;
+  }
+
+  atualizarSubcategorias(categoriaId: string) {
+    const categoria = this.categorias.find(c => c.id === categoriaId);
+    this.subcategorias = categoria?.subcategorias || [];
+  }
+
+  selecionarSubcategoria(subcategoriaId: string) {
+    this.form.patchValue({ subcategoriaId });
+  }
+
+  getSubcategoriaSelecionada(): Subcategoria | undefined {
+    const subcategoriaId = this.form.get('subcategoriaId')?.value;
+    return this.subcategorias.find(s => s.id === subcategoriaId);
   }
 }

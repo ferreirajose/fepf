@@ -6,11 +6,20 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
 import { ReceitaService } from '../../shared/services/receita.service';
 
+interface Subcategoria {
+  id: string;
+  nome: string;
+  icone?: string;
+  categoriaId: string;
+  ativo: boolean;
+}
+
 interface Categoria {
   id: string;
   nome: string;
   icone: string;
   cor: string;
+  subcategorias?: Subcategoria[];
 }
 
 @Component({
@@ -30,6 +39,7 @@ export class ReceitasFormComponent implements OnInit {
   carregando = signal(false);
   erro = signal<string | null>(null);
   categorias: Categoria[] = [];
+  subcategorias: Subcategoria[] = [];
 
   formasRecebimento = [
     { id: 'dinheiro', nome: 'Dinheiro', icone: 'money-dollar-box' },
@@ -48,6 +58,7 @@ export class ReceitasFormComponent implements OnInit {
       valor: [null, [Validators.required, Validators.min(0.01)]],
       data: [this.getDataHoje(), Validators.required],
       categoriaId: ['', Validators.required],
+      subcategoriaId: [''],
       formaRecebimento: ['pix', Validators.required],
       recorrente: [false],
       frequenciaRecorrencia: ['mensal'],
@@ -63,6 +74,11 @@ export class ReceitasFormComponent implements OnInit {
       this.isEdicao.set(true);
       this.carregarReceita(id);
     }
+
+    this.form.get('categoriaId')?.valueChanges.subscribe(categoriaId => {
+      this.atualizarSubcategorias(categoriaId);
+      this.form.patchValue({ subcategoriaId: '' });
+    });
 
     this.form.get('recorrente')?.valueChanges.subscribe(recorrente => {
       if (recorrente) {
@@ -90,7 +106,14 @@ export class ReceitasFormComponent implements OnInit {
               id: c._id || '',
               nome: c.nome,
               icone: c.icone || 'dollar-sign',
-              cor: c.cor || '#006947'
+              cor: c.cor || '#006947',
+              subcategorias: c.subcategorias?.filter(s => s.ativo).map(s => ({
+                id: s.id,
+                nome: s.nome,
+                icone: s.icone,
+                categoriaId: s.categoriaId,
+                ativo: s.ativo
+              })) || []
             }));
         }
       },
@@ -126,6 +149,7 @@ export class ReceitasFormComponent implements OnInit {
             valor: receita.valor,
             data: dataFormatada,
             categoriaId: categoriaId,
+            subcategoriaId: receita.subcategoriaId || '',
             recorrente: receita.recorrente,
             observacoes: receita.observacoes || ''
           });
@@ -159,6 +183,7 @@ export class ReceitasFormComponent implements OnInit {
         valor: valorNumerico,
         data: formValue.data,
         categoriaId: formValue.categoriaId,
+        subcategoriaId: formValue.subcategoriaId || undefined,
         recorrente: formValue.recorrente,
         observacoes: formValue.observacoes || undefined
       };
@@ -215,5 +240,19 @@ export class ReceitasFormComponent implements OnInit {
     valor = valor.replace(/\D/g, '');
     valor = (parseFloat(valor) / 100).toFixed(2);
     this.form.patchValue({ valor: parseFloat(valor) }, { emitEvent: false });
+  }
+
+  atualizarSubcategorias(categoriaId: string) {
+    const categoria = this.categorias.find(c => c.id === categoriaId);
+    this.subcategorias = categoria?.subcategorias || [];
+  }
+
+  selecionarSubcategoria(subcategoriaId: string) {
+    this.form.patchValue({ subcategoriaId });
+  }
+
+  getSubcategoriaSelecionada(): Subcategoria | undefined {
+    const subcategoriaId = this.form.get('subcategoriaId')?.value;
+    return this.subcategorias.find(s => s.id === subcategoriaId);
   }
 }
