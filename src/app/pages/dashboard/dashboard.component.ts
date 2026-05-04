@@ -807,27 +807,26 @@ export class DashboardComponent implements OnInit {
     }
 
     const orcamentos = this.orcamentos();
-    const stats = this.dadosEstatisticos();
-    const categorias = this.categorias();
-    const despesasPorCategoria = stats?.despesas?.porCategoria || [];
-
-    // Mapear categorias por ID
-    const categoriasMap = new Map();
-    categorias.forEach((c: any) => {
-      categoriasMap.set(c._id, c.nome);
-    });
-
-    // Mapear gastos reais por categoria
-    const gastosMap = new Map();
-    despesasPorCategoria.forEach((d: any) => {
-      gastosMap.set(d.categoriaId, d.total);
-    });
 
     const labels = orcamentos.length > 0
-      ? orcamentos.map((o: any) => categoriasMap.get(o.categoriaId) || 'Categoria')
+      ? orcamentos.map((o: any) => o.categoriaId?.nome || 'Categoria')
       : ['Sem orçamentos cadastrados'];
-    const planejados = orcamentos.length > 0 ? orcamentos.map((o: any) => o.valor || 0) : [0];
-    const gastos = orcamentos.length > 0 ? orcamentos.map((o: any) => gastosMap.get(o.categoriaId) || 0) : [0];
+    const planejados = orcamentos.length > 0
+      ? orcamentos.map((o: any) => o.valorPlanejado || o.valor || 0)
+      : [0];
+    const gastos = orcamentos.length > 0
+      ? orcamentos.map((o: any) => o.valorGasto || 0)
+      : [0];
+
+    // Cores dinâmicas baseadas no percentual gasto
+    const coresGastos = orcamentos.length > 0
+      ? orcamentos.map((o: any) => {
+          const percentual = o.percentualGasto || 0;
+          if (percentual > 100) return '#b51621'; // Vermelho - excedido
+          if (percentual >= 90) return '#ffa500';  // Laranja - alerta
+          return '#006947';                         // Verde - normal
+        })
+      : ['#6e9fff'];
 
     this.orcamentosChart = new Chart(ctx, {
       type: 'bar',
@@ -844,7 +843,7 @@ export class DashboardComponent implements OnInit {
           {
             label: 'Gasto',
             data: gastos,
-            backgroundColor: '#6e9fff',
+            backgroundColor: coresGastos,
             borderRadius: 8,
             borderSkipped: false
           }
@@ -887,7 +886,11 @@ export class DashboardComponent implements OnInit {
             },
             displayColors: true,
             callbacks: {
-              label: function(context) {
+              label: (context) => {
+                const dataIndex = context.dataIndex;
+                const orcamento = orcamentos[dataIndex];
+                const isGasto = context.dataset.label === 'Gasto';
+
                 let label = context.dataset.label || '';
                 if (label) {
                   label += ': ';
@@ -895,7 +898,29 @@ export class DashboardComponent implements OnInit {
                 if (context.parsed && typeof context.parsed.y === 'number') {
                   label += 'R$ ' + context.parsed.y.toFixed(2).replace('.', ',');
                 }
+
+                // Adicionar percentual e status apenas para barra de Gasto
+                if (isGasto && orcamento) {
+                  const percentual = orcamento.percentualGasto || 0;
+                  label += ` (${percentual.toFixed(1)}%)`;
+                }
+
                 return label;
+              },
+              afterLabel: (context) => {
+                const dataIndex = context.dataIndex;
+                const orcamento = orcamentos[dataIndex];
+                const isGasto = context.dataset.label === 'Gasto';
+
+                if (isGasto && orcamento) {
+                  const restante = orcamento.valorRestante || 0;
+                  if (restante >= 0) {
+                    return `Restante: R$ ${restante.toFixed(2).replace('.', ',')}`;
+                  } else {
+                    return `Excedido em: R$ ${Math.abs(restante).toFixed(2).replace('.', ',')}`;
+                  }
+                }
+                return '';
               }
             }
           }

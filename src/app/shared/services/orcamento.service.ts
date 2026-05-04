@@ -10,6 +10,10 @@ export interface Orcamento {
   mes: number;
   ano: number;
   observacoes?: string;
+  valorPlanejado?: number;
+  valorGasto?: number;
+  valorRestante?: number;
+  percentualGasto?: number;
 }
 
 export interface OrcamentoResponse {

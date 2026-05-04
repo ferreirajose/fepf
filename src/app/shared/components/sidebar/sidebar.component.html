@@ -31,7 +31,7 @@
           routerLinkActive="bg-[#e4e7ff] text-primary font-semibold"
           [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface transition-colors group"
           [ngClass]="isCollapsed() ? 'justify-center' : ''">
-          <i [class]="'ri-' + item.icon + '-line w-5 h-5 group-hover:scale-110 transition-transform'">
+          <i [class]="'ri-' + item.icon + '-line group-hover:scale-110 transition-transform'">
           </i>
           <span
             *ngIf="!isCollapsed()" class="font-inter text-on-surface">

@@ -81,14 +81,14 @@ export class OrcamentosComponent implements OnInit {
     this.orcamentoService.listar(filtros).subscribe({
       next: (response) => {
         if (response.success && Array.isArray(response.data)) {
-          this.orcamentos.set((response.data as OrcamentoAPI[]).map(o => ({
+          this.orcamentos.set((response.data as any[]).map(o => ({
             id: o._id || '',
             categoriaId: o.categoriaId,
-            categoriaNome: (o as any).categoriaId?.nome || 'Sem categoria',
-            categoriaIcone: (o as any).categoriaId?.icone || 'circle',
-            categoriaCor: (o as any).categoriaId?.cor || '#6e9fff',
-            valorPlanejado: o.valor,
-            valorGasto: 0,
+            categoriaNome: o.categoriaId?.nome || 'Sem categoria',
+            categoriaIcone: o.categoriaId?.icone || 'circle',
+            categoriaCor: o.categoriaId?.cor || '#6e9fff',
+            valorPlanejado: o.valorPlanejado || o.valor,
+            valorGasto: o.valorGasto || 0,
             mes: o.mes,
             ano: o.ano,
             ativo: true
@@ -219,5 +219,15 @@ export class OrcamentosComponent implements OnInit {
 
   getProgressWidth(orcamento: Orcamento): number {
     return Math.min(this.getPercentualGasto(orcamento), 100);
+  }
+
+  getProgressColor(orcamento: Orcamento): string {
+    if (this.isExcedido(orcamento)) {
+      return 'linear-gradient(to right, #b51621, #ff928b)';
+    } else if (this.getPercentualGasto(orcamento) >= 90) {
+      return 'linear-gradient(to right, #ffa500, #ffcc00)';
+    } else {
+      return 'linear-gradient(to right, #006947, #69f6b8)';
+    }
   }
 }

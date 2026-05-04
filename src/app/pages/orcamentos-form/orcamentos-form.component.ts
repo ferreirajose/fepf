@@ -31,6 +31,8 @@ export class OrcamentosFormComponent implements OnInit {
   erro = signal<string | null>(null);
   categorias: Categoria[] = [];
 
+  orcamentoAtual = signal<any>(null);
+
   meses = [
     { numero: 1, nome: 'Janeiro' },
     { numero: 2, nome: 'Fevereiro' },
@@ -103,6 +105,9 @@ export class OrcamentosFormComponent implements OnInit {
         if (response.success && response.data && !Array.isArray(response.data)) {
           const orcamento = response.data as any;
 
+          // Salvar orçamento completo
+          this.orcamentoAtual.set(orcamento);
+
           // Extrair ID de objeto populado ou usar valor direto
           const categoriaId = typeof orcamento.categoriaId === 'object' && orcamento.categoriaId?._id
             ? orcamento.categoriaId._id
@@ -110,7 +115,7 @@ export class OrcamentosFormComponent implements OnInit {
 
           this.form.patchValue({
             categoriaId: categoriaId,
-            valorPlanejado: orcamento.valor,
+            valorPlanejado: orcamento.valorPlanejado || orcamento.valor,
             mes: orcamento.mes,
             ano: orcamento.ano,
             descricao: orcamento.observacoes || ''

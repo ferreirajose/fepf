@@ -133,7 +133,7 @@
                 {{ orcamento.categoriaNome }}
               </h3>
               <p class="text-xs text-[#515981] font-inter">
-                R$ {{ orcamento.valorGasto.toFixed(2).replace('.', ',') }} de R$ {{ orcamento.valorPlanejado.toFixed(2).replace('.', ',') }}
+                {{ orcamento.valorGasto | currency:'BRL':'symbol':'1.2-2' }} de {{ orcamento.valorPlanejado | currency:'BRL':'symbol':'1.2-2' }}
               </p>
             </div>
           </div>
@@ -168,16 +168,17 @@
                 'text-[#006947]': !isExcedido(orcamento),
                 'text-[#b51621]': isExcedido(orcamento)
               }">
-              {{ isExcedido(orcamento) ? 'R$ ' + (getValorRestante(orcamento) * -1).toFixed(2).replace('.', ',') + ' acima' : 'R$ ' + getValorRestante(orcamento).toFixed(2).replace('.', ',') + ' restante' }}
+              <ng-container *ngIf="isExcedido(orcamento)">
+                {{ (getValorRestante(orcamento) * -1) | currency:'BRL':'symbol':'1.2-2' }} acima
+              </ng-container>
+              <ng-container *ngIf="!isExcedido(orcamento)">
+                {{ getValorRestante(orcamento) | currency:'BRL':'symbol':'1.2-2' }} restante
+              </ng-container>
             </span>
           </div>
           <div class="w-full bg-[#efefff] rounded-full h-3 overflow-hidden">
             <div class="h-full rounded-full transition-all duration-300"
-              [ngClass]="{
-                'bg-gradient-to-r from-[#006947] to-[#69f6b8]': !isExcedido(orcamento) && getPercentualGasto(orcamento) < 90,
-                'bg-gradient-to-r from-[#ffa500] to-[#ffcc00]': !isExcedido(orcamento) && getPercentualGasto(orcamento) >= 90,
-                'bg-gradient-to-r from-[#b51621] to-[#ff928b]': isExcedido(orcamento)
-              }"
+              [style.background]="getProgressColor(orcamento)"
               [style.width.%]="getProgressWidth(orcamento)">
             </div>
           </div>

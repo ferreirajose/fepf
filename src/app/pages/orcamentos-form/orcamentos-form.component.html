@@ -215,7 +215,7 @@
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center"
                   [style.background-color]="(getCategoriaSelecionada()?.cor || '#515981') + '30'"
                   [style.color]="getCategoriaSelecionada()?.cor || '#515981'">
-                  <i [class]="'ri-' + (getCategoriaSelecionada()?.icone || 'tag') + '-line w-6 h-6'">
+                  <i [class]="'ri-' + (getCategoriaSelecionada()?.icone || 'tag') + '-line'">
                   </i>
                 </div>
                 <div>
@@ -230,7 +230,7 @@
               <div class="text-right">
                 <p class="text-xs text-[#515981] font-inter mb-1">Limite Planejado</p>
                 <p class="text-2xl font-extrabold text-primary font-manrope">
-                  R$ {{ (form.get('valorPlanejado')?.value || 0).toFixed(2).replace('.', ',') }}
+                  {{ (form.get('valorPlanejado')?.value || 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
                 </p>
               </div>
             </div>
@@ -241,9 +241,9 @@
               </div>
             </div>
             <div class="flex items-center justify-between mt-2">
-              <span class="text-xs text-[#515981] font-inter">R$ 0,00 gasto</span>
+              <span class="text-xs text-[#515981] font-inter">{{ 0 | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} gasto</span>
               <span class="text-xs text-[#006947] font-inter font-bold">
-                R$ {{ (form.get('valorPlanejado')?.value || 0).toFixed(2).replace('.', ',') }} disponível
+                {{ (form.get('valorPlanejado')?.value || 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} disponível
               </span>
             </div>
           </div>

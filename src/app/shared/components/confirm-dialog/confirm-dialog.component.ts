@@ -18,7 +18,7 @@ import { CommonModule } from '@angular/common';
           <div class="p-6 pb-4">
             <div class="flex items-start">
               <div [ngClass]="getIconClass()" class="mx-auto flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full">
-                <i [class]="getIconName() + ' h-7 w-7 text-white'"></i>
+                <i [class]="getIconName() + 'text-white'"></i>
               </div>
             </div>
             <div class="mt-4 text-center">
