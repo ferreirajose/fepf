@@ -6,11 +6,12 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
 import { PwaInstallBannerComponent } from './shared/components/pwa-install-banner/pwa-install-banner.component';
 import { PwaUpdatePromptComponent } from './shared/components/pwa-update-prompt/pwa-update-prompt.component';
+import { ChatbotWidgetComponent } from './shared/components/chatbot-widget/chatbot-widget.component';
 import { SidebarService } from './shared/services/sidebar.service';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, SidebarComponent, NavbarComponent, BottomNavComponent, PwaInstallBannerComponent, PwaUpdatePromptComponent],
+  imports: [CommonModule, RouterOutlet, SidebarComponent, NavbarComponent, BottomNavComponent, PwaInstallBannerComponent, PwaUpdatePromptComponent, ChatbotWidgetComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

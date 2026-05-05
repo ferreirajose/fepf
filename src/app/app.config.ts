@@ -5,6 +5,7 @@ import { provideEnvironmentNgxMask } from 'ngx-mask';
 import { provideServiceWorker } from '@angular/service-worker';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
+import { provideMarkdown } from 'ngx-markdown';
 
 import { routes } from './app.routes';
 
@@ -16,6 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
     provideEnvironmentNgxMask(),
+    provideMarkdown(),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'

@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DespesaService } from '../../shared/services/despesa.service';
 import { ReceitaService } from '../../shared/services/receita.service';
 import { SafePipe } from '../../shared/pipes/safe.pipe';
@@ -8,7 +8,7 @@ import { SafePipe } from '../../shared/pipes/safe.pipe';
 @Component({
   selector: 'app-transacao-detalhes',
   standalone: true,
-  imports: [CommonModule, RouterLink, SafePipe],
+  imports: [CommonModule, SafePipe],
   templateUrl: './transacao-detalhes.component.html',
   styleUrl: './transacao-detalhes.component.css'
 })

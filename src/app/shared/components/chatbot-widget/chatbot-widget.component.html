@@ -1,0 +1,272 @@
+<!-- Botão Flutuante -->
+<button
+  *ngIf="!isOpen()"
+  (click)="toggleChat()"
+  class="chatbot-button"
+  aria-label="Abrir chat assistente financeiro"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+</button>
+
+<!-- Janela de Chat -->
+<div *ngIf="isOpen()" class="chatbot-window">
+  <!-- Header -->
+  <div class="chatbot-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M2 17l10 5 10-5"></path>
+          <path d="M2 12l10 5 10-5"></path>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h3 class="header-title">Assistente Financeiro</h3>
+        <p class="header-subtitle">Powered by Google Gemini</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button
+        (click)="limparHistorico()"
+        class="header-button"
+        aria-label="Limpar histórico"
+        title="Limpar histórico"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+      </button>
+      <button
+        (click)="closeChat()"
+        class="header-button"
+        aria-label="Fechar chat"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Área de Mensagens -->
+  <div #messagesContainer class="chatbot-messages">
+    <div *ngFor="let message of messages()" class="message" [class.message-user]="message.role === 'user'" [class.message-assistant]="message.role === 'assistant'">
+      <div class="message-avatar" *ngIf="message.role === 'assistant'">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M2 17l10 5 10-5"></path>
+          <path d="M2 12l10 5 10-5"></path>
+        </svg>
+      </div>
+
+      <div class="message-content">
+        <markdown class="message-text" [data]="message.content"></markdown>
+
+        <div *ngIf="message.attachments && message.attachments.length > 0" class="message-attachments">
+          <div *ngFor="let attachment of message.attachments" class="attachment-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="attachment-icon">
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+              <polyline points="13 2 13 9 20 9"></polyline>
+            </svg>
+            <span>{{ attachment.filename }}</span>
+          </div>
+        </div>
+
+        <span class="message-time">
+          {{ message.createdAt | date:'short' }}
+        </span>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading()" class="message message-assistant">
+      <div class="message-avatar">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M2 17l10 5 10-5"></path>
+          <path d="M2 12l10 5 10-5"></path>
+        </svg>
+      </div>
+      <div class="message-content">
+        <div class="typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview de Arquivos Selecionados -->
+  <div *ngIf="selectedFiles().length > 0" class="file-preview-container">
+    <div class="file-preview-header">
+      <span class="file-preview-title">Arquivos anexados ({{ selectedFiles().length }})</span>
+      <button (click)="selectedFiles.set([])" class="file-preview-clear">
+        Limpar tudo
+      </button>
+    </div>
+    <div class="file-preview-list">
+      <div *ngFor="let file of selectedFiles(); let i = index" class="file-preview-item">
+        <div class="file-info">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="file-icon">
+            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+            <polyline points="13 2 13 9 20 9"></polyline>
+          </svg>
+          <div class="file-details">
+            <span class="file-name">{{ file.name }}</span>
+            <span class="file-size">{{ formatarTamanho(file.size) }}</span>
+          </div>
+        </div>
+        <button (click)="removerArquivo(i)" class="file-remove" aria-label="Remover arquivo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input de Mensagem - Novo Design -->
+  <div class="chatbot-input-wrapper">
+    <div class="chatbot-input-container">
+      <!-- Hidden file input -->
+      <input
+        #fileInput
+        type="file"
+        (change)="onFileSelected($event)"
+        multiple
+        accept=".pdf,.xls,.xlsx,.png,.jpg,.jpeg"
+        class="file-input-hidden"
+        id="chatbot-file-input"
+      />
+
+      <!-- Textarea -->
+      <textarea
+        [(ngModel)]="messageText"
+        (keypress)="onKeyPress($event)"
+        placeholder="O que você gostaria de saber?"
+        class="message-input-new"
+        rows="3"
+        [disabled]="isLoading()"
+      ></textarea>
+
+      <!-- Action Buttons Container -->
+      <div class="input-actions">
+        <!-- Attach Button -->
+        <button
+          (click)="triggerFileInput()"
+          class="action-button attach-btn"
+          aria-label="Anexar arquivo"
+          [disabled]="isLoading()"
+          title="Anexar arquivo"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+
+        <!-- Model Selector Button -->
+        <button
+          (click)="toggleModelSelector()"
+          class="action-button model-selector-btn"
+          aria-label="Selecionar modelo Gemini"
+          [disabled]="isLoading()"
+          title="Selecionar modelo Gemini"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="model-icon">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+          <span class="model-label">{{ currentModel?.description || 'Gemini' }}</span>
+        </button>
+
+        <!-- Send Button -->
+        <button
+          (click)="enviarMensagem()"
+          [disabled]="(!messageText().trim() && selectedFiles().length === 0) || isLoading()"
+          class="action-button send-btn"
+          aria-label="Enviar mensagem"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13"></path>
+            <path d="M22 2L15 22L11 13L2 9L22 2z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Model Selector Modal -->
+<div *ngIf="showModelSelector()" class="modal-overlay" (click)="closeModelSelector()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="search-container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          type="text"
+          [(ngModel)]="modelSearchText"
+          placeholder="Buscar modelos Gemini..."
+          class="search-input"
+          autofocus
+        />
+      </div>
+      <button (click)="closeModelSelector()" class="close-modal-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Model List -->
+    <div class="model-list">
+      <ng-container *ngFor="let category of ['Google']">
+        <div class="model-category" *ngIf="filteredModels.some(m => m.category === category)">
+          <div class="category-label">{{ category }}</div>
+
+          <div
+            *ngFor="let model of filteredModels.filter(m => m.category === category)"
+            class="model-item"
+            [class.selected]="selectedModelId() === model.id"
+            [class.disabled]="!model.available"
+            (click)="selectModel(model.id)"
+          >
+            <div class="model-info">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="model-item-icon">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                <path d="M2 17l10 5 10-5"></path>
+                <path d="M2 12l10 5 10-5"></path>
+              </svg>
+              <div class="model-text">
+                <div class="model-name-row">
+                  <span class="model-name">{{ model.name }}</span>
+                  <span class="recommended-badge" *ngIf="model.recommended">Recomendado</span>
+                </div>
+                <span class="model-description">{{ model.description }}</span>
+                <span class="model-status" *ngIf="!model.available">(Em breve)</span>
+              </div>
+            </div>
+            <svg *ngIf="selectedModelId() === model.id" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+        </div>
+      </ng-container>
+
+      <div *ngIf="filteredModels.length === 0" class="no-results">
+        <p>Nenhum modelo Gemini encontrado</p>
+      </div>
+    </div>
+  </div>
+</div>
