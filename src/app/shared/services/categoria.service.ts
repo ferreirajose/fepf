@@ -67,4 +67,16 @@ export class CategoriaService {
   deletarSubcategoria(categoriaId: string, subcategoriaId: string): Observable<CategoriaResponse> {
     return this.http.delete<CategoriaResponse>(`${this.apiUrl}/${categoriaId}/subcategorias/${subcategoriaId}`);
   }
+
+  exportar(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/export`, {
+      responseType: 'blob'
+    });
+  }
+
+  importar(file: File): Observable<CategoriaResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<CategoriaResponse>(`${this.apiUrl}/import`, formData);
+  }
 }

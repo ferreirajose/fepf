@@ -413,4 +413,101 @@ export class CategoriasListaComponent implements OnInit {
   getTotalCategorias(): number {
     return this.categorias().length;
   }
+
+  exportarCategorias() {
+    this.categoriaService.exportar().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const dataAtual = new Date().toISOString().split('T')[0];
+        link.download = `categorias-export-${dataAtual}.json`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+
+        this.alertDialog.set({
+          isOpen: true,
+          title: 'Sucesso',
+          message: 'Categorias exportadas com sucesso!',
+          type: 'success'
+        });
+      },
+      error: (err) => {
+        console.error('Erro ao exportar categorias:', err);
+        this.alertDialog.set({
+          isOpen: true,
+          title: 'Erro',
+          message: 'Não foi possível exportar as categorias. Tente novamente.',
+          type: 'error'
+        });
+      }
+    });
+  }
+
+  importarCategorias(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.name.endsWith('.json')) {
+      this.alertDialog.set({
+        isOpen: true,
+        title: 'Erro',
+        message: 'Por favor, selecione um arquivo JSON válido.',
+        type: 'error'
+      });
+      input.value = '';
+      return;
+    }
+
+    this.categoriaService.importar(file).subscribe({
+      next: (response) => {
+        input.value = '';
+
+        if (response.success) {
+          this.carregarCategorias();
+          this.alertDialog.set({
+            isOpen: true,
+            title: 'Sucesso',
+            message: 'Categorias importadas com sucesso!',
+            type: 'success'
+          });
+        } else {
+          this.alertDialog.set({
+            isOpen: true,
+            title: 'Erro',
+            message: response.error || 'Não foi possível importar as categorias',
+            type: 'error'
+          });
+        }
+      },
+      error: (err) => {
+        input.value = '';
+        console.error('Erro ao importar categorias:', err);
+
+        let errorMessage = 'Não foi possível importar as categorias. Tente novamente.';
+        if (err.error?.error) {
+          errorMessage = err.error.error;
+        }
+
+        this.alertDialog.set({
+          isOpen: true,
+          title: 'Erro',
+          message: errorMessage,
+          type: 'error'
+        });
+      }
+    });
+  }
+
+  abrirSeletorArquivo() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (event) => this.importarCategorias(event);
+    input.click();
+  }
 }

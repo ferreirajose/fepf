@@ -11,11 +11,30 @@
           Organize suas movimentações financeiras com uma estrutura hierárquica precisa para relatórios detalhados.
         </p>
       </div>
-      <a
-        routerLink="/categorias/novo" class="bg-gradient-to-r from-primary to-[#6e9fff] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
-        <i class="ri-add-circle-line"></i>
-        <span>Adicionar Nova Categoria</span>
-      </a>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <!-- Botões de Import/Export -->
+        <div class="flex gap-2">
+          <button
+            (click)="exportarCategorias()"
+            class="bg-white text-primary border-2 border-primary px-4 py-3 rounded-xl font-bold flex items-center space-x-2 hover:bg-primary/5 active:scale-[0.98] transition-all font-inter"
+            title="Exportar categorias">
+            <i class="ri-download-line"></i>
+            <span>Exportar</span>
+          </button>
+          <button
+            (click)="abrirSeletorArquivo()"
+            class="bg-white text-primary border-2 border-primary px-4 py-3 rounded-xl font-bold flex items-center space-x-2 hover:bg-primary/5 active:scale-[0.98] transition-all font-inter"
+            title="Importar categorias">
+            <i class="ri-upload-line"></i>
+            <span>Importar</span>
+          </button>
+        </div>
+        <a
+          routerLink="/categorias/novo" class="bg-gradient-to-r from-primary to-[#6e9fff] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+          <i class="ri-add-circle-line"></i>
+          <span>Adicionar Nova Categoria</span>
+        </a>
+      </div>
     </section>
 
     <!-- Categories List -->

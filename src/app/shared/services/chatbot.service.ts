@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   ChatResponse,
-  SendMessageRequest
+  SendMessageRequest,
+  ChatbotContext
 } from '../models/chatbot.model';
 
 @Injectable({
