@@ -421,7 +421,7 @@ export class CategoriasListaComponent implements OnInit {
         const link = document.createElement('a');
         link.href = url;
         const dataAtual = new Date().toISOString().split('T')[0];
-        link.download = `categorias-export-${dataAtual}.json`;
+        link.download = `categorias-export-${dataAtual}.xlsx`;
         link.click();
         window.URL.revokeObjectURL(url);
 
@@ -452,11 +452,12 @@ export class CategoriasListaComponent implements OnInit {
       return;
     }
 
-    if (!file.name.endsWith('.json')) {
+    const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+    if (!isExcel) {
       this.alertDialog.set({
         isOpen: true,
         title: 'Erro',
-        message: 'Por favor, selecione um arquivo JSON válido.',
+        message: 'Por favor, selecione um arquivo Excel válido (.xlsx ou .xls).',
         type: 'error'
       });
       input.value = '';
@@ -467,13 +468,24 @@ export class CategoriasListaComponent implements OnInit {
       next: (response) => {
         input.value = '';
 
-        if (response.success) {
+        if (response.success && response.data) {
+          const result = response.data as any;
           this.carregarCategorias();
+
+          let message = `Importação concluída!\nTotal: ${result.total}\nSucesso: ${result.success}\nFalhas: ${result.failed}`;
+
+          if (result.errors && result.errors.length > 0) {
+            message += '\n\nErros:\n';
+            result.errors.forEach((error: any) => {
+              message += `Linha ${error.row}: ${error.message}\n`;
+            });
+          }
+
           this.alertDialog.set({
             isOpen: true,
-            title: 'Sucesso',
-            message: 'Categorias importadas com sucesso!',
-            type: 'success'
+            title: result.failed > 0 ? 'Importação com Avisos' : 'Sucesso',
+            message: message,
+            type: result.failed > 0 ? 'warning' : 'success'
           });
         } else {
           this.alertDialog.set({
@@ -506,7 +518,7 @@ export class CategoriasListaComponent implements OnInit {
   abrirSeletorArquivo() {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.json';
+    input.accept = '.xlsx,.xls';
     input.onchange = (event) => this.importarCategorias(event);
     input.click();
   }
