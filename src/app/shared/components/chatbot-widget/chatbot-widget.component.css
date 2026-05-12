@@ -43,6 +43,36 @@
   z-index: 9999;
   overflow: hidden;
   animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estado Maximizado */
+.chatbot-window.maximized {
+  top: 1.5rem;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  width: calc(100vw - 3rem);
+  height: calc(100vh - 3rem);
+  max-width: 1400px;
+  max-height: calc(100vh - 3rem);
+  margin: auto;
+  border-radius: 1.25rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* Overlay quando maximizado */
+.chatbot-window.maximized::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: -1;
+  animation: fadeIn 0.3s ease;
 }
 
 @keyframes slideUp {
@@ -133,6 +163,37 @@
 .header-button svg {
   width: 1.125rem;
   height: 1.125rem;
+}
+
+/* Destaque no botão maximizar */
+.header-button[aria-label*="Maximizar"]:not(:hover) {
+  position: relative;
+}
+
+.header-button[aria-label*="Maximizar"]:not(:hover)::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  animation: pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Área de Mensagens */
@@ -379,32 +440,188 @@
   opacity: 0.8;
 }
 
+/* Tabelas Desktop */
 .message-text ::ng-deep table {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 0.75rem 0;
-  font-size: 0.875rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+  font-size: 0.8125rem;
 }
 
-.message-text ::ng-deep table th,
-.message-text ::ng-deep table td {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 0.5rem 0.75rem;
-  text-align: left;
+.message-text ::ng-deep div:has(> table) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0.75rem 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  position: relative;
+  background: white;
+  max-width: 100%;
+}
+
+.message-text ::ng-deep div:has(> table)::after {
+  content: '→';
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.4);
+}
+
+.message-text ::ng-deep div:has(> table):hover::after {
+  opacity: 1;
+}
+
+/* Sombra gradiente quando tem scroll */
+.message-text ::ng-deep div:has(> table)::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 0.625rem auto;
+  width: 60px;
+  background: linear-gradient(to left, rgba(255,255,255,0.98), transparent);
+  pointer-events: none;
+  z-index: 4;
 }
 
 .message-text ::ng-deep table th {
-  background: rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 0.875rem 1rem;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.message-text ::ng-deep table th:first-child { border-radius: 0.5rem 0 0 0; }
+.message-text ::ng-deep table th:last-child { border-radius: 0 0.5rem 0 0; }
+
+.message-text ::ng-deep table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  white-space: nowrap;
+  min-width: 100px;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-text ::ng-deep table td:first-child { font-weight: 500; min-width: 90px; }
+.message-text ::ng-deep table td:nth-child(2) { min-width: 150px; max-width: 300px; }
+.message-text ::ng-deep table td:last-child { min-width: 100%; max-width: 120px; }
+
+/* Tabelas quando maximizado - mais espaço */
+.chatbot-window.maximized .message-text ::ng-deep table td {
+  min-width: 120px;
+  max-width: 400px;
+}
+.chatbot-window.maximized .message-text ::ng-deep table td:nth-child(2) {
+  min-width: 200px;
+  max-width: 500px;
+}
+
+/* Mensagens quando maximizado - aproveitar espaço horizontal */
+.chatbot-window.maximized .message-content {
+  max-width: 75%;
+}
+
+/* Container de mensagens quando maximizado */
+.chatbot-window.maximized .chatbot-messages {
+  padding: 2rem 3rem;
+}
+
+/* Status badges com Remix Icons */
+.message-text ::ng-deep table td .status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
-.message-user .message-text ::ng-deep table th,
-.message-user .message-text ::ng-deep table td {
-  border-color: rgba(255, 255, 255, 0.2);
+.message-text ::ng-deep table td .status-badge i { font-size: 1rem; line-height: 1; }
+.message-text ::ng-deep table td .status-badge.pendente { background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
+.message-text ::ng-deep table td .status-badge.pago,
+.message-text ::ng-deep table td .status-badge.paga { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+.message-text ::ng-deep table td .status-badge.cancelado,
+.message-text ::ng-deep table td .status-badge.cancelada { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+.message-text ::ng-deep table td .status-badge.atrasado,
+.message-text ::ng-deep table td .status-badge.vencido { background: rgba(220,38,38,0.1); color: #dc2626; border: 1px solid rgba(220,38,38,0.2); }
+.message-text ::ng-deep table td .status-badge.processamento { background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); }
+.message-text ::ng-deep table td .status-badge.processamento i { animation: spin 2s linear infinite; }
+.message-user .message-text ::ng-deep table td .status-badge { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-color: rgba(255,255,255,0.25); }
+.message-user .message-text ::ng-deep table td .status-badge.pendente { color: #fbbf24; }
+.message-user .message-text ::ng-deep table td .status-badge.pago,
+.message-user .message-text ::ng-deep table td .status-badge.paga { color: #34d399; }
+.message-user .message-text ::ng-deep table td .status-badge.cancelado,
+.message-user .message-text ::ng-deep table td .status-badge.cancelada,
+.message-user .message-text ::ng-deep table td .status-badge.atrasado,
+.message-user .message-text ::ng-deep table td .status-badge.vencido { color: #fca5a5; }
+.message-user .message-text ::ng-deep table td .status-badge.processamento { color: #93c5fd; }
+.message-text ::ng-deep table tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+.message-text ::ng-deep table tbody tr:hover { background: rgba(102,126,234,0.05); }
+.message-text ::ng-deep table tbody tr:last-child td { border-bottom: none; }
+
+.message-user .message-text ::ng-deep div:has(> table) { background: rgba(255,255,255,0.1); }
+.message-user .message-text ::ng-deep div:has(> table)::before { background: linear-gradient(to left, rgba(102,126,234,0.98), transparent); }
+.message-user .message-text ::ng-deep div:has(> table)::after { background: rgba(255,255,255,0.9); color: #667eea; }
+.message-user .message-text ::ng-deep table th { background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); }
+.message-user .message-text ::ng-deep table td { border-bottom-color: rgba(255,255,255,0.15); }
+.message-user .message-text ::ng-deep table tbody tr:nth-child(even) { background: rgba(255,255,255,0.08); }
+.message-user .message-text ::ng-deep table tbody tr:hover { background: rgba(255,255,255,0.15); }
+
+/* Scrollbar customizada */
+.message-text ::ng-deep div:has(> table)::-webkit-scrollbar {
+  height: 0.625rem;
+  margin: 0.25rem;
+}
+.message-text ::ng-deep div:has(> table)::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+  border-radius: 0.375rem;
+  margin: 0 0.5rem;
+}
+.message-text ::ng-deep div:has(> table)::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 0.375rem;
+  border: 2px solid white;
+}
+.message-text ::ng-deep div:has(> table)::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5568d3, #6a3f8f);
+}
+.message-user .message-text ::ng-deep div:has(> table)::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.6);
+  border-color: rgba(102,126,234,0.3);
+}
+.message-user .message-text ::ng-deep div:has(> table)::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.8);
 }
 
-.message-user .message-text ::ng-deep table th {
-  background: rgba(255, 255, 255, 0.15);
+/* Estilo para células com valores numéricos */
+.message-text ::ng-deep table td:has(> strong),
+.message-text ::ng-deep table td > strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.message-user .message-text ::ng-deep table td > strong {
+  color: white;
 }
 
 .message-text ::ng-deep img {
@@ -959,21 +1176,30 @@
   font-size: 0.9375rem;
 }
 
-/* Responsivo Mobile */
+/* Responsivo Mobile - Tabelas como Cards */
 @media (max-width: 640px) {
-  .chatbot-window {
+  .chatbot-window,
+  .chatbot-window.maximized {
     bottom: 0;
     right: 0;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
     border-radius: 0;
     max-height: 100vh;
+    margin: 0;
   }
 
   .chatbot-button {
     bottom: 1rem;
     right: 1rem;
+  }
+
+  /* Esconder botão maximizar no mobile */
+  .header-button[aria-label*="Maximizar"],
+  .header-button[aria-label*="Restaurar"] {
+    display: none;
   }
 
   .message-content {
@@ -993,4 +1219,62 @@
     max-height: 100%;
     border-radius: 0;
   }
+
+  /* Tabelas em cards */
+  .message-text ::ng-deep div:has(> table) { overflow: visible; box-shadow: none; margin: 0.5rem 0; }
+  .message-text ::ng-deep div:has(> table)::before,
+  .message-text ::ng-deep div:has(> table)::after { display: none; }
+  .message-text ::ng-deep table { border: none; display: block; }
+  .message-text ::ng-deep table thead { display: none; }
+  .message-text ::ng-deep table tbody { display: block; }
+  .message-text ::ng-deep table tbody tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 0.5rem;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .message-text ::ng-deep table tbody tr:nth-child(even),
+  .message-text ::ng-deep table tbody tr:hover { background: white; }
+  /* Cada célula como flexbox para evitar sobreposição */
+  .message-text ::ng-deep table tbody tr td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    min-width: auto;
+    white-space: normal;
+    font-size: 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .message-text ::ng-deep table tbody tr td:last-child { border-bottom: none; }
+
+  .message-text ::ng-deep table tbody tr td::before {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 0.8125rem;
+    flex-shrink: 0;
+  }
+
+  .message-text ::ng-deep table tbody tr td:nth-child(1)::before { content: 'Data: '; }
+  .message-text ::ng-deep table tbody tr td:nth-child(2)::before { content: 'Descrição: '; }
+  .message-text ::ng-deep table tbody tr td:nth-child(3)::before { content: 'Valor: '; }
+  .message-text ::ng-deep table tbody tr td:nth-child(4)::before { content: 'Status: '; }
+  .message-text ::ng-deep table tbody tr td:nth-child(5)::before { content: 'Categoria: '; }
+
+  /* Badge de status alinhado à direita */
+  .message-text ::ng-deep table tbody tr td .status-badge {
+    flex-shrink: 0;
+  }
+
+  .message-user .message-text ::ng-deep table tbody tr {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+  }
+  .message-user .message-text ::ng-deep table tbody tr td { border-bottom-color: rgba(255,255,255,0.1); color: white; }
+  .message-user .message-text ::ng-deep table tbody tr td::before { color: rgba(255,255,255,0.9); }
 }

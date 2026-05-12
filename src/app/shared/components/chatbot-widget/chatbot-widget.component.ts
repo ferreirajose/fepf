@@ -30,6 +30,7 @@ export class ChatbotWidgetComponent implements AfterViewChecked {
   private chatbotService = inject(ChatbotService);
 
   isOpen = signal(false);
+  isMaximized = signal(false);
   messages = signal<ChatMessage[]>([]);
   messageText = signal('');
   isLoading = signal(false);
@@ -138,6 +139,65 @@ export class ChatbotWidgetComponent implements AfterViewChecked {
       this.scrollToBottom();
       this.shouldScrollToBottom = false;
     }
+    this.processarStatusTabelas();
+  }
+
+  private processarStatusTabelas() {
+    if (!this.messagesContainer) return;
+
+    const container = this.messagesContainer.nativeElement;
+    const cells = container.querySelectorAll('table td:not([data-status-processed])');
+
+    cells.forEach((cell: HTMLTableCellElement) => {
+      const text = cell.textContent?.trim().toLowerCase() || '';
+
+      // Mapear status conhecidos com seus ícones Remix Icon
+      const statusMap: { [key: string]: { class: string; icon: string } } = {
+        'pendente': { class: 'pendente', icon: 'ri-time-line' },
+        'pago': { class: 'pago', icon: 'ri-checkbox-circle-line' },
+        'paga': { class: 'paga', icon: 'ri-checkbox-circle-line' },
+        'cancelado': { class: 'cancelado', icon: 'ri-close-circle-line' },
+        'cancelada': { class: 'cancelada', icon: 'ri-close-circle-line' },
+        'atrasado': { class: 'atrasado', icon: 'ri-error-warning-line' },
+        'vencido': { class: 'vencido', icon: 'ri-error-warning-line' },
+        'processamento': { class: 'processamento', icon: 'ri-loader-line' },
+        'em processamento': { class: 'processamento', icon: 'ri-loader-line' }
+      };
+
+      // Verificar se é uma célula de status
+      const statusKey = Object.keys(statusMap).find(key => text === key);
+
+      if (statusKey) {
+        const originalText = cell.textContent?.trim() || '';
+        const statusConfig = statusMap[statusKey];
+
+        // Criar badge
+        const badge = document.createElement('span');
+        badge.className = `status-badge ${statusConfig.class}`;
+
+        // Criar ícone
+        const icon = document.createElement('i');
+        icon.className = statusConfig.icon;
+
+        // Criar texto
+        const textSpan = document.createElement('span');
+        textSpan.textContent = originalText;
+
+        // Montar badge
+        badge.appendChild(icon);
+        badge.appendChild(textSpan);
+
+        // Substituir conteúdo
+        cell.innerHTML = '';
+        cell.appendChild(badge);
+
+        // Marcar como processado
+        cell.setAttribute('data-status-processed', 'true');
+      } else {
+        // Marcar como não-status para não processar novamente
+        cell.setAttribute('data-status-processed', 'false');
+      }
+    });
   }
 
   toggleChat() {
@@ -146,6 +206,11 @@ export class ChatbotWidgetComponent implements AfterViewChecked {
 
   closeChat() {
     this.isOpen.set(false);
+    this.isMaximized.set(false);
+  }
+
+  toggleMaximize() {
+    this.isMaximized.update(value => !value);
   }
 
   enviarMensagem() {

@@ -11,7 +11,7 @@
 </button>
 
 <!-- Janela de Chat -->
-<div *ngIf="isOpen()" class="chatbot-window">
+<div *ngIf="isOpen()" class="chatbot-window" [class.maximized]="isMaximized()">
   <!-- Header -->
   <div class="chatbot-header">
     <div class="header-content">
@@ -37,6 +37,19 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="3 6 5 6 21 6"></polyline>
           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+      </button>
+      <button
+        (click)="toggleMaximize()"
+        class="header-button"
+        [attr.aria-label]="isMaximized() ? 'Restaurar tamanho' : 'Maximizar'"
+        [title]="isMaximized() ? 'Restaurar tamanho' : 'Maximizar'"
+      >
+        <svg *ngIf="!isMaximized()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+        </svg>
+        <svg *ngIf="isMaximized()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
         </svg>
       </button>
       <button
