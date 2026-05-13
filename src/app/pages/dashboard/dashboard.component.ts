@@ -53,6 +53,7 @@ export class DashboardComponent implements OnInit {
   orcamentos = signal<any[]>([]);
   categorias = signal<any[]>([]);
   transacoesRecentes: any[] = [];
+  despesas = signal<any[]>([]);
   despesasComLocalizacao = signal<any[]>([]);
   gruposDespesas = signal<any[]>([]);
   googleMapsApiKey = environment.googleMapsApiKey;
@@ -126,6 +127,11 @@ export class DashboardComponent implements OnInit {
           receitas: response.receitas.data,
           despesas: response.despesas.data
         });
+
+        // Armazenar despesas para cálculo de utilização dos cartões
+        if (Array.isArray(response.despesasLista.data)) {
+          this.despesas.set(response.despesasLista.data);
+        }
 
         // Processar transações recentes
         this.processarTransacoesRecentes(response.receitasLista.data, response.despesasLista.data);
@@ -686,9 +692,34 @@ export class DashboardComponent implements OnInit {
     const cartoes = this.cartoes().filter((c: any) => c.ativo);
 
     const labels = cartoes.length > 0 ? cartoes.map((c: any) => c.nome) : ['Sem cartões cadastrados'];
-    // Para demo, vamos mostrar o limite disponível. No futuro, pode-se buscar despesas por cartão para calcular utilizado
-    const limites = cartoes.length > 0 ? cartoes.map((c: any) => c.limite || 0) : [0];
-    const utilizados = cartoes.length > 0 ? cartoes.map(() => 0) : [0]; // Placeholder - pode ser calculado futuramente
+
+    // Calcular utilização real baseada nas despesas
+    const mesAtual = new Date().getMonth() + 1;
+    const anoAtual = new Date().getFullYear();
+
+    const utilizados = cartoes.length > 0 ? cartoes.map((cartao: any) => {
+      // Filtrar despesas do mês atual deste cartão
+      const despesasCartao = this.despesas().filter((d: any) => {
+        const dataDespesa = new Date(d.data);
+        const mesCartao = dataDespesa.getMonth() + 1;
+        const anoCartao = dataDespesa.getFullYear();
+        const cartaoId = d.cartaoId?._id || d.cartaoId;
+
+        return mesCartao === mesAtual &&
+               anoCartao === anoAtual &&
+               cartaoId === cartao._id;
+      });
+
+      // Somar o total das despesas
+      return despesasCartao.reduce((total: number, d: any) => total + (d.valor || 0), 0);
+    }) : [0];
+
+    // Calcular disponível = limite - utilizado
+    const disponiveis = cartoes.length > 0 ? cartoes.map((c: any, index: number) => {
+      const limite = c.limite || 0;
+      const utilizado = utilizados[index] || 0;
+      return Math.max(0, limite - utilizado); // Garantir que não seja negativo
+    }) : [0];
 
     this.cartoesChart = new Chart(ctx, {
       type: 'bar',
@@ -704,7 +735,7 @@ export class DashboardComponent implements OnInit {
           },
           {
             label: 'Disponível',
-            data: limites,
+            data: disponiveis,
             backgroundColor: '#006947',
             borderRadius: 8,
             borderSkipped: false
@@ -758,6 +789,22 @@ export class DashboardComponent implements OnInit {
                   label += 'R$ ' + context.parsed.x.toFixed(2).replace('.', ',');
                 }
                 return label;
+              },
+              afterBody: function(context) {
+                if (context.length > 0) {
+                  const index = context[0].dataIndex;
+                  const utilizado = utilizados[index] || 0;
+                  const disponivel = disponiveis[index] || 0;
+                  const limite = utilizado + disponivel;
+                  const percentual = limite > 0 ? ((utilizado / limite) * 100).toFixed(1) : '0.0';
+
+                  return [
+                    '',
+                    'Limite Total: R$ ' + limite.toFixed(2).replace('.', ','),
+                    'Utilização: ' + percentual + '%'
+                  ];
+                }
+                return [];
               }
             }
           }

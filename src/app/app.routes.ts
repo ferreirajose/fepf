@@ -125,6 +125,11 @@ export const routes: Routes = [
       import('./pages/more-menu/more-menu.component').then(m => m.MoreMenuComponent)
   },
   {
+    path: 'sistema/backup-dados',
+    loadComponent: () =>
+      import('./pages/backup/backup.component').then(m => m.BackupComponent)
+  },
+  {
     path: '**',
     redirectTo: '/dashboard'
   }

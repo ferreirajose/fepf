@@ -15,6 +15,7 @@ export interface Despesa {
   valor: number;
   data: Date | string;
   categoriaId: string;
+  subcategoriaId?: string;
   cartaoId?: string;
   recorrente: boolean;
   observacoes?: string;
@@ -30,6 +31,7 @@ export interface DespesaPopulada {
   valor: number;
   data: Date | string;
   categoriaId: string | { _id: string; nome: string; cor: string; icone?: string };
+  subcategoriaId?: string | { id: string; _id?: string; nome: string };
   cartaoId?: string | { _id: string; nome: string; bandeira: string };
   recorrente: boolean;
   observacoes?: string;
@@ -70,7 +72,10 @@ export interface FiltrosDespesa {
   dataInicio?: string;
   dataFim?: string;
   categoriaId?: string;
+  subcategoriaId?: string;
   cartaoId?: string;
+  formaPagamento?: string;
+  pago?: boolean;
 }
 
 @Injectable({
@@ -93,8 +98,17 @@ export class DespesaService {
       if (filtros.categoriaId) {
         params = params.set('categoriaId', filtros.categoriaId);
       }
+      if (filtros.subcategoriaId) {
+        params = params.set('subcategoriaId', filtros.subcategoriaId);
+      }
       if (filtros.cartaoId) {
         params = params.set('cartaoId', filtros.cartaoId);
+      }
+      if (filtros.formaPagamento) {
+        params = params.set('formaPagamento', filtros.formaPagamento);
+      }
+      if (filtros.pago !== undefined) {
+        params = params.set('pago', filtros.pago.toString());
       }
     }
 

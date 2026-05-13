@@ -1,9 +1,9 @@
-import { Component, signal, inject, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, signal, inject, OnInit, ViewChild, ElementRef, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DespesaService, Despesa as DespesaAPI } from '../../shared/services/despesa.service';
-import { CategoriaService, Categoria } from '../../shared/services/categoria.service';
+import { CategoriaService, Categoria, Subcategoria } from '../../shared/services/categoria.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AlertDialogComponent } from '../../shared/components/alert-dialog/alert-dialog.component';
 
@@ -16,10 +16,13 @@ interface Despesa {
   categoriaNome: string;
   categoriaIcone: string;
   categoriaCor: string;
+  subcategoriaId?: string;
+  subcategoriaNome?: string;
   cartaoId?: string;
   cartaoNome?: string;
   recorrente: boolean;
   pago: boolean;
+  formaPagamento?: 'dinheiro' | 'debito' | 'credito' | 'pix';
   observacoes?: string;
 }
 
@@ -38,7 +41,9 @@ export class DespesasComponent implements OnInit {
 
   filtroTexto = signal('');
   filtroCategoria = signal('todas');
+  filtroSubcategoria = signal('todas');
   filtroStatus = signal('todas');
+  filtroFormaPagamento = signal('todas');
   mesAtual = signal(new Date().getMonth() + 1);
   anoAtual = signal(new Date().getFullYear());
   carregando = signal(false);
@@ -81,6 +86,18 @@ export class DespesasComponent implements OnInit {
     { id: 'todas', nome: 'Todas Categorias' }
   ]);
 
+  subcategorias = signal<Array<{ id: string; nome: string }>>([
+    { id: 'todas', nome: 'Todas Subcategorias' }
+  ]);
+
+  // Computed para verificar se select de subcategoria deve estar habilitado
+  subcategoriaHabilitada = computed(() => {
+    return this.filtroCategoria() !== 'todas' && this.subcategorias().length > 1;
+  });
+
+  // Armazena todas as categorias com suas subcategorias
+  private categoriasCompletas: Categoria[] = [];
+
   ngOnInit() {
     this.carregarCategorias();
     this.carregarDespesas();
@@ -92,10 +109,12 @@ export class DespesasComponent implements OnInit {
         if (response.success && Array.isArray(response.data)) {
           const categoriasApi = response.data as Categoria[];
 
+          // Armazenar categorias completas para acessar subcategorias
+          this.categoriasCompletas = categoriasApi.filter(c => c.ativo);
+
           // Filtrar apenas categorias ativas
           // Note: campo 'tipo' será adicionado futuramente para separar despesa/receita
-          const categoriasAtivas = categoriasApi
-            .filter(c => c.ativo)
+          const categoriasAtivas = this.categoriasCompletas
             .map(c => ({
               id: c._id || '',
               nome: c.nome
@@ -113,6 +132,50 @@ export class DespesasComponent implements OnInit {
     });
   }
 
+  carregarSubcategorias(categoriaId: string) {
+    if (categoriaId === 'todas') {
+      this.subcategorias.set([{ id: 'todas', nome: 'Todas Subcategorias' }]);
+      this.filtroSubcategoria.set('todas');
+      return;
+    }
+
+    const categoria = this.categoriasCompletas.find(c => c._id === categoriaId);
+
+    if (categoria && categoria.subcategorias && categoria.subcategorias.length > 0) {
+      const subcategoriasAtivas = categoria.subcategorias
+        .filter(s => s.ativo)
+        .map(s => ({
+          id: s.id,
+          nome: s.nome
+        }));
+
+      this.subcategorias.set([
+        { id: 'todas', nome: 'Todas Subcategorias' },
+        ...subcategoriasAtivas
+      ]);
+    } else {
+      this.subcategorias.set([{ id: 'todas', nome: 'Todas Subcategorias' }]);
+    }
+    this.filtroSubcategoria.set('todas');
+  }
+
+  onCategoriaChange(categoriaId: string) {
+    this.carregarSubcategorias(categoriaId);
+    this.carregarDespesas();
+  }
+
+  onSubcategoriaChange() {
+    this.carregarDespesas();
+  }
+
+  onFormaPagamentoChange() {
+    this.carregarDespesas();
+  }
+
+  onStatusChange() {
+    this.carregarDespesas();
+  }
+
   carregarDespesas() {
     this.carregando.set(true);
     this.erro.set(null);
@@ -120,10 +183,29 @@ export class DespesasComponent implements OnInit {
     const primeiroDia = new Date(this.anoAtual(), this.mesAtual() - 1, 1);
     const ultimoDia = new Date(this.anoAtual(), this.mesAtual(), 0);
 
-    const filtros = {
+    const filtros: any = {
       dataInicio: primeiroDia.toISOString().split('T')[0],
       dataFim: ultimoDia.toISOString().split('T')[0]
     };
+
+    // Adicionar filtros condicionais
+    if (this.filtroCategoria() !== 'todas') {
+      filtros.categoriaId = this.filtroCategoria();
+    }
+
+    if (this.filtroSubcategoria() !== 'todas') {
+      filtros.subcategoriaId = this.filtroSubcategoria();
+    }
+
+    if (this.filtroFormaPagamento() !== 'todas') {
+      filtros.formaPagamento = this.filtroFormaPagamento();
+    }
+
+    if (this.filtroStatus() === 'pagas') {
+      filtros.pago = true;
+    } else if (this.filtroStatus() === 'pendentes') {
+      filtros.pago = false;
+    }
 
     this.despesaService.listar(filtros).subscribe({
       next: (response) => {
@@ -133,19 +215,28 @@ export class DespesasComponent implements OnInit {
             const dataUTC = new Date(d.data);
             const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
 
+            // Buscar subcategoria dentro do array de subcategorias da categoria
+            const categoria = (d as any).categoriaId;
+            const subcategoria = categoria?.subcategorias?.find(
+              (s: any) => s.id === d.subcategoriaId
+            );
+
             return {
               id: (d as any)._id || d.id || '',
               descricao: d.descricao,
               valor: d.valor,
               data: dataLocal,
-              categoriaId: (d as any).categoriaId?._id || (d as any).categoriaId?.id || d.categoriaId,
-              categoriaNome: (d as any).categoriaId?.nome || 'Sem categoria',
-              categoriaIcone: (d as any).categoriaId?.icone || 'circle',
-              categoriaCor: (d as any).categoriaId?.cor || '#6e9fff',
+              categoriaId: categoria?._id || categoria?.id || d.categoriaId,
+              categoriaNome: categoria?.nome || 'Sem categoria',
+              categoriaIcone: categoria?.icone || 'circle',
+              categoriaCor: categoria?.cor || '#6e9fff',
+              subcategoriaId: d.subcategoriaId,
+              subcategoriaNome: subcategoria?.nome,
               cartaoId: (d as any).cartaoId?._id || (d as any).cartaoId?.id || d.cartaoId,
               cartaoNome: (d as any).cartaoId?.nome,
               recorrente: d.recorrente,
               pago: d.pago || false,
+              formaPagamento: d.formaPagamento,
               observacoes: d.observacoes
             };
           }));
@@ -186,31 +277,19 @@ export class DespesasComponent implements OnInit {
   }
 
   getDespesasFiltradas(): Despesa[] {
-    let despesas = this.despesas().filter(d => {
-      const dataD = new Date(d.data);
-      return dataD.getMonth() + 1 === this.mesAtual() && dataD.getFullYear() === this.anoAtual();
-    });
+    let despesas = this.despesas();
 
-    // Filtro por texto
+    // MANTER apenas o filtro por texto (busca local rápida)
     if (this.filtroTexto()) {
       const texto = this.filtroTexto().toLowerCase();
       despesas = despesas.filter(d =>
         d.descricao.toLowerCase().includes(texto) ||
-        d.categoriaNome.toLowerCase().includes(texto)
+        d.categoriaNome.toLowerCase().includes(texto) ||
+        (d.subcategoriaNome && d.subcategoriaNome.toLowerCase().includes(texto))
       );
     }
 
-    // Filtro por categoria
-    if (this.filtroCategoria() !== 'todas') {
-      despesas = despesas.filter(d => d.categoriaId === this.filtroCategoria());
-    }
-
-    // Filtro por status
-    if (this.filtroStatus() === 'pagas') {
-      despesas = despesas.filter(d => d.pago);
-    } else if (this.filtroStatus() === 'pendentes') {
-      despesas = despesas.filter(d => !d.pago);
-    }
+    // Filtros de categoria, subcategoria, status e formaPagamento agora são aplicados no backend
 
     return despesas.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
   }
@@ -308,10 +387,39 @@ export class DespesasComponent implements OnInit {
     return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  getFormaPagamentoTexto(formaPagamento?: string): string {
+    if (!formaPagamento) return '';
+
+    const formas: { [key: string]: string } = {
+      'dinheiro': 'Dinheiro',
+      'debito': 'Débito',
+      'credito': 'Crédito',
+      'pix': 'PIX'
+    };
+
+    return formas[formaPagamento] || formaPagamento;
+  }
+
+  getFormaPagamentoIcone(formaPagamento?: string): string {
+    if (!formaPagamento) return '';
+
+    const icones: { [key: string]: string } = {
+      'dinheiro': 'ri-money-dollar-circle-line',
+      'debito': 'ri-bank-card-line',
+      'credito': 'ri-bank-card-2-line',
+      'pix': 'ri-qr-code-line'
+    };
+
+    return icones[formaPagamento] || 'ri-wallet-line';
+  }
+
   limparFiltros() {
     this.filtroTexto.set('');
     this.filtroCategoria.set('todas');
+    this.filtroSubcategoria.set('todas');
     this.filtroStatus.set('todas');
+    this.filtroFormaPagamento.set('todas');
+    this.subcategorias.set([{ id: 'todas', nome: 'Todas Subcategorias' }]);
   }
 
   exportarDespesas() {

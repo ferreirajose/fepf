@@ -1,0 +1,111 @@
+<div class="backup-container">
+  <div class="backup-header">
+    <h1>
+      <i class="ri-database-2-line"></i>
+      Backup do Sistema
+    </h1>
+    <p class="subtitle">Faça backup ou restaure os dados do MongoDB</p>
+  </div>
+
+  @if (mensagem()) {
+    <div class="alert" [class.alert-success]="mensagem()?.tipo === 'success'" [class.alert-error]="mensagem()?.tipo === 'error'">
+      <i class="ri-information-line" *ngIf="mensagem()?.tipo === 'success'"></i>
+      <i class="ri-error-warning-line" *ngIf="mensagem()?.tipo === 'error'"></i>
+      {{ mensagem()?.texto }}
+    </div>
+  }
+
+  <div class="backup-actions">
+    <div class="action-card">
+      <div class="card-icon gerar">
+        <i class="ri-download-cloud-line"></i>
+      </div>
+      <h2>Gerar Backup</h2>
+      <p>Exporta todos os dados do sistema para um arquivo JSON</p>
+      <button
+        class="btn btn-primary"
+        (click)="gerarBackup()"
+        [disabled]="carregando()">
+        @if (carregando()) {
+          <i class="ri-loader-4-line rotating"></i>
+          Gerando...
+        } @else {
+          <i class="ri-download-line"></i>
+          Baixar Backup
+        }
+      </button>
+    </div>
+
+    <div class="action-card">
+      <div class="card-icon restaurar">
+        <i class="ri-upload-cloud-line"></i>
+      </div>
+      <h2>Restaurar Backup</h2>
+      <p>Importa dados de um arquivo de backup JSON</p>
+      <label class="btn btn-secondary" [class.disabled]="carregando()">
+        @if (carregando()) {
+          <i class="ri-loader-4-line rotating"></i>
+          Restaurando...
+        } @else {
+          <i class="ri-upload-line"></i>
+          Selecionar Arquivo
+        }
+        <input
+          type="file"
+          accept=".json"
+          (change)="onFileSelected($event)"
+          [disabled]="carregando()"
+          style="display: none;">
+      </label>
+    </div>
+  </div>
+
+  @if (ultimoBackup()) {
+    <div class="backup-info">
+      <h3><i class="ri-information-line"></i> Informações do Último Backup</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Data de Exportação:</span>
+          <span class="value">{{ ultimoBackup().metadata.dataExportacao | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Versão:</span>
+          <span class="value">{{ ultimoBackup().metadata.versao }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Categorias:</span>
+          <span class="value">{{ ultimoBackup().metadata.totalRegistros.categorias }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Cartões:</span>
+          <span class="value">{{ ultimoBackup().metadata.totalRegistros.cartoes }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Despesas:</span>
+          <span class="value">{{ ultimoBackup().metadata.totalRegistros.despesas }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Receitas:</span>
+          <span class="value">{{ ultimoBackup().metadata.totalRegistros.receitas }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Orçamentos:</span>
+          <span class="value">{{ ultimoBackup().metadata.totalRegistros.orcamentos }}</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="warning-box">
+    <i class="ri-alert-line"></i>
+    <div>
+      <strong>Atenção:</strong>
+      <ul>
+        <li>O backup contém TODOS os dados do sistema</li>
+        <li>Restaurar um backup irá sobrescrever os dados existentes</li>
+        <li>Faça backups regulares para garantir a segurança dos dados</li>
+        <li>Armazene os arquivos de backup em local seguro</li>
+      </ul>
+    </div>
+  </div>
+</div>

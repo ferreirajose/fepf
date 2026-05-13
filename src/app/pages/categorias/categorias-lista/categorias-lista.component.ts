@@ -36,6 +36,7 @@ export class CategoriasListaComponent implements OnInit {
     { nome: 'restaurant', label: 'Alimentação' },
     { nome: 'home', label: 'Casa' },
     { nome: 'car', label: 'Transporte' },
+    { nome: 'e-bike-2', label: 'Moto' },
     { nome: 'heart', label: 'Saúde' },
     { nome: 'book', label: 'Educação' },
     { nome: 'shirt', label: 'Vestuário' },
