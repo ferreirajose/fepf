@@ -1,0 +1,246 @@
+<div class="min-h-screen p-8">
+  <div class="max-w-6xl mx-auto w-full space-y-8">
+
+    <!-- Header Section -->
+    <section class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div class="space-y-1">
+        <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
+          Contas Bancárias
+        </h1>
+        <p class="text-[#515981] max-w-lg font-inter">
+          Gerencie suas contas bancárias e acompanhe os saldos em tempo real.
+        </p>
+      </div>
+      <a
+        routerLink="/contas/novo"
+        class="bg-gradient-to-r from-[#006947] to-[#69f6b8] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-[#006947]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+        <i class="ri-add-circle-line"></i>
+        <span>Nova Conta</span>
+      </a>
+    </section>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-[#515981] font-inter">Total de Contas</p>
+            <h2 class="text-3xl font-extrabold text-on-surface font-manrope">
+              {{ getQuantidadeContas() }}
+            </h2>
+          </div>
+          <i class="ri-bank-line text-4xl text-[#006947]"></i>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-[#515981] font-inter">Saldo Total Atual</p>
+            <h2 class="text-3xl font-extrabold text-[#006947] font-manrope">
+              {{ getTotalSaldoAtual() | currency:'BRL':'symbol':'1.2-2' }}
+            </h2>
+          </div>
+          <i class="ri-money-dollar-circle-line text-4xl text-[#006947]"></i>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-[#515981] font-inter">Saldo Inicial Total</p>
+            <h2 class="text-3xl font-extrabold text-on-surface font-manrope">
+              {{ getTotalSaldoInicial() | currency:'BRL':'symbol':'1.2-2' }}
+            </h2>
+          </div>
+          <i class="ri-wallet-line text-4xl text-[#515981]"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Row -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Search -->
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="relative">
+          <input
+            type="text"
+            [(ngModel)]="filtroTexto"
+            placeholder="Buscar por nome ou tipo de conta..."
+            class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-secondary/20 font-inter">
+          <i class="ri-search-line text-[#515981] absolute left-4 top-1/2 -translate-y-1/2"></i>
+        </div>
+      </div>
+
+      <!-- Type Filter -->
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <select
+          [(ngModel)]="filtroTipoConta"
+          class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20 font-inter">
+          <option *ngFor="let cat of categorias()" [value]="cat.id">{{ cat.nome }}</option>
+        </select>
+      </div>
+
+      <!-- Status Filter -->
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <select
+          [(ngModel)]="filtroAtivo"
+          class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20 font-inter">
+          <option value="ativas">Apenas Ativas</option>
+          <option value="inativas">Apenas Inativas</option>
+          <option value="todas">Todas as Contas</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Filters Actions -->
+    <div class="flex flex-col md:flex-row md:items-center gap-4">
+      <button
+        (click)="limparFiltros()"
+        class="w-full md:w-auto px-4 py-2 text-[#515981] hover:bg-[#efefff] rounded-xl transition-colors font-inter text-sm font-bold">
+        Limpar Filtros
+      </button>
+
+      <div class="w-full md:w-auto md:ml-auto text-sm font-inter text-[#515981] text-center md:text-left">
+        {{ getQuantidadeContas() }} contas encontradas
+      </div>
+    </div>
+
+    <!-- Contas Table -->
+    <div class="bg-white rounded-xl shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 overflow-hidden">
+      <div *ngIf="carregando()" class="p-12 text-center">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#006947] border-t-transparent"></div>
+        <p class="mt-4 text-[#515981] font-inter">Carregando contas...</p>
+      </div>
+
+      <div *ngIf="erro()" class="p-12 text-center">
+        <i class="ri-error-warning-line text-6xl text-red-500"></i>
+        <p class="mt-4 text-red-500 font-inter">{{ erro() }}</p>
+      </div>
+
+      <div *ngIf="!carregando() && !erro() && getContasFiltradas().length === 0" class="p-12 text-center">
+        <i class="ri-bank-line text-6xl text-[#515981]"></i>
+        <p class="mt-4 text-[#515981] font-inter">Nenhuma conta encontrada</p>
+      </div>
+
+      <div *ngIf="!carregando() && !erro() && getContasFiltradas().length > 0" class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-[#efefff]">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-bold text-[#515981] uppercase tracking-wider font-inter">
+                Conta
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-[#515981] uppercase tracking-wider font-inter">
+                Tipo
+              </th>
+              <th class="px-6 py-4 text-right text-xs font-bold text-[#515981] uppercase tracking-wider font-inter">
+                Saldo Inicial
+              </th>
+              <th class="px-6 py-4 text-right text-xs font-bold text-[#515981] uppercase tracking-wider font-inter">
+                Saldo Atual
+              </th>
+              <th class="px-6 py-4 text-center text-xs font-bold text-[#515981] uppercase tracking-wider font-inter">
+                Ações
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#a3abd7]/10">
+            <tr *ngFor="let conta of getContasFiltradas()"
+                class="hover:bg-[#efefff]/30 transition-colors"
+                [class.opacity-50]="!conta.ativo">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                    [style.background-color]="getTipoCor(conta.tipoConta)">
+                    <i [class]="'ri-' + getTipoIcone(conta.tipoConta) + '-line'"></i>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <p class="font-bold text-on-surface font-inter">{{ conta.nome }}</p>
+                      <span *ngIf="!conta.ativo"
+                            class="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded-full font-inter">
+                        Inativa
+                      </span>
+                    </div>
+                    <p class="text-xs text-[#515981] font-inter">{{ getBancoLabel(conta.banco) }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div>
+                  <p class="text-sm text-[#515981] font-inter">{{ getTipoLabel(conta.tipoConta) }}</p>
+                  <p *ngIf="conta.subTipoConta" class="text-xs text-[#515981]/70 font-inter">{{ conta.subTipoConta }}</p>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <span class="text-sm font-bold text-on-surface font-inter">
+                  {{ conta.saldoInicial | currency:'BRL':'symbol':'1.2-2' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <span class="text-sm font-bold font-inter"
+                  [ngClass]="{
+                    'text-[#006947]': conta.saldoAtual >= 0,
+                    'text-red-500': conta.saldoAtual < 0
+                  }">
+                  {{ conta.saldoAtual | currency:'BRL':'symbol':'1.2-2' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <div class="flex items-center justify-center space-x-2">
+                  <a
+                    *ngIf="conta.ativo"
+                    [routerLink]="['/contas', conta.id, 'detalhes']"
+                    class="p-2 text-[#0057bd] hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Ver Detalhes">
+                    <i class="ri-eye-line"></i>
+                  </a>
+                  <button
+                    *ngIf="conta.ativo"
+                    (click)="atualizarSaldo(conta.id, $event)"
+                    class="p-2 text-[#006947] hover:bg-[#006947]/10 rounded-lg transition-colors"
+                    title="Atualizar Saldo">
+                    <i class="ri-refresh-line"></i>
+                  </button>
+                  <a
+                    *ngIf="conta.ativo"
+                    [routerLink]="['/contas', conta.id, 'editar']"
+                    class="p-2 text-purple-500 hover:bg-purple-50 rounded-lg transition-colors"
+                    title="Editar">
+                    <i class="ri-edit-line"></i>
+                  </a>
+                  <button
+                    *ngIf="conta.ativo"
+                    (click)="excluirConta(conta.id, $event)"
+                    class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Desativar">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                  <span *ngIf="!conta.ativo" class="text-xs text-[#515981] font-inter italic">
+                    Conta desativada
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<app-confirm-dialog
+  [isOpen]="confirmDialog().isOpen"
+  [title]="confirmDialog().title"
+  [message]="confirmDialog().message"
+  (onConfirm)="confirmDialog().onConfirm()"
+  (onCancel)="confirmDialog.set({ ...confirmDialog(), isOpen: false })" />
+
+<app-alert-dialog
+  [isOpen]="alertDialog().isOpen"
+  [title]="alertDialog().title"
+  [message]="alertDialog().message"
+  [type]="alertDialog().type"
+  (onClose)="alertDialog.set({ ...alertDialog(), isOpen: false })" />

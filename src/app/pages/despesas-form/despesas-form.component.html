@@ -159,6 +159,29 @@
           </div>
         </div>
 
+        <!-- Conta Bancária (Opcional) -->
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl flex items-center justify-center">
+              <i class="ri-bank-line text-white text-xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-on-surface font-manrope">Conta Bancária</h2>
+          </div>
+
+          <select
+            formControlName="contaId"
+            class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20 font-inter transition-all"
+          >
+            <option value="">Nenhuma conta (opcional)</option>
+            <option *ngFor="let conta of contas" [value]="conta._id || conta.id">
+              {{ conta.nome }}
+            </option>
+          </select>
+          <p class="mt-2 text-sm text-gray-600">
+            Vincule esta despesa a uma conta específica para rastreamento
+          </p>
+        </div>
+
         <!-- Pagamento Card -->
         <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
           <div class="flex items-center space-x-3 mb-6">

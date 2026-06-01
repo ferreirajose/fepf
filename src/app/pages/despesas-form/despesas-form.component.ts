@@ -7,6 +7,8 @@ import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 import { DespesaService } from '../../shared/services/despesa.service';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
 import { CartaoService, Cartao as CartaoAPI } from '../../shared/services/cartao.service';
+import { ContaService } from '../../shared/services/conta.service';
+import { Conta } from '../../shared/models/conta.model';
 import { environment } from '../../../environments/environment';
 
 interface Subcategoria {
@@ -42,6 +44,7 @@ export class DespesasFormComponent implements OnInit {
   private despesaService = inject(DespesaService);
   private categoriaService = inject(CategoriaService);
   private cartaoService = inject(CartaoService);
+  private contaService = inject(ContaService);
 
   form: FormGroup;
   despesaId = signal<string | null>(null);
@@ -51,6 +54,7 @@ export class DespesasFormComponent implements OnInit {
 
   categorias: Categoria[] = [];
   cartoes: Cartao[] = [];
+  contas: Conta[] = [];
   subcategorias: Subcategoria[] = [];
 
   formasPagamento = [
@@ -77,6 +81,7 @@ export class DespesasFormComponent implements OnInit {
       categoriaId: ['', Validators.required],
       subcategoriaId: [''],
       cartaoId: [''],
+      contaId: [''],
       formaPagamento: ['dinheiro', Validators.required],
       recorrente: [false],
       frequenciaRecorrencia: ['mensal'],
@@ -120,6 +125,7 @@ export class DespesasFormComponent implements OnInit {
   ngOnInit() {
     this.carregarCategorias();
     this.carregarCartoes();
+    this.carregarContas();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -176,6 +182,17 @@ export class DespesasFormComponent implements OnInit {
     });
   }
 
+  carregarContas() {
+    this.contaService.listar(true).subscribe({
+      next: (response) => {
+        if (response.success && Array.isArray(response.data)) {
+          this.contas = response.data;
+        }
+      },
+      error: (err) => console.error('Erro ao carregar contas:', err)
+    });
+  }
+
   getDataHoje(): string {
     const hoje = new Date();
     return hoje.toISOString().split('T')[0];
@@ -208,6 +225,7 @@ export class DespesasFormComponent implements OnInit {
             categoriaId: categoriaId,
             subcategoriaId: despesa.subcategoriaId || '',
             cartaoId: cartaoId,
+            contaId: despesa.contaId || '',
             formaPagamento: despesa.formaPagamento || 'dinheiro',
             recorrente: despesa.recorrente,
             pago: despesa.pago || false,
@@ -260,6 +278,7 @@ export class DespesasFormComponent implements OnInit {
         categoriaId: formValue.categoriaId,
         subcategoriaId: formValue.subcategoriaId || undefined,
         cartaoId: formValue.cartaoId || undefined,
+        contaId: formValue.contaId || undefined,
         formaPagamento: formValue.formaPagamento,
         recorrente: formValue.recorrente,
         pago: formValue.pago,

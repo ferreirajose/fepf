@@ -14,6 +14,7 @@ export class BottomNavComponent {
     { label: 'Início', icon: 'home', route: '/dashboard' },
     { label: 'Despesas', icon: 'shopping-bag', route: '/despesas' },
     { label: 'Receitas', icon: 'money-dollar-circle', route: '/receitas' },
+    { label: 'Contas', icon: 'bank', route: '/contas' },
     { label: 'Mais', icon: 'menu', route: '/more' }
   ];
 }

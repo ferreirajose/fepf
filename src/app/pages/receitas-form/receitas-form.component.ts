@@ -5,6 +5,8 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { NgxMaskDirective } from 'ngx-mask';
 import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/services/categoria.service';
 import { ReceitaService } from '../../shared/services/receita.service';
+import { ContaService } from '../../shared/services/conta.service';
+import { Conta } from '../../shared/models/conta.model';
 
 interface Subcategoria {
   id: string;
@@ -32,6 +34,7 @@ interface Categoria {
 export class ReceitasFormComponent implements OnInit {
   private receitaService = inject(ReceitaService);
   private categoriaService = inject(CategoriaService);
+  private contaService = inject(ContaService);
 
   form: FormGroup;
   receitaId = signal<string | null>(null);
@@ -40,6 +43,7 @@ export class ReceitasFormComponent implements OnInit {
   erro = signal<string | null>(null);
   categorias: Categoria[] = [];
   subcategorias: Subcategoria[] = [];
+  contas: Conta[] = [];
 
   formasRecebimento = [
     { id: 'dinheiro', nome: 'Dinheiro', icone: 'money-dollar-box' },
@@ -58,6 +62,7 @@ export class ReceitasFormComponent implements OnInit {
       valor: [null, [Validators.required, Validators.min(0.01)]],
       data: [this.getDataHoje(), Validators.required],
       categoriaId: ['', Validators.required],
+      contaId: [''],
       subcategoriaId: [''],
       formaRecebimento: ['pix', Validators.required],
       recorrente: [false],
@@ -94,6 +99,7 @@ export class ReceitasFormComponent implements OnInit {
 
   ngOnInit() {
     this.carregarCategorias();
+    this.carregarContas();
   }
 
   carregarCategorias() {
@@ -123,6 +129,17 @@ export class ReceitasFormComponent implements OnInit {
     });
   }
 
+  carregarContas() {
+    this.contaService.listar(true).subscribe({
+      next: (response) => {
+        if (response.success && Array.isArray(response.data)) {
+          this.contas = response.data;
+        }
+      },
+      error: (err) => console.error('Erro ao carregar contas:', err)
+    });
+  }
+
   getDataHoje(): string {
     const hoje = new Date();
     return hoje.toISOString().split('T')[0];
@@ -149,6 +166,7 @@ export class ReceitasFormComponent implements OnInit {
             valor: receita.valor,
             data: dataFormatada,
             categoriaId: categoriaId,
+            contaId: receita.contaId || '',
             subcategoriaId: receita.subcategoriaId || '',
             recorrente: receita.recorrente,
             observacoes: receita.observacoes || ''
@@ -183,6 +201,7 @@ export class ReceitasFormComponent implements OnInit {
         valor: valorNumerico,
         data: formValue.data,
         categoriaId: formValue.categoriaId,
+        contaId: formValue.contaId || undefined,
         subcategoriaId: formValue.subcategoriaId || undefined,
         recorrente: formValue.recorrente,
         observacoes: formValue.observacoes || undefined

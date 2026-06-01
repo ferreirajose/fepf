@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   template: `
     <div *ngIf="isOpen" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <!-- Backdrop -->
-      <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" (click)="onCancel()"></div>
+      <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" (click)="handleCancel()"></div>
 
       <!-- Modal -->
       <div class="flex min-h-full items-center justify-center p-4">
@@ -37,13 +37,13 @@ import { CommonModule } from '@angular/common';
           <div class="px-6 py-4 bg-[#f7f5ff] flex flex-col-reverse sm:flex-row gap-3">
             <button
               type="button"
-              (click)="onCancel()"
+              (click)="handleCancel()"
               class="flex-1 px-4 py-3 bg-white border-2 border-[#a3abd7]/30 text-[#515981] rounded-xl font-bold text-sm hover:bg-[#efefff] transition-colors font-inter">
               {{ cancelText }}
             </button>
             <button
               type="button"
-              (click)="onConfirm()"
+              (click)="handleConfirm()"
               [ngClass]="getConfirmButtonClass()"
               class="flex-1 px-4 py-3 text-white rounded-xl font-bold text-sm shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] font-inter">
               {{ confirmText }}
@@ -63,16 +63,16 @@ export class ConfirmDialogComponent {
   @Input() cancelText = 'Cancelar';
   @Input() type: 'danger' | 'warning' | 'info' | 'success' = 'warning';
 
-  @Output() confirm = new EventEmitter<void>();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() onConfirm = new EventEmitter<void>();
+  @Output() onCancel = new EventEmitter<void>();
 
-  onConfirm() {
-    this.confirm.emit();
+  handleConfirm() {
+    this.onConfirm.emit();
     this.isOpen = false;
   }
 
-  onCancel() {
-    this.cancel.emit();
+  handleCancel() {
+    this.onCancel.emit();
     this.isOpen = false;
   }
 

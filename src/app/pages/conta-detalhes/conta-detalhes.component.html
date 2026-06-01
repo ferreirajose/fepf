@@ -1,0 +1,269 @@
+<div class="min-h-screen p-4 md:p-8 pb-24 md:pb-8">
+  <div class="max-w-7xl mx-auto w-full space-y-4 md:space-y-8">
+
+    <!-- Loading State -->
+    <div *ngIf="carregando()" class="flex items-center justify-center min-h-[400px]">
+      <div class="text-center space-y-4">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#006947] border-t-transparent"></div>
+        <p class="text-[#515981] font-inter text-sm md:text-base">Carregando dados da conta...</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="erro() && !carregando()" class="bg-red-50 border-l-4 border-red-500 p-4 md:p-6 rounded-xl">
+      <div class="flex items-center">
+        <i class="ri-error-warning-line text-xl md:text-2xl text-red-500 mr-3"></i>
+        <p class="text-red-700 font-inter text-sm md:text-base">{{ erro() }}</p>
+      </div>
+      <button
+        (click)="voltar()"
+        class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-inter text-sm md:text-base w-full md:w-auto">
+        Voltar para Contas
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="conta() && !carregando()" class="space-y-4 md:space-y-8">
+
+      <!-- Header with Back Button -->
+      <div class="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+        <button
+          (click)="voltar()"
+          class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white border-2 border-[#a3abd7]/30 text-[#515981] hover:bg-[#efefff] transition-colors flex-shrink-0">
+          <i class="ri-arrow-left-line text-lg md:text-xl"></i>
+        </button>
+        <div class="flex-1 min-w-0">
+          <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight text-on-surface font-manrope truncate">
+            {{ conta()!.nome }}
+          </h1>
+          <p class="text-[#515981] font-inter mt-1 text-xs md:text-sm">
+            Detalhes e histórico da conta
+          </p>
+        </div>
+        <button
+          (click)="atualizarSaldo()"
+          class="w-full md:w-auto px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-[#006947] to-[#69f6b8] text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-[#006947]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter text-sm md:text-base">
+          <i class="ri-refresh-line"></i>
+          <span>Atualizar Saldo</span>
+        </button>
+      </div>
+
+      <!-- Cards de Resumo -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+        <!-- Saldo Atual -->
+        <div class="col-span-2 md:col-span-1 bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl p-4 md:p-6 text-white shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-xs opacity-90 font-inter">Saldo Atual</p>
+            <i class="ri-wallet-3-line text-xl md:text-2xl opacity-80"></i>
+          </div>
+          <h2 class="text-2xl md:text-3xl font-extrabold font-manrope break-words">
+            {{ conta()!.saldoAtual | currency:'BRL':'symbol':'1.2-2' }}
+          </h2>
+          <p class="text-xs opacity-80 mt-1 font-inter">
+            Inicial: {{ conta()!.saldoInicial | currency:'BRL':'symbol':'1.2-2' }}
+          </p>
+        </div>
+
+        <!-- Total Receitas -->
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-xs text-[#515981] font-inter">Receitas</p>
+            <i class="ri-arrow-up-circle-fill text-xl md:text-2xl text-[#006947]"></i>
+          </div>
+          <h2 class="text-lg md:text-2xl font-extrabold text-[#006947] font-manrope break-words">
+            {{ fluxoCaixa().totalReceitas | currency:'BRL':'symbol':'1.2-2' }}
+          </h2>
+        </div>
+
+        <!-- Total Despesas -->
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-xs text-[#515981] font-inter">Despesas</p>
+            <i class="ri-arrow-down-circle-fill text-xl md:text-2xl text-[#b51621]"></i>
+          </div>
+          <h2 class="text-lg md:text-2xl font-extrabold text-[#b51621] font-manrope break-words">
+            {{ fluxoCaixa().totalDespesas | currency:'BRL':'symbol':'1.2-2' }}
+          </h2>
+        </div>
+
+        <!-- Saldo Líquido -->
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-xs text-[#515981] font-inter">Líquido</p>
+            <i class="ri-line-chart-line text-xl md:text-2xl text-[#0057bd]"></i>
+          </div>
+          <h2 class="text-lg md:text-2xl font-extrabold font-manrope break-words"
+              [ngClass]="fluxoCaixa().saldoLiquido >= 0 ? 'text-[#006947]' : 'text-[#b51621]'">
+            {{ fluxoCaixa().saldoLiquido | currency:'BRL':'symbol':'1.2-2' }}
+          </h2>
+        </div>
+      </div>
+
+      <!-- Fluxo de Caixa Detalhado -->
+      <div class="bg-white rounded-xl p-4 md:p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <h2 class="text-lg md:text-2xl font-extrabold text-on-surface mb-4 md:mb-6 font-manrope flex items-center gap-2 md:gap-3">
+          <i class="ri-funds-line text-[#006947] text-xl md:text-2xl"></i>
+          <span>Fluxo de Caixa</span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+          <!-- Receitas e Transferências Recebidas -->
+          <div class="space-y-3 md:space-y-4">
+            <div class="flex items-center justify-between p-3 md:p-4 bg-green-50 rounded-lg">
+              <div class="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#006947] flex items-center justify-center flex-shrink-0">
+                  <i class="ri-arrow-up-line text-white text-sm md:text-base"></i>
+                </div>
+                <span class="text-xs md:text-sm font-bold text-[#006947] font-inter truncate">Receitas</span>
+              </div>
+              <span class="text-sm md:text-lg font-extrabold text-[#006947] font-manrope ml-2 flex-shrink-0">
+                {{ fluxoCaixa().totalReceitas | currency:'BRL':'symbol':'1.2-2' }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 md:p-4 bg-blue-50 rounded-lg">
+              <div class="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#2196F3] flex items-center justify-center flex-shrink-0">
+                  <i class="ri-download-line text-white text-sm md:text-base"></i>
+                </div>
+                <span class="text-xs md:text-sm font-bold text-[#2196F3] font-inter truncate">Transf. Recebidas</span>
+              </div>
+              <span class="text-sm md:text-lg font-extrabold text-[#2196F3] font-manrope ml-2 flex-shrink-0">
+                {{ fluxoCaixa().totalTransferenciasRecebidas | currency:'BRL':'symbol':'1.2-2' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Despesas e Transferências Enviadas -->
+          <div class="space-y-3 md:space-y-4">
+            <div class="flex items-center justify-between p-3 md:p-4 bg-red-50 rounded-lg">
+              <div class="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#b51621] flex items-center justify-center flex-shrink-0">
+                  <i class="ri-arrow-down-line text-white text-sm md:text-base"></i>
+                </div>
+                <span class="text-xs md:text-sm font-bold text-[#b51621] font-inter truncate">Despesas</span>
+              </div>
+              <span class="text-sm md:text-lg font-extrabold text-[#b51621] font-manrope ml-2 flex-shrink-0">
+                {{ fluxoCaixa().totalDespesas | currency:'BRL':'symbol':'1.2-2' }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 md:p-4 bg-orange-50 rounded-lg">
+              <div class="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#FF9800] flex items-center justify-center flex-shrink-0">
+                  <i class="ri-upload-line text-white text-sm md:text-base"></i>
+                </div>
+                <span class="text-xs md:text-sm font-bold text-[#FF9800] font-inter truncate">Transf. Enviadas</span>
+              </div>
+              <span class="text-sm md:text-lg font-extrabold text-[#FF9800] font-manrope ml-2 flex-shrink-0">
+                {{ fluxoCaixa().totalTransferenciasEnviadas | currency:'BRL':'symbol':'1.2-2' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Histórico de Transações -->
+      <div class="bg-white rounded-xl p-4 md:p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-6 gap-3">
+          <h2 class="text-lg md:text-2xl font-extrabold text-on-surface font-manrope flex items-center gap-2 md:gap-3">
+            <i class="ri-history-line text-[#006947] text-xl md:text-2xl"></i>
+            <span>Histórico</span>
+          </h2>
+
+          <div class="flex flex-col sm:flex-row gap-2 md:gap-3 w-full md:w-auto">
+            <!-- Filtro por Período -->
+            <select
+              [(ngModel)]="periodoSelecionado"
+              class="w-full sm:w-auto px-3 md:px-4 py-2 border-2 border-[#a3abd7]/30 rounded-lg text-xs md:text-sm font-inter focus:outline-none focus:border-[#006947]">
+              <option value="7dias">7 dias</option>
+              <option value="30dias">30 dias</option>
+              <option value="90dias">90 dias</option>
+              <option value="todos">Todos</option>
+            </select>
+
+            <!-- Filtro por Tipo -->
+            <select
+              [(ngModel)]="filtroTipo"
+              class="w-full sm:w-auto px-3 md:px-4 py-2 border-2 border-[#a3abd7]/30 rounded-lg text-xs md:text-sm font-inter focus:outline-none focus:border-[#006947]">
+              <option value="todas">Todas</option>
+              <option value="receitas">Receitas</option>
+              <option value="despesas">Despesas</option>
+              <option value="transferencias">Transferências</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Lista de Transações -->
+        <div class="space-y-2 md:space-y-3">
+          <div *ngIf="getTransacoesFiltradas().length === 0" class="text-center py-8 md:py-12">
+            <i class="ri-inbox-line text-4xl md:text-6xl text-[#a3abd7] mb-2 md:mb-4"></i>
+            <p class="text-[#515981] font-inter text-sm md:text-base">Nenhuma transação encontrada</p>
+          </div>
+
+          <div
+            *ngFor="let transacao of getTransacoesFiltradas()"
+            class="flex items-center gap-3 md:gap-4 p-3 md:p-4 hover:bg-[#f7f5ff] rounded-lg transition-colors border-b border-[#a3abd7]/10 last:border-0">
+
+            <!-- Ícone da Transação -->
+            <div
+              class="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center flex-shrink-0"
+              [style.background-color]="getTipoCor(transacao.tipo) + '20'">
+              <i [class]="getTipoIcon(transacao.tipo) + ' text-lg md:text-xl'" [style.color]="getTipoCor(transacao.tipo)"></i>
+            </div>
+
+            <!-- Info da Transação -->
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-on-surface font-inter text-sm md:text-base truncate">{{ transacao.descricao }}</h3>
+              <div class="flex flex-wrap items-center gap-1 md:gap-2 mt-1">
+                <span class="text-xs text-[#515981] font-inter whitespace-nowrap">
+                  {{ transacao.data | date:'dd/MM/yyyy' }}
+                </span>
+                <span class="text-xs text-[#515981] hidden sm:inline">•</span>
+                <span
+                  class="text-xs px-2 py-0.5 md:py-1 rounded font-bold font-inter whitespace-nowrap"
+                  [style.background-color]="getTipoCor(transacao.tipo) + '20'"
+                  [style.color]="getTipoCor(transacao.tipo)">
+                  {{ getTipoLabel(transacao.tipo) }}
+                </span>
+                <ng-container *ngIf="transacao.categoria">
+                  <span class="text-xs text-[#515981] hidden sm:inline">•</span>
+                  <span class="text-xs text-[#515981] font-inter truncate max-w-[120px]">
+                    {{ transacao.categoria }}
+                  </span>
+                </ng-container>
+                <ng-container *ngIf="transacao.contaOrigem">
+                  <span class="text-xs text-[#515981] hidden sm:inline">•</span>
+                  <span class="text-xs text-[#515981] font-inter truncate max-w-[100px]">
+                    De: {{ transacao.contaOrigem }}
+                  </span>
+                </ng-container>
+                <ng-container *ngIf="transacao.contaDestino">
+                  <span class="text-xs text-[#515981] hidden sm:inline">•</span>
+                  <span class="text-xs text-[#515981] font-inter truncate max-w-[100px]">
+                    Para: {{ transacao.contaDestino }}
+                  </span>
+                </ng-container>
+              </div>
+            </div>
+
+            <!-- Valor -->
+            <div class="text-right flex-shrink-0">
+              <p
+                class="text-base md:text-xl font-extrabold font-manrope whitespace-nowrap"
+                [ngClass]="{
+                  'text-[#006947]': transacao.tipo === 'receita' || transacao.tipo === 'transferencia_recebida',
+                  'text-[#b51621]': transacao.tipo === 'despesa' || transacao.tipo === 'transferencia_enviada'
+                }">
+                <span *ngIf="transacao.tipo === 'receita' || transacao.tipo === 'transferencia_recebida'">+</span>
+                <span *ngIf="transacao.tipo === 'despesa' || transacao.tipo === 'transferencia_enviada'">-</span>
+                {{ transacao.valor | currency:'BRL':'symbol':'1.2-2' }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

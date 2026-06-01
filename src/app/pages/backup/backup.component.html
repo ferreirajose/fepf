@@ -77,6 +77,10 @@
           <span class="value">{{ ultimoBackup().metadata.totalRegistros.categorias }}</span>
         </div>
         <div class="info-item">
+          <span class="label">Contas:</span>
+          <span class="value">{{ ultimoBackup().metadata.totalRegistros.contas || 0 }}</span>
+        </div>
+        <div class="info-item">
           <span class="label">Cartões:</span>
           <span class="value">{{ ultimoBackup().metadata.totalRegistros.cartoes }}</span>
         </div>
@@ -87,6 +91,10 @@
         <div class="info-item">
           <span class="label">Receitas:</span>
           <span class="value">{{ ultimoBackup().metadata.totalRegistros.receitas }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Transferências:</span>
+          <span class="value">{{ ultimoBackup().metadata.totalRegistros.transferencias || 0 }}</span>
         </div>
         <div class="info-item">
           <span class="label">Orçamentos:</span>

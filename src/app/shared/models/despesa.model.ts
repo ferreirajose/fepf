@@ -6,6 +6,7 @@ export interface Despesa {
   categoriaId: string;
   subcategoriaId?: string;
   cartaoId?: string;
+  contaId?: string;
   recorrente: boolean;
   observacoes?: string;
 }

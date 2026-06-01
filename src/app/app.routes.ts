@@ -115,6 +115,31 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'contas',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/contas/contas.component').then(m => m.ContasComponent)
+      },
+      {
+        path: 'novo',
+        loadComponent: () =>
+          import('./pages/contas-form/contas-form.component').then(m => m.ContasFormComponent)
+      },
+      {
+        path: ':id/detalhes',
+        loadComponent: () =>
+          import('./pages/conta-detalhes/conta-detalhes.component').then(m => m.ContaDetalhesComponent)
+      },
+      {
+        path: ':id/editar',
+        loadComponent: () =>
+          import('./pages/contas-form/contas-form.component').then(m => m.ContasFormComponent)
+      }
+    ]
+  },
+  {
     path: 'transacao/:tipo/:id',
     loadComponent: () =>
       import('./pages/transacao-detalhes/transacao-detalhes.component').then(m => m.TransacaoDetalhesComponent)

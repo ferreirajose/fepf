@@ -23,6 +23,7 @@ export class SidebarComponent {
     { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
     { label: 'Receitas', route: '/receitas', icon: 'arrow-up' },
     { label: 'Despesas', route: '/despesas', icon: 'arrow-down' },
+    { label: 'Contas', route: '/contas', icon: 'bank' },
     { label: 'Categorias', route: '/categorias', icon: 'price-tag-3' },
     { label: 'Cartões', route: '/cartoes', icon: 'bank-card' },
     { label: 'Orçamentos', route: '/orcamentos', icon: 'pie-chart' },
