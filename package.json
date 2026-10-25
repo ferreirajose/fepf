@@ -4,10 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:local": "NG_APP_API_URL=http://localhost:3000 NG_APP_ENVIRONMENT=development ng serve",
-    "start:prod": "NG_APP_API_URL=https://fepf-api.vercel.app NG_APP_ENVIRONMENT=production ng serve",
+    "start:local": "cross-env NG_APP_API_URL=http://localhost:3000 NG_APP_ENVIRONMENT=development ng serve",
+    "start:prod": "cross-env NG_APP_API_URL=https://fepf-api.vercel.app NG_APP_ENVIRONMENT=production ng serve",
     "build": "ng build",
-    "build:prod": "NG_APP_API_URL=https://fepf-api.vercel.app NG_APP_ENVIRONMENT=production ng build",
+    "build:prod": "cross-env NG_APP_API_URL=https://fepf-api.vercel.app NG_APP_ENVIRONMENT=production ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -38,6 +38,7 @@
     "@angular/compiler-cli": "^21.2.0",
     "@ngx-env/builder": "^21.0.1",
     "autoprefixer": "^10.5.0",
+    "cross-env": "^7.0.3",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.12",
     "prettier": "^3.8.1",

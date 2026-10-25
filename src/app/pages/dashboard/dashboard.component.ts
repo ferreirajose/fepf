@@ -1,18 +1,41 @@
-import { Component, OnInit, ViewChild, ElementRef, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+  Injector,
+  afterNextRender,
+  computed,
+  inject,
+  signal
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Chart, ChartConfiguration, registerables } from 'chart.js';
-import { DespesaService } from '../../shared/services/despesa.service';
-import { ReceitaService } from '../../shared/services/receita.service';
-import { CartaoService } from '../../shared/services/cartao.service';
-import { OrcamentoService } from '../../shared/services/orcamento.service';
-import { CategoriaService } from '../../shared/services/categoria.service';
+import { Chart, registerables } from 'chart.js';
 import { FinanceiroService } from '../../shared/services/financeiro.service';
 import { MapClustererComponent } from '../../shared/components/map-clusterer/map-clusterer.component';
+import { DashboardFinanceiro } from '../../shared/models/dashboard.model';
+import {
+  CORES_GRAFICO,
+  formatarMoeda,
+  legendaPadrao,
+  tooltipPadrao,
+  escalaValores,
+  escalaRotulos
+} from '../../shared/utils/chart-theme';
 import { environment } from '../../../environments/environment';
-import { forkJoin } from 'rxjs';
 
 Chart.register(...registerables);
+
+const MESES_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+const CORES_RESERVA = ['#6e9fff', '#69f6b8', '#ff928b', '#0057bd', '#006947', '#515981', '#820AD1', '#FFD700'];
+
+// As datas da API são meia-noite UTC; converte para a mesma data no fuso local
+const dataLocal = (iso: string): Date => {
+  const data = new Date(iso);
+  return new Date(data.getUTCFullYear(), data.getUTCMonth(), data.getUTCDate());
+};
 
 @Component({
   selector: 'app-dashboard',
@@ -21,130 +44,86 @@ Chart.register(...registerables);
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements OnInit {
-  private despesaService = inject(DespesaService);
-  private receitaService = inject(ReceitaService);
-  private cartaoService = inject(CartaoService);
-  private orcamentoService = inject(OrcamentoService);
-  private categoriaService = inject(CategoriaService);
+export class DashboardComponent implements OnInit, OnDestroy {
   private financeiroService = inject(FinanceiroService);
+  private injector = inject(Injector);
 
-  @ViewChild('evolucaoChart') evolucaoChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('categoriasChart') categoriasChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('cartoesChart') cartoesChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('orcamentosChart') orcamentosChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('evolucaoChart') evolucaoChartRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('categoriasChart') categoriasChartRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('cartoesChart') cartoesChartRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('orcamentosChart') orcamentosChartRef?: ElementRef<HTMLCanvasElement>;
 
-  // Instâncias dos gráficos
   private evolucaoChart?: Chart;
   private categoriasChart?: Chart;
   private cartoesChart?: Chart;
   private orcamentosChart?: Chart;
 
-  saldoAnterior = signal(0);
-  saldoAtual = signal(0);
-  receitasMes = signal(0);
-  despesasMes = signal(0);
+  private hoje = new Date();
+  mesSelecionado = signal(this.hoje.getMonth() + 1);
+  anoSelecionado = signal(this.hoje.getFullYear());
+
   carregando = signal(false);
   erro = signal<string | null>(null);
   tipoVisualizacao = signal<'mensal' | 'anual'>('mensal');
+  dados = signal<DashboardFinanceiro | null>(null);
 
-  dadosEstatisticos = signal<any>(null);
-  cartoes = signal<any[]>([]);
-  orcamentos = signal<any[]>([]);
-  categorias = signal<any[]>([]);
-  transacoesRecentes: any[] = [];
-  despesas = signal<any[]>([]);
-  despesasComLocalizacao = signal<any[]>([]);
-  gruposDespesas = signal<any[]>([]);
   googleMapsApiKey = environment.googleMapsApiKey;
+
+  saldo = computed(() => this.dados()?.saldo ?? null);
+  saldoAnterior = computed(() => this.saldo()?.saldoAnterior ?? 0);
+  saldoAtual = computed(() => this.saldo()?.saldoAtual ?? 0);
+  receitasMes = computed(() => this.saldo()?.receitasMes ?? 0);
+  despesasMes = computed(() => this.saldo()?.despesasMes ?? 0);
+
+  periodoInput = computed(() =>
+    `${this.anoSelecionado()}-${String(this.mesSelecionado()).padStart(2, '0')}`
+  );
+
+  ehMesAtual = computed(() =>
+    this.mesSelecionado() === this.hoje.getMonth() + 1 && this.anoSelecionado() === this.hoje.getFullYear()
+  );
+
+  // Percentual das receitas do mês consumido pelas despesas
+  comprometimentoReceitas = computed(() => {
+    const saldo = this.saldo();
+    if (!saldo || saldo.receitasMes <= 0) return saldo && saldo.despesasMes > 0 ? 100 : 0;
+    return (saldo.despesasMes / saldo.receitasMes) * 100;
+  });
+
+  transacoesRecentes = computed(() =>
+    (this.dados()?.transacoesRecentes ?? []).map(t => ({ ...t, data: dataLocal(t.data) }))
+  );
+
+  despesasComLocalizacao = computed(() =>
+    (this.dados()?.locais ?? []).map(local => ({ ...local, id: local._id, data: dataLocal(local.data) }))
+  );
+
+  totalLocais = computed(() =>
+    new Set(this.despesasComLocalizacao().map(d => `${d.latitude},${d.longitude}`)).size
+  );
 
   ngOnInit() {
     this.carregarDados();
+  }
+
+  ngOnDestroy() {
+    this.destruirGraficos();
   }
 
   carregarDados() {
     this.carregando.set(true);
     this.erro.set(null);
 
-    // Para o gráfico de evolução, buscar dados dos últimos 5 anos (para ter dados suficientes para visualização anual)
-    const dataFim = new Date();
-    dataFim.setMonth(dataFim.getMonth() + 1);
-    dataFim.setDate(0);
-    dataFim.setHours(23, 59, 59, 999); // Final do mês atual
-
-    const dataInicio = new Date();
-    dataInicio.setFullYear(dataInicio.getFullYear() - 4); // 5 anos atrás (ano atual + 4 anteriores)
-    dataInicio.setMonth(0); // Janeiro
-    dataInicio.setDate(1);
-    dataInicio.setHours(0, 0, 0, 0); // Início do ano
-
-    const filtros = {
-      dataInicio: dataInicio.toISOString().split('T')[0],
-      dataFim: dataFim.toISOString().split('T')[0]
-    };
-
-    const mesAtual = new Date().getMonth() + 1;
-    const anoAtual = new Date().getFullYear();
-
-    forkJoin({
-      receitas: this.receitaService.obterEstatisticas(filtros),
-      despesas: this.despesaService.obterEstatisticas(filtros),
-      receitasLista: this.receitaService.listar(),
-      despesasLista: this.despesaService.listar(),
-      cartoes: this.cartaoService.listar(),
-      orcamentos: this.orcamentoService.listar({ mes: mesAtual, ano: anoAtual }),
-      categorias: this.categoriaService.listar(),
-      saldoAcumulado: this.financeiroService.obterSaldoAcumulado(mesAtual, anoAtual)
-    }).subscribe({
+    this.financeiroService.obterDashboard(this.mesSelecionado(), this.anoSelecionado()).subscribe({
       next: (response) => {
-        if (response.saldoAcumulado.success && response.saldoAcumulado.data) {
-          const saldo = response.saldoAcumulado.data;
-          this.saldoAnterior.set(saldo.saldoAnterior);
-          this.receitasMes.set(saldo.receitasMes);
-          this.despesasMes.set(saldo.despesasMes);
-          this.saldoAtual.set(saldo.saldoAtual);
+        if (response.success && response.data) {
+          this.dados.set(response.data);
+          // Os canvas são atualizados depois que o template refletir os novos dados
+          afterNextRender(() => this.criarGraficos(), { injector: this.injector });
         } else {
-          if (response.receitas.success && response.receitas.data) {
-            this.receitasMes.set(response.receitas.data.total || 0);
-          }
-          if (response.despesas.success && response.despesas.data) {
-            this.despesasMes.set(response.despesas.data.total || 0);
-          }
-          this.saldoAtual.set(this.receitasMes() - this.despesasMes());
+          this.erro.set(response.error || 'Não foi possível carregar os dados');
         }
-        if (response.cartoes.success && Array.isArray(response.cartoes.data)) {
-          this.cartoes.set(response.cartoes.data);
-        }
-        if (response.orcamentos.success && Array.isArray(response.orcamentos.data)) {
-          this.orcamentos.set(response.orcamentos.data);
-        }
-        if (response.categorias.success && Array.isArray(response.categorias.data)) {
-          this.categorias.set(response.categorias.data);
-        }
-
-        // Armazenar estatísticas completas
-        this.dadosEstatisticos.set({
-          receitas: response.receitas.data,
-          despesas: response.despesas.data
-        });
-
-        // Armazenar despesas para cálculo de utilização dos cartões
-        if (Array.isArray(response.despesasLista.data)) {
-          this.despesas.set(response.despesasLista.data);
-        }
-
-        // Processar transações recentes
-        this.processarTransacoesRecentes(response.receitasLista.data, response.despesasLista.data);
-
-        // Processar despesas com localização
-        this.processarDespesasComLocalizacao(response.despesasLista.data);
-
         this.carregando.set(false);
-
-        // Aguardar o próximo ciclo de renderização para criar gráficos
-        setTimeout(() => {
-          this.criarGraficos();
-        }, 100);
       },
       error: (err) => {
         console.error('Erro ao carregar dados do dashboard:', err);
@@ -154,267 +133,73 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  calcularSaldo(): number {
-    return this.saldoAnterior() + this.receitasMes() - this.despesasMes();
+  alterarPeriodo(valor: string) {
+    const [ano, mes] = valor.split('-').map(Number);
+    if (!ano || !mes) return;
+    this.anoSelecionado.set(ano);
+    this.mesSelecionado.set(mes);
+    this.carregarDados();
   }
 
-  processarTransacoesRecentes(receitas: any, despesas: any) {
-    const transacoes: any[] = [];
-
-    // Adicionar receitas
-    if (Array.isArray(receitas)) {
-      receitas.forEach((receita: any) => {
-        const dataUTC = new Date(receita.data);
-        const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
-        transacoes.push({
-          id: receita._id,
-          tipo: 'receita',
-          descricao: receita.descricao,
-          valor: receita.valor,
-          data: dataLocal
-        });
-      });
-    }
-
-    // Adicionar despesas
-    if (Array.isArray(despesas)) {
-      despesas.forEach((despesa: any) => {
-        const dataUTC = new Date(despesa.data);
-        const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
-        transacoes.push({
-          id: despesa._id,
-          tipo: 'despesa',
-          descricao: despesa.descricao,
-          valor: despesa.valor,
-          data: dataLocal
-        });
-      });
-    }
-
-    // Ordenar por data (mais recente primeiro)
-    transacoes.sort((a, b) => b.data.getTime() - a.data.getTime());
-
-    // Pegar apenas as 5 mais recentes
-    this.transacoesRecentes = transacoes.slice(0, 5);
+  navegarMes(delta: number) {
+    const data = new Date(this.anoSelecionado(), this.mesSelecionado() - 1 + delta, 1);
+    this.alterarPeriodo(`${data.getFullYear()}-${data.getMonth() + 1}`);
   }
 
-  processarDespesasComLocalizacao(despesas: any) {
-    if (!Array.isArray(despesas)) {
-      this.despesasComLocalizacao.set([]);
-      this.gruposDespesas.set([]);
-      return;
-    }
-
-    const despesasComLoc = despesas
-      .filter((despesa: any) =>
-        despesa.localizacao &&
-        despesa.localizacao.latitude &&
-        despesa.localizacao.longitude
-      )
-      .map((despesa: any) => {
-        const dataUTC = new Date(despesa.data);
-        const dataLocal = new Date(dataUTC.getUTCFullYear(), dataUTC.getUTCMonth(), dataUTC.getUTCDate());
-        return {
-          id: despesa._id,
-          descricao: despesa.descricao,
-          valor: despesa.valor,
-          data: dataLocal,
-          latitude: despesa.localizacao.latitude,
-          longitude: despesa.localizacao.longitude,
-          endereco: despesa.localizacao.endereco || `${despesa.localizacao.latitude}, ${despesa.localizacao.longitude}`,
-          categoriaNome: despesa.categoriaId?.nome || 'Sem categoria',
-          categoriaCor: despesa.categoriaId?.cor || '#6e9fff'
-        };
-      })
-      .sort((a: any, b: any) => b.data.getTime() - a.data.getTime());
-
-    this.despesasComLocalizacao.set(despesasComLoc);
-
-    // Agrupar despesas por proximidade (15km)
-    const grupos = this.agruparDespesasPorProximidade(despesasComLoc, 15);
-    this.gruposDespesas.set(grupos);
+  irParaMesAtual() {
+    this.alterarPeriodo(`${this.hoje.getFullYear()}-${this.hoje.getMonth() + 1}`);
   }
 
-  // Calcula distância entre duas coordenadas em km (fórmula de Haversine)
-  calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371; // Raio da Terra em km
-    const dLat = this.toRad(lat2 - lat1);
-    const dLon = this.toRad(lon2 - lon1);
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distancia = R * c;
-
-    return distancia;
-  }
-
-  toRad(valor: number): number {
-    return valor * Math.PI / 180;
-  }
-
-  // Agrupa despesas por proximidade (raio em km)
-  agruparDespesasPorProximidade(despesas: any[], raioKm: number): any[] {
-    if (despesas.length === 0) return [];
-
-    const grupos: any[] = [];
-    const processadas = new Set<string>();
-
-    despesas.forEach(despesa => {
-      if (processadas.has(despesa.id)) return;
-
-      // Criar novo grupo com a despesa atual
-      const grupo: any = {
-        id: `grupo-${grupos.length}`,
-        latitude: despesa.latitude,
-        longitude: despesa.longitude,
-        despesas: [despesa],
-        totalValor: despesa.valor,
-        endereco: despesa.endereco
-      };
-
-      processadas.add(despesa.id);
-
-      // Buscar outras despesas próximas
-      despesas.forEach(outraDespesa => {
-        if (processadas.has(outraDespesa.id)) return;
-
-        const distancia = this.calcularDistancia(
-          despesa.latitude,
-          despesa.longitude,
-          outraDespesa.latitude,
-          outraDespesa.longitude
-        );
-
-        if (distancia <= raioKm) {
-          grupo.despesas.push(outraDespesa);
-          grupo.totalValor += outraDespesa.valor;
-          processadas.add(outraDespesa.id);
-        }
-      });
-
-      // Calcular centro do grupo (média das coordenadas)
-      if (grupo.despesas.length > 1) {
-        grupo.latitude = grupo.despesas.reduce((sum: number, d: any) => sum + d.latitude, 0) / grupo.despesas.length;
-        grupo.longitude = grupo.despesas.reduce((sum: number, d: any) => sum + d.longitude, 0) / grupo.despesas.length;
-
-        // Usar o endereço da primeira despesa como referência, mas indicar que é uma área
-        const enderecoBase = grupo.despesas[0].endereco;
-        // Tentar extrair apenas a cidade/bairro do endereço completo
-        const partes = enderecoBase.split(',');
-        if (partes.length >= 2) {
-          grupo.endereco = `Área de ${partes[partes.length - 2].trim()}, ${partes[partes.length - 1].trim()}`;
-        } else {
-          grupo.endereco = `${grupo.despesas.length} despesas nesta área`;
-        }
-      }
-
-      grupos.push(grupo);
-    });
-
-    return grupos;
-  }
-
-  getMapUrl(): string {
-    const grupos = this.gruposDespesas();
-
-    if (grupos.length === 0) {
-      // Mapa padrão centrado nas coordenadas padrão
-      return `https://maps.google.com/maps?q=-7.165104,-34.855471&z=13&output=embed`;
-    }
-
-    // Se tiver apenas um grupo, centralizar nele
-    if (grupos.length === 1) {
-      const grupo = grupos[0];
-      return `https://maps.google.com/maps?q=${grupo.latitude},${grupo.longitude}&z=14&output=embed`;
-    }
-
-    // Para múltiplos grupos, criar uma URL com o centro calculado e zoom ajustado
-    const latitudes = grupos.map(g => g.latitude);
-    const longitudes = grupos.map(g => g.longitude);
-
-    const centerLat = latitudes.reduce((a, b) => a + b, 0) / latitudes.length;
-    const centerLng = longitudes.reduce((a, b) => a + b, 0) / longitudes.length;
-
-    // Calcular zoom baseado na dispersão dos pontos
-    const maxLat = Math.max(...latitudes);
-    const minLat = Math.min(...latitudes);
-    const maxLng = Math.max(...longitudes);
-    const minLng = Math.min(...longitudes);
-
-    const latDiff = maxLat - minLat;
-    const lngDiff = maxLng - minLng;
-    const maxDiff = Math.max(latDiff, lngDiff);
-
-    // Ajustar zoom baseado na diferença
-    let zoom = 13;
-    if (maxDiff < 0.01) zoom = 15;      // Muito próximos
-    else if (maxDiff < 0.05) zoom = 13;  // Próximos
-    else if (maxDiff < 0.1) zoom = 12;   // Moderadamente dispersos
-    else if (maxDiff < 0.2) zoom = 11;   // Dispersos
-    else zoom = 10;                      // Muito dispersos
-
-    return `https://maps.google.com/maps?q=${centerLat},${centerLng}&z=${zoom}&output=embed`;
+  nomeMesSelecionado(): string {
+    return new Date(this.anoSelecionado(), this.mesSelecionado() - 1, 1)
+      .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   }
 
   getMapUrlComMarcadores(): string {
-    const grupos = this.gruposDespesas();
+    const locais = this.despesasComLocalizacao();
+    if (locais.length === 0) return '';
 
-    if (grupos.length === 0) {
-      return '';
+    if (locais.length === 1) {
+      return `https://www.google.com/maps/search/?api=1&query=${locais[0].latitude},${locais[0].longitude}`;
     }
 
-    // Criar URL do Google Maps com múltiplos pontos
-    // Usar o formato de busca com múltiplas coordenadas
-    if (grupos.length === 1) {
-      const grupo = grupos[0];
-      return `https://www.google.com/maps/search/?api=1&query=${grupo.latitude},${grupo.longitude}`;
-    }
-
-    // Para múltiplos grupos, criar URL com direções
-    const origem = grupos[0];
-    const destino = grupos[grupos.length - 1];
-    const waypoints = grupos.slice(1, -1).map(g => `${g.latitude},${g.longitude}`).join('|');
+    // Google Maps aceita no máximo 9 waypoints intermediários
+    const origem = locais[0];
+    const destino = locais[locais.length - 1];
+    const waypoints = locais.slice(1, -1).slice(0, 9).map(l => `${l.latitude},${l.longitude}`).join('|');
 
     let url = `https://www.google.com/maps/dir/?api=1&origin=${origem.latitude},${origem.longitude}&destination=${destino.latitude},${destino.longitude}`;
     if (waypoints) {
       url += `&waypoints=${waypoints}`;
     }
-    url += '&travelmode=driving';
-
-    return url;
+    return url + '&travelmode=driving';
   }
 
   setTipoVisualizacao(tipo: 'mensal' | 'anual') {
     this.tipoVisualizacao.set(tipo);
-    // Recriar apenas o gráfico de evolução
-    setTimeout(() => {
-      this.criarGraficoEvolucao();
-    }, 50);
+    this.criarGraficoEvolucao();
   }
 
-  criarGraficos() {
+  private criarGraficos() {
     this.criarGraficoEvolucao();
     this.criarGraficoCategorias();
     this.criarGraficoCartoes();
     this.criarGraficoOrcamentos();
   }
 
-  criarGraficoEvolucao() {
-    if (!this.evolucaoChartRef) return;
+  private destruirGraficos() {
+    this.evolucaoChart?.destroy();
+    this.categoriasChart?.destroy();
+    this.cartoesChart?.destroy();
+    this.orcamentosChart?.destroy();
+  }
 
-    const ctx = this.evolucaoChartRef.nativeElement.getContext('2d');
+  private criarGraficoEvolucao() {
+    const ctx = this.evolucaoChartRef?.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    // Destruir gráfico anterior se existir
-    if (this.evolucaoChart) {
-      this.evolucaoChart.destroy();
-    }
+    this.evolucaoChart?.destroy();
 
-    // Criar gradientes para receitas e despesas
     const receitasGradient = ctx.createLinearGradient(0, 0, 0, 300);
     receitasGradient.addColorStop(0, 'rgba(0, 105, 71, 0.3)');
     receitasGradient.addColorStop(1, 'rgba(0, 105, 71, 0.01)');
@@ -423,205 +208,87 @@ export class DashboardComponent implements OnInit {
     despesasGradient.addColorStop(0, 'rgba(181, 22, 33, 0.3)');
     despesasGradient.addColorStop(1, 'rgba(181, 22, 33, 0.01)');
 
-    const stats = this.dadosEstatisticos();
-    const receitasPorMes = stats?.receitas?.porMes || [];
-    const despesasPorMes = stats?.despesas?.porMes || [];
-
-    let labels: string[] = [];
-    let receitasData: number[] = [];
-    let despesasData: number[] = [];
+    const evolucao = this.dados()?.evolucao ?? [];
+    let labels: string[];
+    let receitasData: number[];
+    let despesasData: number[];
 
     if (this.tipoVisualizacao() === 'mensal') {
-      // Visualização mensal - últimos 12 meses
-      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-      const hoje = new Date();
-      const anoAtualCompleto = hoje.getFullYear();
-
-      for (let i = 11; i >= 0; i--) {
-        const data = new Date();
-        data.setMonth(hoje.getMonth() - i);
-        const mes = data.getMonth() + 1;
-        const ano = data.getFullYear();
-
-        // Incluir ano no label se for diferente do ano atual
-        const label = ano !== anoAtualCompleto ? `${meses[mes - 1]}/${ano}` : meses[mes - 1];
-        labels.push(label);
-
-        // Buscar receita do mês
-        const receitaMes = receitasPorMes.find((r: any) => r._id.mes === mes && r._id.ano === ano);
-        receitasData.push(receitaMes?.total || 0);
-
-        // Buscar despesa do mês
-        const despesaMes = despesasPorMes.find((d: any) => d._id.mes === mes && d._id.ano === ano);
-        despesasData.push(despesaMes?.total || 0);
-      }
+      // Últimos 12 meses até o mês selecionado
+      const ultimos = evolucao.slice(-12);
+      labels = ultimos.map(e =>
+        e.ano !== this.anoSelecionado() ? `${MESES_ABREV[e.mes - 1]}/${e.ano}` : MESES_ABREV[e.mes - 1]
+      );
+      receitasData = ultimos.map(e => e.receitas);
+      despesasData = ultimos.map(e => e.despesas);
     } else {
-      // Visualização anual - últimos 5 anos
-      const anoAtual = new Date().getFullYear();
-
-      for (let i = 4; i >= 0; i--) {
-        const ano = anoAtual - i;
-        labels.push(ano.toString());
-
-        // Somar todas as receitas do ano
-        const receitaAno = receitasPorMes
-          .filter((r: any) => r._id.ano === ano)
-          .reduce((sum: number, r: any) => sum + r.total, 0);
-        receitasData.push(receitaAno);
-
-        // Somar todas as despesas do ano
-        const despesaAno = despesasPorMes
-          .filter((d: any) => d._id.ano === ano)
-          .reduce((sum: number, d: any) => sum + d.total, 0);
-        despesasData.push(despesaAno);
-      }
+      // Totais por ano (o ano selecionado vai até o mês selecionado)
+      const anos = [...new Set(evolucao.map(e => e.ano))];
+      labels = anos.map(String);
+      receitasData = anos.map(ano => evolucao.filter(e => e.ano === ano).reduce((s, e) => s + e.receitas, 0));
+      despesasData = anos.map(ano => evolucao.filter(e => e.ano === ano).reduce((s, e) => s + e.despesas, 0));
     }
+
+    const estiloLinha = (cor: string) => ({
+      borderColor: cor,
+      borderWidth: 3,
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: cor,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointRadius: 5,
+      pointHoverRadius: 7
+    });
 
     this.evolucaoChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: labels,
+        labels,
         datasets: [
-          {
-            label: 'Receitas',
-            data: receitasData,
-            borderColor: '#006947',
-            backgroundColor: receitasGradient,
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#006947',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-          },
-          {
-            label: 'Despesas',
-            data: despesasData,
-            borderColor: '#b51621',
-            backgroundColor: despesasGradient,
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#b51621',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-          }
+          { label: 'Receitas', data: receitasData, backgroundColor: receitasGradient, ...estiloLinha(CORES_GRAFICO.receita) },
+          { label: 'Despesas', data: despesasData, backgroundColor: despesasGradient, ...estiloLinha(CORES_GRAFICO.despesa) }
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              font: {
-                family: 'Inter',
-                size: 12,
-                weight: 600
-              },
-              color: '#515981',
-              padding: 15,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
-          },
+          legend: legendaPadrao<'line'>(),
           tooltip: {
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            titleColor: '#242c51',
-            bodyColor: '#515981',
-            borderColor: '#a3abd7',
-            borderWidth: 1,
-            padding: 12,
-            titleFont: {
-              family: 'Manrope',
-              size: 14,
-              weight: 'bold'
-            },
-            bodyFont: {
-              family: 'Inter',
-              size: 12
-            },
-            displayColors: true,
+            ...tooltipPadrao<'line'>(),
             callbacks: {
-              label: function(context) {
-                let label = context.dataset.label || '';
-                if (label) {
-                  label += ': ';
-                }
-                if (context.parsed && typeof context.parsed.y === 'number') {
-                  label += 'R$ ' + context.parsed.y.toFixed(2).replace('.', ',');
-                }
-                return label;
-              }
+              label: (context) => `${context.dataset.label}: ${formatarMoeda(context.parsed.y ?? 0)}`
             }
           }
         },
         scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(163, 171, 215, 0.1)'
-            },
-            ticks: {
-              font: {
-                family: 'Inter',
-                size: 11
-              },
-              color: '#515981',
-              callback: function(value) {
-                return 'R$ ' + value;
-              }
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              font: {
-                family: 'Inter',
-                size: 11,
-                weight: 600
-              },
-              color: '#515981'
-            }
-          }
+          y: escalaValores(),
+          x: escalaRotulos()
         }
       }
     });
   }
 
-  criarGraficoCategorias() {
-    if (!this.categoriasChartRef) return;
-
-    const ctx = this.categoriasChartRef.nativeElement.getContext('2d');
+  private criarGraficoCategorias() {
+    const ctx = this.categoriasChartRef?.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    // Destruir gráfico anterior se existir
-    if (this.categoriasChart) {
-      this.categoriasChart.destroy();
-    }
+    this.categoriasChart?.destroy();
 
-    const stats = this.dadosEstatisticos();
-    const categorias = stats?.despesas?.porCategoria || [];
+    const categorias = this.dados()?.despesasPorCategoria ?? [];
+    const temDados = categorias.length > 0;
 
-    const labels = categorias.map((c: any) => c.categoriaNome || 'Sem categoria');
-    const data = categorias.map((c: any) => c.total);
-    const cores = ['#6e9fff', '#69f6b8', '#ff928b', '#0057bd', '#006947', '#515981', '#820AD1', '#FFD700'];
+    // Usa a cor cadastrada na categoria; repete cores apenas na falta delas
+    const cores = categorias.map((c, i) => c.cor || CORES_RESERVA[i % CORES_RESERVA.length]);
 
     this.categoriasChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: labels.length > 0 ? labels : ['Sem dados'],
+        labels: temDados ? categorias.map(c => c.nome) : ['Sem despesas no mês'],
         datasets: [{
-          data: data.length > 0 ? data : [0],
-          backgroundColor: cores.slice(0, labels.length > 0 ? labels.length : 1),
+          data: temDados ? categorias.map(c => c.total) : [1],
+          backgroundColor: temDados ? cores : ['#efefff'],
           borderWidth: 0,
           hoverOffset: 10
         }]
@@ -631,45 +298,16 @@ export class DashboardComponent implements OnInit {
         maintainAspectRatio: false,
         cutout: '65%',
         plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-            labels: {
-              font: {
-                family: 'Inter',
-                size: 12,
-                weight: 600
-              },
-              color: '#515981',
-              padding: 12,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
-          },
+          legend: legendaPadrao<'doughnut'>('bottom'),
           tooltip: {
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            titleColor: '#242c51',
-            bodyColor: '#515981',
-            borderColor: '#a3abd7',
-            borderWidth: 1,
-            padding: 12,
-            titleFont: {
-              family: 'Manrope',
-              size: 14,
-              weight: 'bold'
-            },
-            bodyFont: {
-              family: 'Inter',
-              size: 12
-            },
-            displayColors: true,
+            ...tooltipPadrao<'doughnut'>(),
+            enabled: temDados,
             callbacks: {
-              label: function(context) {
-                const value = context.parsed;
-                if (typeof value !== 'number') return '';
-                const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
-                return context.label + ': R$ ' + value.toFixed(2).replace('.', ',') + ' (' + percentage + '%)';
+              label: (context) => {
+                const valor = context.parsed;
+                const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
+                const percentual = total > 0 ? ((valor / total) * 100).toFixed(1) : '0.0';
+                return `${context.label}: ${formatarMoeda(valor)} (${percentual}%)`;
               }
             }
           }
@@ -678,65 +316,32 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  criarGraficoCartoes() {
-    if (!this.cartoesChartRef) return;
-
-    const ctx = this.cartoesChartRef.nativeElement.getContext('2d');
+  private criarGraficoCartoes() {
+    const ctx = this.cartoesChartRef?.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    // Destruir gráfico anterior se existir
-    if (this.cartoesChart) {
-      this.cartoesChart.destroy();
-    }
+    this.cartoesChart?.destroy();
 
-    const cartoes = this.cartoes().filter((c: any) => c.ativo);
-
-    const labels = cartoes.length > 0 ? cartoes.map((c: any) => c.nome) : ['Sem cartões cadastrados'];
-
-    // Calcular utilização real baseada nas despesas
-    const mesAtual = new Date().getMonth() + 1;
-    const anoAtual = new Date().getFullYear();
-
-    const utilizados = cartoes.length > 0 ? cartoes.map((cartao: any) => {
-      // Filtrar despesas do mês atual deste cartão
-      const despesasCartao = this.despesas().filter((d: any) => {
-        const dataDespesa = new Date(d.data);
-        const mesCartao = dataDespesa.getMonth() + 1;
-        const anoCartao = dataDespesa.getFullYear();
-        const cartaoId = d.cartaoId?._id || d.cartaoId;
-
-        return mesCartao === mesAtual &&
-               anoCartao === anoAtual &&
-               cartaoId === cartao._id;
-      });
-
-      // Somar o total das despesas
-      return despesasCartao.reduce((total: number, d: any) => total + (d.valor || 0), 0);
-    }) : [0];
-
-    // Calcular disponível = limite - utilizado
-    const disponiveis = cartoes.length > 0 ? cartoes.map((c: any, index: number) => {
-      const limite = c.limite || 0;
-      const utilizado = utilizados[index] || 0;
-      return Math.max(0, limite - utilizado); // Garantir que não seja negativo
-    }) : [0];
+    const cartoes = this.dados()?.cartoes ?? [];
+    const temDados = cartoes.length > 0;
+    const formatarDia = (iso: string) => dataLocal(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 
     this.cartoesChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: labels,
+        labels: temDados ? cartoes.map(c => c.nome) : ['Sem cartões cadastrados'],
         datasets: [
           {
             label: 'Utilizado',
-            data: utilizados,
-            backgroundColor: '#b51621',
+            data: temDados ? cartoes.map(c => c.utilizado) : [0],
+            backgroundColor: CORES_GRAFICO.despesa,
             borderRadius: 8,
             borderSkipped: false
           },
           {
             label: 'Disponível',
-            data: disponiveis,
-            backgroundColor: '#006947',
+            data: temDados ? cartoes.map(c => c.disponivel) : [0],
+            backgroundColor: CORES_GRAFICO.receita,
             borderRadius: 8,
             borderSkipped: false
           }
@@ -747,153 +352,64 @@ export class DashboardComponent implements OnInit {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              font: {
-                family: 'Inter',
-                size: 12,
-                weight: 600
-              },
-              color: '#515981',
-              padding: 15,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
-          },
+          legend: legendaPadrao<'bar'>(),
           tooltip: {
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            titleColor: '#242c51',
-            bodyColor: '#515981',
-            borderColor: '#a3abd7',
-            borderWidth: 1,
-            padding: 12,
-            titleFont: {
-              family: 'Manrope',
-              size: 14,
-              weight: 'bold'
-            },
-            bodyFont: {
-              family: 'Inter',
-              size: 12
-            },
-            displayColors: true,
+            ...tooltipPadrao<'bar'>(),
             callbacks: {
-              label: function(context) {
-                let label = context.dataset.label || '';
-                if (label) {
-                  label += ': ';
-                }
-                if (context.parsed && typeof context.parsed.x === 'number') {
-                  label += 'R$ ' + context.parsed.x.toFixed(2).replace('.', ',');
-                }
-                return label;
-              },
-              afterBody: function(context) {
-                if (context.length > 0) {
-                  const index = context[0].dataIndex;
-                  const utilizado = utilizados[index] || 0;
-                  const disponivel = disponiveis[index] || 0;
-                  const limite = utilizado + disponivel;
-                  const percentual = limite > 0 ? ((utilizado / limite) * 100).toFixed(1) : '0.0';
-
-                  return [
-                    '',
-                    'Limite Total: R$ ' + limite.toFixed(2).replace('.', ','),
-                    'Utilização: ' + percentual + '%'
-                  ];
-                }
-                return [];
+              label: (context) => `${context.dataset.label}: ${formatarMoeda(context.parsed.x ?? 0)}`,
+              afterBody: (context) => {
+                const cartao = cartoes[context[0]?.dataIndex];
+                if (!cartao) return [];
+                return [
+                  '',
+                  `Fatura: ${formatarDia(cartao.cicloInicio)} a ${formatarDia(cartao.cicloFim)}`,
+                  `Limite: ${formatarMoeda(cartao.limite)}`,
+                  `Utilização: ${cartao.percentualUtilizado.toFixed(1)}%`
+                ];
               }
             }
           }
         },
         scales: {
-          x: {
-            stacked: true,
-            grid: {
-              color: 'rgba(163, 171, 215, 0.1)'
-            },
-            ticks: {
-              font: {
-                family: 'Inter',
-                size: 11
-              },
-              color: '#515981',
-              callback: function(value) {
-                return 'R$ ' + value;
-              }
-            }
-          },
-          y: {
-            stacked: true,
-            grid: {
-              display: false
-            },
-            ticks: {
-              font: {
-                family: 'Inter',
-                size: 11,
-                weight: 600
-              },
-              color: '#515981'
-            }
-          }
+          x: escalaValores(true),
+          y: escalaRotulos(true)
         }
       }
     });
   }
 
-  criarGraficoOrcamentos() {
-    if (!this.orcamentosChartRef) return;
-
-    const ctx = this.orcamentosChartRef.nativeElement.getContext('2d');
+  private criarGraficoOrcamentos() {
+    const ctx = this.orcamentosChartRef?.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    // Destruir gráfico anterior se existir
-    if (this.orcamentosChart) {
-      this.orcamentosChart.destroy();
-    }
+    this.orcamentosChart?.destroy();
 
-    const orcamentos = this.orcamentos();
+    const orcamentos = this.dados()?.orcamentos ?? [];
+    const temDados = orcamentos.length > 0;
 
-    const labels = orcamentos.length > 0
-      ? orcamentos.map((o: any) => o.categoriaId?.nome || 'Categoria')
-      : ['Sem orçamentos cadastrados'];
-    const planejados = orcamentos.length > 0
-      ? orcamentos.map((o: any) => o.valorPlanejado || o.valor || 0)
-      : [0];
-    const gastos = orcamentos.length > 0
-      ? orcamentos.map((o: any) => o.valorGasto || 0)
-      : [0];
-
-    // Cores dinâmicas baseadas no percentual gasto
-    const coresGastos = orcamentos.length > 0
-      ? orcamentos.map((o: any) => {
-          const percentual = o.percentualGasto || 0;
-          if (percentual > 100) return '#b51621'; // Vermelho - excedido
-          if (percentual >= 90) return '#ffa500';  // Laranja - alerta
-          return '#006947';                         // Verde - normal
-        })
-      : ['#6e9fff'];
+    // Verde: normal · Laranja: acima de 90% · Vermelho: excedido
+    const coresGastos = orcamentos.map(o => {
+      if (o.percentualGasto > 100) return CORES_GRAFICO.despesa;
+      if (o.percentualGasto >= 90) return CORES_GRAFICO.alerta;
+      return CORES_GRAFICO.receita;
+    });
 
     this.orcamentosChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: labels,
+        labels: temDados ? orcamentos.map(o => o.categoriaNome) : ['Sem orçamentos no mês'],
         datasets: [
           {
             label: 'Planejado',
-            data: planejados,
-            backgroundColor: '#0057bd',
+            data: temDados ? orcamentos.map(o => o.valorPlanejado) : [0],
+            backgroundColor: CORES_GRAFICO.planejado,
             borderRadius: 8,
             borderSkipped: false
           },
           {
             label: 'Gasto',
-            data: gastos,
-            backgroundColor: coresGastos,
+            data: temDados ? orcamentos.map(o => o.valorGasto) : [0],
+            backgroundColor: temDados ? coresGastos : [CORES_GRAFICO.neutro],
             borderRadius: 8,
             borderSkipped: false
           }
@@ -903,108 +419,31 @@ export class DashboardComponent implements OnInit {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              font: {
-                family: 'Inter',
-                size: 12,
-                weight: 600
-              },
-              color: '#515981',
-              padding: 15,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
-          },
+          legend: legendaPadrao<'bar'>(),
           tooltip: {
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            titleColor: '#242c51',
-            bodyColor: '#515981',
-            borderColor: '#a3abd7',
-            borderWidth: 1,
-            padding: 12,
-            titleFont: {
-              family: 'Manrope',
-              size: 14,
-              weight: 'bold'
-            },
-            bodyFont: {
-              family: 'Inter',
-              size: 12
-            },
-            displayColors: true,
+            ...tooltipPadrao<'bar'>(),
             callbacks: {
               label: (context) => {
-                const dataIndex = context.dataIndex;
-                const orcamento = orcamentos[dataIndex];
-                const isGasto = context.dataset.label === 'Gasto';
-
-                let label = context.dataset.label || '';
-                if (label) {
-                  label += ': ';
+                const orcamento = orcamentos[context.dataIndex];
+                let label = `${context.dataset.label}: ${formatarMoeda(context.parsed.y ?? 0)}`;
+                if (context.dataset.label === 'Gasto' && orcamento) {
+                  label += ` (${orcamento.percentualGasto.toFixed(1)}%)`;
                 }
-                if (context.parsed && typeof context.parsed.y === 'number') {
-                  label += 'R$ ' + context.parsed.y.toFixed(2).replace('.', ',');
-                }
-
-                // Adicionar percentual e status apenas para barra de Gasto
-                if (isGasto && orcamento) {
-                  const percentual = orcamento.percentualGasto || 0;
-                  label += ` (${percentual.toFixed(1)}%)`;
-                }
-
                 return label;
               },
               afterLabel: (context) => {
-                const dataIndex = context.dataIndex;
-                const orcamento = orcamentos[dataIndex];
-                const isGasto = context.dataset.label === 'Gasto';
-
-                if (isGasto && orcamento) {
-                  const restante = orcamento.valorRestante || 0;
-                  if (restante >= 0) {
-                    return `Restante: R$ ${restante.toFixed(2).replace('.', ',')}`;
-                  } else {
-                    return `Excedido em: R$ ${Math.abs(restante).toFixed(2).replace('.', ',')}`;
-                  }
-                }
-                return '';
+                const orcamento = orcamentos[context.dataIndex];
+                if (context.dataset.label !== 'Gasto' || !orcamento) return '';
+                return orcamento.valorRestante >= 0
+                  ? `Restante: ${formatarMoeda(orcamento.valorRestante)}`
+                  : `Excedido em: ${formatarMoeda(Math.abs(orcamento.valorRestante))}`;
               }
             }
           }
         },
         scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(163, 171, 215, 0.1)'
-            },
-            ticks: {
-              font: {
-                family: 'Inter',
-                size: 11
-              },
-              color: '#515981',
-              callback: function(value) {
-                return 'R$ ' + value;
-              }
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              font: {
-                family: 'Inter',
-                size: 11,
-                weight: 600
-              },
-              color: '#515981'
-            }
-          }
+          y: escalaValores(),
+          x: escalaRotulos()
         }
       }
     });
