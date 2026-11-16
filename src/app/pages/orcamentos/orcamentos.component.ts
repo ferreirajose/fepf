@@ -1,4 +1,5 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
+import { atribuirCoresUnicas } from '../../shared/utils/cores-categoria';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OrcamentoService, Orcamento as OrcamentoAPI } from '../../shared/services/orcamento.service';
@@ -81,18 +82,25 @@ export class OrcamentosComponent implements OnInit {
     this.orcamentoService.listar(filtros).subscribe({
       next: (response) => {
         if (response.success && Array.isArray(response.data)) {
-          this.orcamentos.set((response.data as any[]).map(o => ({
+          const lista = (response.data as any[]).map(o => ({
             id: o._id || '',
             categoriaId: o.categoriaId,
             categoriaNome: o.categoriaId?.nome || 'Sem categoria',
             categoriaIcone: o.categoriaId?.icone || 'circle',
-            categoriaCor: o.categoriaId?.cor || '#6e9fff',
+            categoriaCor: o.categoriaId?.cor || '#34D399',
             valorPlanejado: o.valorPlanejado || o.valor,
             valorGasto: o.valorGasto || 0,
             mes: o.mes,
             ano: o.ano,
             ativo: true
-          })));
+          }));
+          // Categorias com cores iguais/parecidas recebem cores distintas da paleta
+          this.orcamentos.set(atribuirCoresUnicas(
+            lista,
+            o => o.categoriaId?._id || o.categoriaId || o.categoriaNome,
+            o => o.categoriaCor,
+            (o, cor) => ({ ...o, categoriaCor: cor })
+          ));
         }
         this.carregando.set(false);
       },
@@ -223,11 +231,11 @@ export class OrcamentosComponent implements OnInit {
 
   getProgressColor(orcamento: Orcamento): string {
     if (this.isExcedido(orcamento)) {
-      return 'linear-gradient(to right, #b51621, #ff928b)';
+      return 'linear-gradient(to right, #DC2626, #F87171)';
     } else if (this.getPercentualGasto(orcamento) >= 90) {
-      return 'linear-gradient(to right, #ffa500, #ffcc00)';
+      return 'linear-gradient(to right, #F59E0B, #ffcc00)';
     } else {
-      return 'linear-gradient(to right, #006947, #69f6b8)';
+      return 'linear-gradient(to right, #059669, #6EE7B7)';
     }
   }
 }

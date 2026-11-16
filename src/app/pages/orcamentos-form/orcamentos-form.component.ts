@@ -88,7 +88,7 @@ export class OrcamentosFormComponent implements OnInit {
               id: c._id || '',
               nome: c.nome,
               icone: c.icone || 'circle',
-              cor: c.cor || '#6e9fff'
+              cor: c.cor || '#34D399'
             }));
         }
       },

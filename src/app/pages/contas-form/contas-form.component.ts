@@ -24,8 +24,8 @@ export class ContasFormComponent implements OnInit {
 
   tiposConta = [
     { valor: 'conta_corrente', label: 'Conta Corrente', cor: '#4CAF50', icone: 'ri-bank-line' },
-    { valor: 'poupanca', label: 'Poupança', cor: '#2196F3', icone: 'ri-safe-line' },
-    { valor: 'investimentos', label: 'Investimentos', cor: '#FF9800', icone: 'ri-line-chart-line' },
+    { valor: 'poupanca', label: 'Poupança', cor: '#0284C7', icone: 'ri-safe-line' },
+    { valor: 'investimentos', label: 'Investimentos', cor: '#F59E0B', icone: 'ri-line-chart-line' },
     { valor: 'conta_beneficios', label: 'Benefícios', cor: '#9C27B0', icone: 'ri-gift-line' }
   ];
 

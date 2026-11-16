@@ -1,3 +1,4 @@
+import { PALETA_CATEGORIAS } from '../../../shared/utils/cores-categoria';
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -24,10 +25,7 @@ export class CategoriasFormComponent {
   novaSubcategoria = signal('');
   novoIconeSubcategoria = signal('tag');
 
-  cores = [
-    '#0057bd', '#006947', '#b51621', '#FF6B6B', '#4ECDC4',
-    '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'
-  ];
+  cores = PALETA_CATEGORIAS;
 
   icones = [
     { nome: 'tag', label: 'Tag' },
@@ -88,7 +86,7 @@ export class CategoriasFormComponent {
   ) {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
-      cor: ['#0057bd', Validators.required],
+      cor: ['#10B981', Validators.required],
       icone: ['tag', Validators.required],
       ativo: [true]
     });
@@ -112,7 +110,7 @@ export class CategoriasFormComponent {
           const categoria = response.data;
           this.form.patchValue({
             nome: categoria.nome,
-            cor: categoria.cor || '#0057bd',
+            cor: categoria.cor || '#10B981',
             icone: categoria.icone || '',
             ativo: categoria.ativo
           });

@@ -290,12 +290,12 @@ export class ContaDetalhesComponent implements OnInit {
 
   getTipoCor(tipo: string): string {
     const cores: Record<string, string> = {
-      'receita': '#006947',
-      'despesa': '#b51621',
-      'transferencia_recebida': '#2196F3',
-      'transferencia_enviada': '#FF9800'
+      'receita': '#059669',
+      'despesa': '#DC2626',
+      'transferencia_recebida': '#0284C7',
+      'transferencia_enviada': '#F59E0B'
     };
-    return cores[tipo] || '#515981';
+    return cores[tipo] || '#57534E';
   }
 
   getTipoLabel(tipo: string): string {

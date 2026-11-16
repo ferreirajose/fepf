@@ -229,7 +229,7 @@ export class DespesasComponent implements OnInit {
               categoriaId: categoria?._id || categoria?.id || d.categoriaId,
               categoriaNome: categoria?.nome || 'Sem categoria',
               categoriaIcone: categoria?.icone || 'circle',
-              categoriaCor: categoria?.cor || '#6e9fff',
+              categoriaCor: categoria?.cor || '#34D399',
               subcategoriaId: d.subcategoriaId,
               subcategoriaNome: subcategoria?.nome,
               cartaoId: (d as any).cartaoId?._id || (d as any).cartaoId?.id || d.cartaoId,

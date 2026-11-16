@@ -65,7 +65,7 @@ export class CartoesComponent implements OnInit {
     mastercard: '#EB001B',
     elo: '#FFCB05',
     amex: '#006FCF',
-    outra: '#6e9fff'
+    outra: '#34D399'
   };
 
   ngOnInit() {
@@ -87,7 +87,7 @@ export class CartoesComponent implements OnInit {
             limiteDisponivel: c.limite,
             diaVencimento: c.diaVencimento,
             diaFechamento: c.diaFechamento,
-            cor: this.coresPorBandeira[c.bandeira] || '#6e9fff',
+            cor: this.coresPorBandeira[c.bandeira] || '#34D399',
             ativo: c.ativo
           })));
         }

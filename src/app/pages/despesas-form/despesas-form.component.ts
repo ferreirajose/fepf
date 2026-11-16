@@ -9,7 +9,7 @@ import { CategoriaService, Categoria as CategoriaAPI } from '../../shared/servic
 import { CartaoService, Cartao as CartaoAPI } from '../../shared/services/cartao.service';
 import { ContaService } from '../../shared/services/conta.service';
 import { Conta } from '../../shared/models/conta.model';
-import { environment } from '../../../environments/environment';
+import { GeocodingService } from '../../shared/services/geocoding.service';
 
 interface Subcategoria {
   id: string;
@@ -45,6 +45,7 @@ export class DespesasFormComponent implements OnInit {
   private categoriaService = inject(CategoriaService);
   private cartaoService = inject(CartaoService);
   private contaService = inject(ContaService);
+  private geocodingService = inject(GeocodingService);
 
   form: FormGroup;
   despesaId = signal<string | null>(null);
@@ -68,6 +69,8 @@ export class DespesasFormComponent implements OnInit {
   erroLocalizacao = signal<string | null>(null);
   buscandoCoordenadas = signal(false);
   enderecoManual = signal('');
+
+  private readonly LOCALIZACAO_PADRAO = { latitude: -7.165104, longitude: -34.855471 };
 
   constructor(
     private fb: FormBuilder,
@@ -145,7 +148,7 @@ export class DespesasFormComponent implements OnInit {
               id: c._id || '',
               nome: c.nome,
               icone: c.icone || 'circle',
-              cor: c.cor || '#6e9fff',
+              cor: c.cor || '#34D399',
               subcategorias: c.subcategorias?.filter(s => s.ativo).map(s => ({
                 id: s.id,
                 nome: s.nome,
@@ -218,6 +221,17 @@ export class DespesasFormComponent implements OnInit {
             ? despesa.cartaoId._id
             : despesa.cartaoId || '';
 
+          // Coordenadas padrão significam que não houve localização real:
+          // nesse caso exibimos o endereço salvo no campo de texto, sem mapa.
+          const loc = despesa.localizacao;
+          const usaCoordenadaPadrao = loc
+            && loc.latitude === this.LOCALIZACAO_PADRAO.latitude
+            && loc.longitude === this.LOCALIZACAO_PADRAO.longitude;
+          const enderecoPadrao = `${this.LOCALIZACAO_PADRAO.latitude}, ${this.LOCALIZACAO_PADRAO.longitude}`;
+          if (usaCoordenadaPadrao) {
+            this.enderecoManual.set(loc.endereco && loc.endereco !== enderecoPadrao ? loc.endereco : '');
+          }
+
           this.form.patchValue({
             descricao: despesa.descricao,
             valor: despesa.valor,
@@ -230,7 +244,7 @@ export class DespesasFormComponent implements OnInit {
             recorrente: despesa.recorrente,
             pago: despesa.pago || false,
             observacoes: despesa.observacoes || '',
-            localizacao: despesa.localizacao || {
+            localizacao: (!usaCoordenadaPadrao && loc) || {
               latitude: null,
               longitude: null,
               endereco: ''
@@ -247,20 +261,26 @@ export class DespesasFormComponent implements OnInit {
     });
   }
 
-  salvar() {
+  async salvar() {
     if (this.form.valid) {
       this.carregando.set(true);
       this.erro.set(null);
 
       const formValue = this.form.value;
 
-      // Se localização não foi capturada, usar coordenadas padrão
+      // Sem coordenadas: se o usuário digitou um endereço, tentar localizá-lo no mapa
+      // automaticamente; se não for possível, usar coordenadas padrão preservando o texto
       let localizacao = formValue.localizacao;
       if (!localizacao.latitude && !localizacao.longitude) {
+        const enderecoDigitado = this.enderecoManual().trim();
+        const coordenadas = enderecoDigitado.length >= 5
+          ? await this.geocodificarEndereco(enderecoDigitado)
+          : null;
+        const { latitude, longitude } = coordenadas ?? this.LOCALIZACAO_PADRAO;
         localizacao = {
-          latitude: -7.165104,
-          longitude: -34.855471,
-          endereco: '-7.165104, -34.855471'
+          latitude,
+          longitude,
+          endereco: enderecoDigitado || `${latitude}, ${longitude}`
         };
       }
 
@@ -335,7 +355,7 @@ export class DespesasFormComponent implements OnInit {
 
   capturarLocalizacao() {
     if (!navigator.geolocation) {
-      this.erroLocalizacao.set('Geolocalização não suportada pelo navegador');
+      this.erroLocalizacao.set('Geolocalização não suportada pelo navegador. Digite o endereço do local abaixo.');
       return;
     }
 
@@ -363,16 +383,16 @@ export class DespesasFormComponent implements OnInit {
         this.capturandoLocalizacao.set(false);
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            this.erroLocalizacao.set('Permissão negada. Habilite a localização no navegador.');
+            this.erroLocalizacao.set('Permissão negada. Habilite a localização no navegador ou digite o endereço do local abaixo.');
             break;
           case error.POSITION_UNAVAILABLE:
-            this.erroLocalizacao.set('Localização indisponível.');
+            this.erroLocalizacao.set('Localização indisponível. Digite o endereço do local abaixo.');
             break;
           case error.TIMEOUT:
-            this.erroLocalizacao.set('Tempo limite excedido.');
+            this.erroLocalizacao.set('Tempo limite excedido. Tente novamente ou digite o endereço do local abaixo.');
             break;
           default:
-            this.erroLocalizacao.set('Erro ao capturar localização.');
+            this.erroLocalizacao.set('Erro ao capturar localização. Digite o endereço do local abaixo.');
         }
       },
       {
@@ -383,35 +403,13 @@ export class DespesasFormComponent implements OnInit {
     );
   }
 
-  obterEndereco(latitude: number, longitude: number) {
-    const apiKey = environment.googleMapsApiKey;
-
-    if (!apiKey) {
-      console.warn('Google Maps API key não configurada');
-      return;
+  async obterEndereco(latitude: number, longitude: number) {
+    const endereco = await this.geocodingService.geocodificarReverso(latitude, longitude);
+    const atual = this.getLocalizacao();
+    // Só aplica se a localização não mudou enquanto a busca acontecia
+    if (endereco && atual?.latitude === latitude && atual?.longitude === longitude) {
+      this.form.patchValue({ localizacao: { latitude, longitude, endereco } });
     }
-
-    fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.status === 'OK' && data.results && data.results.length > 0) {
-          const resultado = data.results[0];
-          const enderecoFormatado = resultado.formatted_address;
-
-          setTimeout(() => {
-            this.form.patchValue({
-              localizacao: {
-                latitude,
-                longitude,
-                endereco: enderecoFormatado
-              }
-            });
-          }, 0);
-        }
-      })
-      .catch((error) => {
-        console.warn('Não foi possível obter o endereço:', error);
-      });
   }
 
   limparLocalizacao() {
@@ -426,57 +424,35 @@ export class DespesasFormComponent implements OnInit {
     this.enderecoManual.set('');
   }
 
-  buscarCoordenadasPorEndereco() {
-    const endereco = this.enderecoManual();
+  async buscarCoordenadasPorEndereco() {
+    const endereco = this.enderecoManual().trim();
 
-    if (!endereco || endereco.trim().length < 5) {
+    if (endereco.length < 5) {
       this.erroLocalizacao.set('Digite um endereço válido com pelo menos 5 caracteres');
-      return;
-    }
-
-    const apiKey = environment.googleMapsApiKey;
-
-    if (!apiKey) {
-      this.erroLocalizacao.set('Google Maps API key não configurada');
       return;
     }
 
     this.buscandoCoordenadas.set(true);
     this.erroLocalizacao.set(null);
 
-    const enderecoEncoded = encodeURIComponent(endereco.trim());
-    fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${enderecoEncoded}&key=${apiKey}`)
-      .then(response => response.json())
-      .then(data => {
-        this.buscandoCoordenadas.set(false);
+    const coordenadas = await this.geocodingService.geocodificar(endereco);
+    this.buscandoCoordenadas.set(false);
 
-        if (data && data.status === 'OK' && data.results && data.results.length > 0) {
-          const resultado = data.results[0];
-          const latitude = resultado.geometry.location.lat;
-          const longitude = resultado.geometry.location.lng;
-          const enderecoFormatado = resultado.formatted_address;
-
-          setTimeout(() => {
-            this.form.patchValue({
-              localizacao: {
-                latitude,
-                longitude,
-                endereco: enderecoFormatado
-              }
-            });
-            this.enderecoManual.set('');
-          }, 0);
-        } else if (data && data.status === 'ZERO_RESULTS') {
-          this.erroLocalizacao.set('Endereço não encontrado. Tente ser mais específico (ex: "Rua X, Cidade, Estado")');
-        } else {
-          this.erroLocalizacao.set(`Erro: ${data?.error_message || data?.status || 'Erro ao buscar o endereço'}`);
-        }
-      })
-      .catch((error) => {
-        console.error('Erro ao buscar coordenadas:', error);
-        this.buscandoCoordenadas.set(false);
-        this.erroLocalizacao.set('Erro ao buscar o endereço. Tente novamente.');
+    if (coordenadas) {
+      // Mantém o texto digitado pelo usuário como endereço registrado
+      this.form.patchValue({
+        localizacao: { latitude: coordenadas.latitude, longitude: coordenadas.longitude, endereco }
       });
+      this.enderecoManual.set('');
+    } else {
+      this.erroLocalizacao.set('Endereço não encontrado no mapa. Tente ser mais específico (ex: "Rua X, Bairro, Cidade - UF") ou salve assim mesmo: o endereço digitado será registrado.');
+    }
+  }
+
+  /** Geocodifica no salvamento, limitado a 15s para não travar o formulário. */
+  private geocodificarEndereco(endereco: string): Promise<{ latitude: number; longitude: number } | null> {
+    const limite = new Promise<null>(resolve => setTimeout(() => resolve(null), 15000));
+    return Promise.race([this.geocodingService.geocodificar(endereco), limite]);
   }
 
   getLocalizacao() {

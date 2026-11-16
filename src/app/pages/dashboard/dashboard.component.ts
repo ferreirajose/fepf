@@ -29,7 +29,7 @@ import { environment } from '../../../environments/environment';
 Chart.register(...registerables);
 
 const MESES_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-const CORES_RESERVA = ['#6e9fff', '#69f6b8', '#ff928b', '#0057bd', '#006947', '#515981', '#820AD1', '#FFD700'];
+const CORES_RESERVA = ['#34D399', '#6EE7B7', '#F87171', '#10B981', '#059669', '#57534E', '#0284C7', '#FFD700'];
 
 // As datas da API são meia-noite UTC; converte para a mesma data no fuso local
 const dataLocal = (iso: string): Date => {
@@ -288,7 +288,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         labels: temDados ? categorias.map(c => c.nome) : ['Sem despesas no mês'],
         datasets: [{
           data: temDados ? categorias.map(c => c.total) : [1],
-          backgroundColor: temDados ? cores : ['#efefff'],
+          backgroundColor: temDados ? cores : ['#F5F5F4'],
           borderWidth: 0,
           hoverOffset: 10
         }]

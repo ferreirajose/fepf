@@ -1,18 +1,18 @@
-<div class="min-h-screen p-8 bg-[#f7f5ff]">
+<div class="min-h-screen p-8 bg-[#FAFFFE]">
   <div class="max-w-4xl mx-auto w-full">
 
     <!-- Header -->
     <div class="mb-8">
       <div class="flex items-center space-x-4 mb-4">
         <button
-          (click)="cancelar()" class="p-2 text-[#515981] hover:bg-white rounded-xl transition-colors">
+          (click)="cancelar()" class="p-2 text-[#57534E] hover:bg-white rounded-xl transition-colors">
           <i class="ri-arrow-left-line"></i>
         </button>
         <div>
           <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
             {{ isEdicao() ? 'Editar Orçamento' : 'Novo Orçamento' }}
           </h1>
-          <p class="text-[#515981] font-inter mt-1">
+          <p class="text-[#57534E] font-body mt-1">
             {{ isEdicao() ? 'Atualize as informações do orçamento' : 'Defina um limite de gastos para uma categoria' }}
           </p>
         </div>
@@ -24,9 +24,9 @@
       <div class="space-y-6">
 
         <!-- Categoria Card -->
-        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
           <div class="flex items-center space-x-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center">
               <i class="ri-price-tag-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Categoria</h2>
@@ -39,28 +39,28 @@
               (click)="selecionarCategoria(categoria.id)" class="p-4 rounded-xl transition-all hover:scale-105"
               [ngClass]="form.get('categoriaId')?.value === categoria.id
                 ? 'bg-gradient-to-br shadow-lg ring-2 ring-offset-2'
-                : 'bg-[#efefff] hover:bg-[#dde1ff]'"
+                : 'bg-[#F5F5F4] hover:bg-[#D1FAE5]'"
               [style.background]="form.get('categoriaId')?.value === categoria.id ? 'linear-gradient(135deg, ' + categoria.cor + ', ' + categoria.cor + 'AA)' : ''"
-              [style.color]="form.get('categoriaId')?.value === categoria.id ? 'white' : '#515981'"
+              [style.color]="form.get('categoriaId')?.value === categoria.id ? 'white' : '#57534E'"
               [style.border-color]="form.get('categoriaId')?.value === categoria.id ? categoria.cor : 'transparent'">
               <div class="flex flex-col items-center space-y-2">
                 <i [class]="'ri-' + categoria.icone + '-line w-6 h-6'">
                 </i>
-                <span class="text-xs font-bold font-inter">{{ categoria.nome }}</span>
+                <span class="text-xs font-bold font-body">{{ categoria.nome }}</span>
               </div>
             </button>
           </div>
 
-          <p *ngIf="form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched" class="text-[#b31b25] text-xs mt-4 font-inter flex items-center space-x-1">
+          <p *ngIf="form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched" class="text-[#DC2626] text-xs mt-4 font-body flex items-center space-x-1">
             <i class="ri-alert-line"></i>
             <span>Selecione uma categoria</span>
           </p>
         </div>
 
         <!-- Valor e Período Card -->
-        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
           <div class="flex items-center space-x-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center">
               <i class="ri-money-dollar-circle-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Valor e Período</h2>
@@ -69,11 +69,11 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Valor Planejado -->
             <div class="md:col-span-3">
-              <label for="valorPlanejado" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label for="valorPlanejado" class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Valor Planejado *
               </label>
               <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#0057bd] font-inter font-bold">R$</span>
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#10B981] font-body font-bold">R$</span>
                 <input
                   id="valorPlanejado"
                   type="text"
@@ -82,15 +82,15 @@
                   thousandSeparator="."
                   decimalMarker=","
                   [dropSpecialCharacters]="false"
-                  placeholder="0,00" class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-[#0057bd] placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter font-bold text-2xl transition-all"
-                  [ngClass]="form.get('valorPlanejado')?.invalid && form.get('valorPlanejado')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
+                  placeholder="0,00" class="w-full pl-12 pr-4 py-3 bg-[#F5F5F4] rounded-xl text-[#10B981] placeholder-[#57534E]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-body font-bold text-2xl transition-all"
+                  [ngClass]="form.get('valorPlanejado')?.invalid && form.get('valorPlanejado')?.touched ? 'ring-2 ring-[#DC2626]' : ''"
                 />
               </div>
-              <p *ngIf="form.get('valorPlanejado')?.invalid && form.get('valorPlanejado')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+              <p *ngIf="form.get('valorPlanejado')?.invalid && form.get('valorPlanejado')?.touched" class="text-[#DC2626] text-xs mt-2 font-body flex items-center space-x-1">
                 <i class="ri-alert-line"></i>
                 <span>Informe um valor válido</span>
               </p>
-              <p class="text-xs text-[#515981] mt-2 font-inter flex items-center space-x-1">
+              <p class="text-xs text-[#57534E] mt-2 font-body flex items-center space-x-1">
                 <i class="ri-information-line"></i>
                 <span>Este é o limite máximo que você planeja gastar nesta categoria</span>
               </p>
@@ -98,26 +98,26 @@
 
             <!-- Mês -->
             <div>
-              <label for="mes" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label for="mes" class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Mês *
               </label>
               <select
                 id="mes"
-                formControlName="mes" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
-                [ngClass]="form.get('mes')?.invalid && form.get('mes')?.touched ? 'ring-2 ring-[#b31b25]' : ''">
+                formControlName="mes" class="w-full px-4 py-3 bg-[#F5F5F4] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-body transition-all"
+                [ngClass]="form.get('mes')?.invalid && form.get('mes')?.touched ? 'ring-2 ring-[#DC2626]' : ''">
                 <option *ngFor="let mes of meses" [value]="mes.numero">{{ mes.nome }}</option>
               </select>
             </div>
 
             <!-- Ano -->
             <div>
-              <label for="ano" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label for="ano" class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Ano *
               </label>
               <select
                 id="ano"
-                formControlName="ano" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter transition-all"
-                [ngClass]="form.get('ano')?.invalid && form.get('ano')?.touched ? 'ring-2 ring-[#b31b25]' : ''">
+                formControlName="ano" class="w-full px-4 py-3 bg-[#F5F5F4] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-body transition-all"
+                [ngClass]="form.get('ano')?.invalid && form.get('ano')?.touched ? 'ring-2 ring-[#DC2626]' : ''">
                 <option *ngFor="let ano of anos" [value]="ano">{{ ano }}</option>
               </select>
             </div>
@@ -125,7 +125,7 @@
             <!-- Preview do Período -->
             <div class="md:col-span-1 flex items-end">
               <div class="w-full p-3 bg-primary/10 rounded-xl">
-                <p class="text-xs text-primary font-inter mb-1">Período Selecionado</p>
+                <p class="text-xs text-primary font-body mb-1">Período Selecionado</p>
                 <p class="text-lg font-bold text-primary font-manrope">
                   {{ getMesNome(form.get('mes')?.value) }}/{{ form.get('ano')?.value }}
                 </p>
@@ -135,9 +135,9 @@
         </div>
 
         <!-- Informações Adicionais Card -->
-        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
           <div class="flex items-center space-x-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#57534E] to-[#A8A29E] rounded-xl flex items-center justify-center">
               <i class="ri-file-text-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Informações Adicionais</h2>
@@ -146,36 +146,36 @@
           <div class="space-y-6">
             <!-- Descrição/Observações -->
             <div>
-              <label for="descricao" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label for="descricao" class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Descrição (opcional)
               </label>
               <textarea
                 id="descricao"
                 formControlName="descricao"
                 rows="3"
-                placeholder="Adicione observações sobre este orçamento..." class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter resize-none">
+                placeholder="Adicione observações sobre este orçamento..." class="w-full px-4 py-3 bg-[#F5F5F4] rounded-xl text-on-surface placeholder-[#57534E]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-body resize-none">
               </textarea>
             </div>
 
             <!-- Status Ativo -->
-            <div class="flex items-center justify-between p-4 bg-[#efefff] rounded-xl">
+            <div class="flex items-center justify-between p-4 bg-[#F5F5F4] rounded-xl">
               <div class="flex items-center space-x-3">
                 <i class="ri-toggle-line text-primary"></i>
                 <div>
-                  <p class="text-sm font-bold text-on-surface font-inter">Orçamento ativo?</p>
-                  <p class="text-xs text-[#515981] font-inter">Orçamentos inativos não são considerados nos cálculos</p>
+                  <p class="text-sm font-bold text-on-surface font-body">Orçamento ativo?</p>
+                  <p class="text-xs text-[#57534E] font-body">Orçamentos inativos não são considerados nos cálculos</p>
                 </div>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" formControlName="ativo" class="sr-only peer">
-                <div class="w-11 h-6 bg-[#a3abd7] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                <div class="w-11 h-6 bg-[#A8A29E] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
           </div>
         </div>
 
         <!-- Ações Rápidas Card -->
-        <div class="bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl p-6 text-white">
+        <div class="bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl p-6 text-white">
           <div class="flex items-center space-x-3 mb-4">
             <i class="ri-flashlight-line"></i>
             <h2 class="text-lg font-bold font-manrope">Ações Rápidas</h2>
@@ -183,38 +183,38 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <button
               type="button"
-              (click)="copiarParaProximoMes()" class="bg-white/20 hover:bg-white/30 px-4 py-3 rounded-xl font-inter font-bold text-sm transition-colors flex items-center justify-center space-x-2">
+              (click)="copiarParaProximoMes()" class="bg-white/20 hover:bg-white/30 px-4 py-3 rounded-xl font-body font-bold text-sm transition-colors flex items-center justify-center space-x-2">
               <i class="ri-file-copy-line"></i>
               <span>Copiar para Próximo Mês</span>
             </button>
             <button
               type="button"
-              (click)="copiarParaMeses()" class="bg-white/20 hover:bg-white/30 px-4 py-3 rounded-xl font-inter font-bold text-sm transition-colors flex items-center justify-center space-x-2">
+              (click)="copiarParaMeses()" class="bg-white/20 hover:bg-white/30 px-4 py-3 rounded-xl font-body font-bold text-sm transition-colors flex items-center justify-center space-x-2">
               <i class="ri-calendar-line"></i>
               <span>Copiar para Todos os Meses</span>
             </button>
           </div>
-          <p class="text-xs text-white/80 mt-3 font-inter">
+          <p class="text-xs text-white/80 mt-3 font-body">
             <i class="ri-information-line inline mr-1"></i>
             Use as ações rápidas para criar orçamentos recorrentes rapidamente
           </p>
         </div>
 
         <!-- Preview do Orçamento -->
-        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
           <div class="flex items-center space-x-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#059669] to-[#6EE7B7] rounded-xl flex items-center justify-center">
               <i class="ri-eye-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Prévia do Orçamento</h2>
           </div>
 
-          <div class="bg-[#efefff] rounded-xl p-6">
+          <div class="bg-[#F5F5F4] rounded-xl p-6">
             <div class="flex items-start justify-between mb-4">
               <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center"
-                  [style.background-color]="(getCategoriaSelecionada()?.cor || '#515981') + '30'"
-                  [style.color]="getCategoriaSelecionada()?.cor || '#515981'">
+                  [style.background-color]="(getCategoriaSelecionada()?.cor || '#57534E') + '30'"
+                  [style.color]="getCategoriaSelecionada()?.cor || '#57534E'">
                   <i [class]="'ri-' + (getCategoriaSelecionada()?.icone || 'tag') + '-line'">
                   </i>
                 </div>
@@ -222,13 +222,13 @@
                   <h3 class="font-bold text-lg text-on-surface font-manrope">
                     {{ getCategoriaSelecionada()?.nome || 'Selecione uma categoria' }}
                   </h3>
-                  <p class="text-xs text-[#515981] font-inter">
+                  <p class="text-xs text-[#57534E] font-body">
                     {{ getMesNome(form.get('mes')?.value) }} {{ form.get('ano')?.value }}
                   </p>
                 </div>
               </div>
               <div class="text-right">
-                <p class="text-xs text-[#515981] font-inter mb-1">Limite Planejado</p>
+                <p class="text-xs text-[#57534E] font-body mb-1">Limite Planejado</p>
                 <p class="text-2xl font-extrabold text-primary font-manrope">
                   {{ (form.get('valorPlanejado')?.value || 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
                 </p>
@@ -236,13 +236,13 @@
             </div>
 
             <div class="w-full bg-white rounded-full h-3 overflow-hidden">
-              <div class="h-full rounded-full bg-gradient-to-r from-[#006947] to-[#69f6b8]"
+              <div class="h-full rounded-full bg-gradient-to-r from-[#059669] to-[#6EE7B7]"
                 style="width: 0%">
               </div>
             </div>
             <div class="flex items-center justify-between mt-2">
-              <span class="text-xs text-[#515981] font-inter">{{ 0 | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} gasto</span>
-              <span class="text-xs text-[#006947] font-inter font-bold">
+              <span class="text-xs text-[#57534E] font-body">{{ 0 | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} gasto</span>
+              <span class="text-xs text-[#059669] font-body font-bold">
                 {{ (form.get('valorPlanejado')?.value || 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} disponível
               </span>
             </div>
@@ -253,13 +253,13 @@
         <div class="flex flex-col md:flex-row gap-4">
           <button
             type="submit"
-            [disabled]="form.invalid" class="flex-1 bg-gradient-to-r from-[#0057bd] to-[#6e9fff] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-3">
+            [disabled]="form.invalid" class="flex-1 bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-body flex items-center justify-center space-x-3">
             <i [class]="isEdicao() ? 'ri-checkbox-circle-line' : 'ri-save-line'"></i>
             <span>{{ isEdicao() ? 'Atualizar Orçamento' : 'Salvar Orçamento' }}</span>
           </button>
           <button
             type="button"
-            (click)="cancelar()" class="flex-1 bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-3">
+            (click)="cancelar()" class="flex-1 bg-white border-2 border-[#A8A29E]/30 text-[#57534E] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#F5F5F4] transition-colors font-body flex items-center justify-center space-x-3">
             <i class="ri-close-line"></i>
             <span>Cancelar</span>
           </button>

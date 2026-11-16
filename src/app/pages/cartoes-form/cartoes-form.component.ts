@@ -36,7 +36,7 @@ export class CartoesFormComponent {
   ];
 
   cores = [
-    '#820AD1', '#0057bd', '#006947', '#b51621', '#1A1A1A',
+    '#0284C7', '#10B981', '#059669', '#DC2626', '#1A1A1A',
     '#D4AF37', '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A'
   ];
 
@@ -52,7 +52,7 @@ export class CartoesFormComponent {
       limite: [null, [Validators.required, Validators.min(0)]],
       diaVencimento: [null, [Validators.required, Validators.min(1), Validators.max(31)]],
       diaFechamento: [null, [Validators.required, Validators.min(1), Validators.max(31)]],
-      cor: ['#820AD1', Validators.required],
+      cor: ['#0284C7', Validators.required],
       ativo: [true]
     });
 

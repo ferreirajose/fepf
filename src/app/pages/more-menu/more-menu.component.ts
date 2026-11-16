@@ -25,15 +25,15 @@ export class MoreMenuComponent {
       description: 'Planeje e acompanhe seus orçamentos mensais',
       icon: 'pie-chart',
       route: '/orcamentos',
-      color: '#0057bd',
-      bgColor: '#e4e7ff'
+      color: '#10B981',
+      bgColor: '#ECFDF5'
     },
     {
       title: 'Categorias',
       description: 'Organize receitas e despesas por categorias',
       icon: 'folder',
       route: '/categorias',
-      color: '#006947',
+      color: '#059669',
       bgColor: '#e6f7f1'
     },
     {
@@ -41,8 +41,8 @@ export class MoreMenuComponent {
       description: 'Gerencie seus cartões de crédito e débito',
       icon: 'bank-card',
       route: '/cartoes',
-      color: '#b51621',
-      bgColor: '#ffe6e8'
+      color: '#DC2626',
+      bgColor: '#FEE2E2'
     }
   ];
 
@@ -51,19 +51,19 @@ export class MoreMenuComponent {
       title: 'Nova Despesa',
       icon: 'subtract',
       route: '/despesas/novo',
-      color: '#b51621'
+      color: '#DC2626'
     },
     {
       title: 'Nova Receita',
       icon: 'money-dollar',
       route: '/receitas/novo',
-      color: '#006947'
+      color: '#059669'
     },
     {
       title: 'Novo Orçamento',
       icon: 'file-list',
       route: '/orcamentos/novo',
-      color: '#0057bd'
+      color: '#10B981'
     }
   ];
 }

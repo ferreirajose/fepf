@@ -26,7 +26,7 @@ import { CommonModule } from '@angular/common';
                 {{ title }}
               </h3>
               <div class="mt-3">
-                <p class="text-sm text-[#515981] font-inter">
+                <p class="text-sm text-[#57534E] font-body">
                   {{ message }}
                 </p>
               </div>
@@ -34,18 +34,18 @@ import { CommonModule } from '@angular/common';
           </div>
 
           <!-- Actions -->
-          <div class="px-6 py-4 bg-[#f7f5ff] flex flex-col-reverse sm:flex-row gap-3">
+          <div class="px-6 py-4 bg-[#FAFFFE] flex flex-col-reverse sm:flex-row gap-3">
             <button
               type="button"
               (click)="handleCancel()"
-              class="flex-1 px-4 py-3 bg-white border-2 border-[#a3abd7]/30 text-[#515981] rounded-xl font-bold text-sm hover:bg-[#efefff] transition-colors font-inter">
+              class="flex-1 px-4 py-3 bg-white border-2 border-[#A8A29E]/30 text-[#57534E] rounded-xl font-bold text-sm hover:bg-[#F5F5F4] transition-colors font-body">
               {{ cancelText }}
             </button>
             <button
               type="button"
               (click)="handleConfirm()"
               [ngClass]="getConfirmButtonClass()"
-              class="flex-1 px-4 py-3 text-white rounded-xl font-bold text-sm shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] font-inter">
+              class="flex-1 px-4 py-3 text-white rounded-xl font-bold text-sm shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] font-body">
               {{ confirmText }}
             </button>
           </div>
@@ -93,28 +93,28 @@ export class ConfirmDialogComponent {
   getIconClass(): string {
     switch (this.type) {
       case 'danger':
-        return 'bg-gradient-to-br from-[#b51621] to-[#ff928b]';
+        return 'bg-gradient-to-br from-[#DC2626] to-[#F87171]';
       case 'warning':
         return 'bg-gradient-to-br from-[#f59e0b] to-[#fbbf24]';
       case 'success':
-        return 'bg-gradient-to-br from-[#006947] to-[#69f6b8]';
+        return 'bg-gradient-to-br from-[#059669] to-[#6EE7B7]';
       case 'info':
       default:
-        return 'bg-gradient-to-br from-[#0057bd] to-[#6e9fff]';
+        return 'bg-gradient-to-br from-[#10B981] to-[#34D399]';
     }
   }
 
   getConfirmButtonClass(): string {
     switch (this.type) {
       case 'danger':
-        return 'bg-gradient-to-r from-[#b51621] to-[#ff928b] shadow-[#b51621]/20';
+        return 'bg-gradient-to-r from-[#DC2626] to-[#F87171] shadow-[#DC2626]/20';
       case 'warning':
         return 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24] shadow-[#f59e0b]/20';
       case 'success':
-        return 'bg-gradient-to-r from-[#006947] to-[#69f6b8] shadow-[#006947]/20';
+        return 'bg-gradient-to-r from-[#059669] to-[#6EE7B7] shadow-[#059669]/20';
       case 'info':
       default:
-        return 'bg-gradient-to-r from-[#0057bd] to-[#6e9fff] shadow-[#0057bd]/20';
+        return 'bg-gradient-to-r from-[#10B981] to-[#34D399] shadow-[#10B981]/20';
     }
   }
 }

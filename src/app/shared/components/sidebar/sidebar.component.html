@@ -2,7 +2,7 @@
   [ngClass]="isCollapsed() ? 'w-20' : 'w-64'" class="fixed left-0 top-0 h-screen bg-white shadow-lg transition-all duration-300 z-40 flex flex-col">
 
   <!-- Header -->
-  <div class="p-6 border-b border-gray-100">
+  <div class="p-6 border-b border-stone-100">
     <div class="flex items-center justify-between">
       <h1
         *ngIf="!isCollapsed()" class="text-2xl font-manrope font-bold text-primary">
@@ -17,7 +17,7 @@
 
   <!-- Toggle Button -->
   <button
-    (click)="toggleSidebar()" class="absolute -right-3 top-20 bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-[#004ca6] transition-colors shadow-md">
+    (click)="toggleSidebar()" class="absolute -right-3 top-20 bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-[#059669] transition-colors shadow-md">
     <i [class]="isCollapsed() ? 'ri-arrow-right-s-line' : 'ri-arrow-left-s-line'">
     </i>
   </button>
@@ -28,13 +28,13 @@
       <li *ngFor="let item of menuItems">
         <a
           [routerLink]="item.route"
-          routerLinkActive="bg-[#e4e7ff] text-primary font-semibold"
+          routerLinkActive="bg-[#ECFDF5] text-primary font-semibold"
           [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface transition-colors group"
           [ngClass]="isCollapsed() ? 'justify-center' : ''">
           <i [class]="'ri-' + item.icon + '-line group-hover:scale-110 transition-transform'">
           </i>
           <span
-            *ngIf="!isCollapsed()" class="font-inter text-on-surface">
+            *ngIf="!isCollapsed()" class="font-body text-on-surface">
             {{ item.label }}
           </span>
         </a>
@@ -43,15 +43,15 @@
   </nav>
 
   <!-- Footer -->
-  <div class="p-4 border-t border-gray-100">
+  <div class="p-4 border-t border-stone-100">
     <div
-      *ngIf="!isCollapsed()" class="text-xs text-gray-500 font-inter text-center">
+      *ngIf="!isCollapsed()" class="text-xs text-stone-500 font-body text-center">
       <p class="mb-1">FePF v1.0.0</p>
       <p class="text-[10px]">Sistema de Gestão Financeira</p>
     </div>
     <div
       *ngIf="isCollapsed()" class="flex justify-center">
-      <i class="ri-briefcase-line text-gray-500"></i>
+      <i class="ri-briefcase-line text-stone-500"></i>
     </div>
   </div>
 </aside>
