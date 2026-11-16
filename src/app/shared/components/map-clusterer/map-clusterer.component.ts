@@ -161,7 +161,7 @@ export class MapClustererComponent implements AfterViewInit, OnChanges {
       marker.addListener('click', () => {
         const content = `
           <div style="padding: 10px; max-width: 250px;">
-            <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #242c51; font-size: 14px;">
+            <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #1C1917; font-size: 14px;">
               ${despesa.descricao}
             </h3>
             <div style="margin-bottom: 6px;">
@@ -169,13 +169,13 @@ export class MapClustererComponent implements AfterViewInit, OnChanges {
                 ${despesa.categoriaNome}
               </span>
             </div>
-            <p style="margin: 6px 0; font-size: 16px; font-weight: bold; color: #b51621;">
+            <p style="margin: 6px 0; font-size: 16px; font-weight: bold; color: #DC2626;">
               R$ ${despesa.valor.toFixed(2).replace('.', ',')}
             </p>
-            <p style="margin: 6px 0; font-size: 12px; color: #515981;">
+            <p style="margin: 6px 0; font-size: 12px; color: #57534E;">
               <strong>Data:</strong> ${new Date(despesa.data).toLocaleDateString('pt-BR')}
             </p>
-            <p style="margin: 6px 0; font-size: 11px; color: #515981;">
+            <p style="margin: 6px 0; font-size: 11px; color: #57534E;">
               <strong>📍</strong> ${despesa.endereco}
             </p>
           </div>

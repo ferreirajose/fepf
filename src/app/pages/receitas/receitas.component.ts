@@ -139,7 +139,7 @@ export class ReceitasComponent implements OnInit {
               categoriaId: (r as any).categoriaId?._id || (r as any).categoriaId?.id || r.categoriaId,
               categoriaNome: (r as any).categoriaId?.nome || 'Sem categoria',
               categoriaIcone: (r as any).categoriaId?.icone || 'circle',
-              categoriaCor: (r as any).categoriaId?.cor || '#69f6b8',
+              categoriaCor: (r as any).categoriaId?.cor || '#6EE7B7',
               recorrente: r.recorrente,
               recebida: true,
               observacoes: r.observacoes

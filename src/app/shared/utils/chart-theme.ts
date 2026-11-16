@@ -3,15 +3,15 @@ import { TooltipOptions, LegendOptions, ChartType } from 'chart.js';
 // Paleta e tipografia comuns aos gráficos do app
 
 export const CORES_GRAFICO = {
-  receita: '#006947',
-  despesa: '#b51621',
-  planejado: '#0057bd',
-  alerta: '#ffa500',
-  neutro: '#6e9fff',
-  texto: '#515981',
-  titulo: '#242c51',
-  borda: '#a3abd7',
-  grade: 'rgba(163, 171, 215, 0.1)'
+  receita: '#059669',
+  despesa: '#DC2626',
+  planejado: '#38BDF8',
+  alerta: '#F59E0B',
+  neutro: '#A8A29E',
+  texto: '#57534E',
+  titulo: '#1C1917',
+  borda: '#E7E5E4',
+  grade: 'rgba(168, 162, 158, 0.1)'
 };
 
 const formatadorMoeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -31,7 +31,7 @@ export const legendaPadrao = <T extends ChartType>(
   display: true,
   position,
   labels: {
-    font: { family: 'Inter', size: 12, weight: 600 },
+    font: { family: 'Nunito', size: 12, weight: 600 },
     color: CORES_GRAFICO.texto,
     padding: 15,
     usePointStyle: true,
@@ -47,7 +47,7 @@ export const tooltipPadrao = <T extends ChartType>(): Partial<TooltipOptions<T>>
   borderWidth: 1,
   padding: 12,
   titleFont: { family: 'Manrope', size: 14, weight: 'bold' },
-  bodyFont: { family: 'Inter', size: 12 },
+  bodyFont: { family: 'Nunito', size: 12 },
   displayColors: true
 });
 
@@ -57,7 +57,7 @@ export const escalaValores = (stacked = false) => ({
   stacked,
   grid: { color: CORES_GRAFICO.grade },
   ticks: {
-    font: { family: 'Inter', size: 11 },
+    font: { family: 'Nunito', size: 11 },
     color: CORES_GRAFICO.texto,
     callback: (valor: string | number) => formatarMoedaCompacta(Number(valor))
   }
@@ -68,7 +68,7 @@ export const escalaRotulos = (stacked = false) => ({
   stacked,
   grid: { display: false },
   ticks: {
-    font: { family: 'Inter', size: 11, weight: 600 as const },
+    font: { family: 'Nunito', size: 11, weight: 600 as const },
     color: CORES_GRAFICO.texto
   }
 });

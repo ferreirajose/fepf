@@ -5,7 +5,7 @@
       <!-- Mobile Layout -->
       <div class="md:hidden space-y-3">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center flex-shrink-0">
+          <div class="w-12 h-12 bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center flex-shrink-0">
             <i class="ri-dashboard-line text-white text-xl"></i>
           </div>
           <div class="flex-1 min-w-0">
@@ -14,7 +14,7 @@
             </h1>
           </div>
         </div>
-        <p class="text-sm text-gray-600 font-inter">Visão geral das suas finanças</p>
+        <p class="text-sm text-stone-600 font-body">Visão geral das suas finanças</p>
         <ng-container *ngTemplateOutlet="seletorPeriodo"></ng-container>
       </div>
 
@@ -22,12 +22,12 @@
       <div class="hidden md:flex items-center justify-between">
         <div>
           <div class="flex items-center space-x-3 mb-2">
-            <div class="w-12 h-12 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+            <div class="w-12 h-12 bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center">
               <i class="ri-dashboard-line text-white"></i>
             </div>
             <h1 class="text-4xl font-manrope font-bold text-on-surface">Dashboard Financeiro</h1>
           </div>
-          <p class="text-gray-600 font-inter ml-15">Visão geral das suas finanças</p>
+          <p class="text-stone-600 font-body ml-15">Visão geral das suas finanças</p>
         </div>
         <ng-container *ngTemplateOutlet="seletorPeriodo"></ng-container>
       </div>
@@ -40,7 +40,7 @@
           (click)="navegarMes(-1)"
           [disabled]="carregando()"
           aria-label="Mês anterior"
-          class="w-10 h-10 flex items-center justify-center bg-white border border-[#a3abd7]/30 rounded-lg text-[#515981] hover:bg-[#efefff] disabled:opacity-50 transition-colors">
+          class="w-10 h-10 flex items-center justify-center bg-white border border-[#A8A29E]/30 rounded-lg text-[#57534E] hover:bg-[#F5F5F4] disabled:opacity-50 transition-colors">
           <i class="ri-arrow-left-s-line"></i>
         </button>
         <input
@@ -49,13 +49,13 @@
           (change)="alterarPeriodo($any($event.target).value)"
           [disabled]="carregando()"
           aria-label="Mês de referência"
-          class="flex-1 md:flex-none h-10 px-3 bg-white border border-[#a3abd7]/30 rounded-lg text-sm font-inter font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-[#0057bd]/30">
+          class="flex-1 md:flex-none h-10 px-3 bg-white border border-[#A8A29E]/30 rounded-lg text-sm font-body font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-[#10B981]/30">
         <button
           type="button"
           (click)="navegarMes(1)"
           [disabled]="carregando()"
           aria-label="Próximo mês"
-          class="w-10 h-10 flex items-center justify-center bg-white border border-[#a3abd7]/30 rounded-lg text-[#515981] hover:bg-[#efefff] disabled:opacity-50 transition-colors">
+          class="w-10 h-10 flex items-center justify-center bg-white border border-[#A8A29E]/30 rounded-lg text-[#57534E] hover:bg-[#F5F5F4] disabled:opacity-50 transition-colors">
           <i class="ri-arrow-right-s-line"></i>
         </button>
         <button
@@ -63,28 +63,28 @@
           type="button"
           (click)="irParaMesAtual()"
           [disabled]="carregando()"
-          class="h-10 px-3 bg-[#0057bd] text-white rounded-lg text-xs font-bold font-inter hover:bg-[#004a9f] disabled:opacity-50 transition-colors">
+          class="h-10 px-3 bg-[#10B981] text-white rounded-lg text-xs font-bold font-body hover:bg-[#004a9f] disabled:opacity-50 transition-colors">
           Hoje
         </button>
       </div>
     </ng-template>
 
     <!-- Erro -->
-    <div *ngIf="erro()" class="mb-6 p-4 bg-[#b51621]/5 border border-[#b51621]/20 rounded-xl flex items-center justify-between gap-4">
-      <div class="flex items-center gap-2 text-sm text-[#b51621] font-inter">
+    <div *ngIf="erro()" class="mb-6 p-4 bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-xl flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2 text-sm text-[#DC2626] font-body">
         <i class="ri-error-warning-line"></i>
         <span>{{ erro() }}</span>
       </div>
       <button
         type="button"
         (click)="carregarDados()"
-        class="px-3 py-1.5 bg-white border border-[#b51621]/30 text-[#b51621] rounded-lg text-xs font-bold font-inter hover:bg-[#b51621] hover:text-white transition-colors">
+        class="px-3 py-1.5 bg-white border border-[#DC2626]/30 text-[#DC2626] rounded-lg text-xs font-bold font-body hover:bg-[#DC2626] hover:text-white transition-colors">
         Tentar novamente
       </button>
     </div>
 
     <!-- Carregando -->
-    <div *ngIf="carregando()" class="mb-6 flex items-center gap-2 text-sm text-[#515981] font-inter">
+    <div *ngIf="carregando()" class="mb-6 flex items-center gap-2 text-sm text-[#57534E] font-body">
       <i class="ri-loader-4-line animate-spin"></i>
       <span>Carregando {{ nomeMesSelecionado() }}...</span>
     </div>
@@ -92,90 +92,90 @@
     <!-- Cards de Resumo -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Card Saldo Anterior -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-xl transition-shadow">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10 hover:shadow-xl transition-shadow">
         <div class="flex items-center space-x-3 mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-[#820AD1] to-[#a855f7] rounded-xl flex items-center justify-center shadow-lg">
+          <div class="w-12 h-12 bg-gradient-to-br from-[#0284C7] to-[#a855f7] rounded-xl flex items-center justify-center shadow-lg">
             <i class="ri-history-line text-white"></i>
           </div>
           <div class="flex-1">
             <div class="flex items-center space-x-1 mb-1">
-              <i class="ri-calendar-check-line text-[#515981]"></i>
-              <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Saldo Anterior</p>
+              <i class="ri-calendar-check-line text-[#57534E]"></i>
+              <p class="text-xs font-body text-[#57534E] uppercase tracking-wide">Saldo Anterior</p>
             </div>
-            <h2 class="text-2xl font-manrope font-extrabold" [class.text-[#006947]]="saldoAnterior() >= 0" [class.text-[#b51621]]="saldoAnterior() < 0">
+            <h2 class="text-2xl font-manrope font-extrabold" [class.text-[#059669]]="saldoAnterior() >= 0" [class.text-[#DC2626]]="saldoAnterior() < 0">
               {{ saldoAnterior() | currency:'BRL' }}
             </h2>
           </div>
         </div>
-        <p class="text-xs text-gray-500 font-inter">Acumulado até o início de {{ nomeMesSelecionado() }}</p>
+        <p class="text-xs text-stone-500 font-body">Acumulado até o início de {{ nomeMesSelecionado() }}</p>
       </div>
 
       <!-- Card Saldo Atual -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-xl transition-shadow">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10 hover:shadow-xl transition-shadow">
         <div class="flex flex-col mb-4">
           <div class="flex items-center space-x-3 mb-2">
-            <div class="w-12 h-12 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center shadow-lg">
+            <div class="w-12 h-12 bg-gradient-to-br from-[#57534E] to-[#A8A29E] rounded-xl flex items-center justify-center shadow-lg">
               <i class="ri-wallet-3-line text-white"></i>
             </div>
             <div class="flex-1">
               <div class="flex items-center space-x-1 mb-1">
-                <i class="ri-funds-line text-[#515981]"></i>
-                <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Saldo Atual</p>
+                <i class="ri-funds-line text-[#57534E]"></i>
+                <p class="text-xs font-body text-[#57534E] uppercase tracking-wide">Saldo Atual</p>
               </div>
-              <h2 class="text-2xl font-manrope font-extrabold" [class.text-[#006947]]="saldoAtual() >= 0" [class.text-[#b51621]]="saldoAtual() < 0">
+              <h2 class="text-2xl font-manrope font-extrabold" [class.text-[#059669]]="saldoAtual() >= 0" [class.text-[#DC2626]]="saldoAtual() < 0">
                 {{ saldoAtual() | currency:'BRL' }}
               </h2>
             </div>
           </div>
-          <p class="text-xs text-gray-500 font-inter">
+          <p class="text-xs text-stone-500 font-body">
             {{ saldoAnterior() | currency:'BRL' }} + {{ receitasMes() | currency:'BRL' }} - {{ despesasMes() | currency:'BRL' }}
           </p>
         </div>
       </div>
 
       <!-- Card Receitas -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-xl transition-shadow">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10 hover:shadow-xl transition-shadow">
         <div class="flex items-center space-x-3 mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl flex items-center justify-center shadow-lg">
+          <div class="w-12 h-12 bg-gradient-to-br from-[#059669] to-[#6EE7B7] rounded-xl flex items-center justify-center shadow-lg">
             <i class="ri-arrow-up-circle-line text-white"></i>
           </div>
           <div class="flex-1">
             <div class="flex items-center space-x-1 mb-1">
-              <i class="ri-hand-coin-line text-[#515981]"></i>
-              <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Receitas do Mês</p>
+              <i class="ri-hand-coin-line text-[#57534E]"></i>
+              <p class="text-xs font-body text-[#57534E] uppercase tracking-wide">Receitas do Mês</p>
             </div>
-            <h2 class="text-2xl font-manrope font-extrabold text-[#006947]">
+            <h2 class="text-2xl font-manrope font-extrabold text-[#059669]">
               {{ receitasMes() | currency:'BRL' }}
             </h2>
           </div>
         </div>
-        <p class="text-xs font-inter" [class.text-[#006947]]="receitasMes() >= despesasMes()" [class.text-[#b51621]]="receitasMes() < despesasMes()">
+        <p class="text-xs font-body" [class.text-[#059669]]="receitasMes() >= despesasMes()" [class.text-[#DC2626]]="receitasMes() < despesasMes()">
           {{ receitasMes() >= despesasMes() ? 'Sobra do mês' : 'Falta no mês' }}:
           {{ (receitasMes() - despesasMes()) | currency:'BRL' }}
         </p>
       </div>
 
       <!-- Card Despesas -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-xl transition-shadow">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10 hover:shadow-xl transition-shadow">
         <div class="flex items-center space-x-3 mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center shadow-lg">
+          <div class="w-12 h-12 bg-gradient-to-br from-[#DC2626] to-[#F87171] rounded-xl flex items-center justify-center shadow-lg">
             <i class="ri-arrow-down-circle-line text-white"></i>
           </div>
           <div class="flex-1">
             <div class="flex items-center space-x-1 mb-1">
-              <i class="ri-shopping-cart-line text-[#515981]"></i>
-              <p class="text-xs font-inter text-[#515981] uppercase tracking-wide">Despesas do Mês</p>
+              <i class="ri-shopping-cart-line text-[#57534E]"></i>
+              <p class="text-xs font-body text-[#57534E] uppercase tracking-wide">Despesas do Mês</p>
             </div>
-            <h2 class="text-2xl font-manrope font-extrabold text-[#b51621]">
+            <h2 class="text-2xl font-manrope font-extrabold text-[#DC2626]">
               {{ despesasMes() | currency:'BRL' }}
             </h2>
           </div>
         </div>
-        <div class="w-full h-2 bg-[#efefff] rounded-full overflow-hidden" role="progressbar"
+        <div class="w-full h-2 bg-[#F5F5F4] rounded-full overflow-hidden" role="progressbar"
           [attr.aria-valuenow]="comprometimentoReceitas() | number:'1.0-0'" aria-valuemin="0" aria-valuemax="100">
-          <div class="h-full bg-gradient-to-r from-[#b51621] to-[#ff928b]" [style.width.%]="comprometimentoReceitas() > 100 ? 100 : comprometimentoReceitas()"></div>
+          <div class="h-full bg-gradient-to-r from-[#DC2626] to-[#F87171]" [style.width.%]="comprometimentoReceitas() > 100 ? 100 : comprometimentoReceitas()"></div>
         </div>
-        <p class="text-xs text-gray-500 font-inter mt-2">
+        <p class="text-xs text-stone-500 font-body mt-2">
           {{ comprometimentoReceitas() | number:'1.0-1' }}% das receitas do mês
         </p>
       </div>
@@ -184,24 +184,24 @@
     <!-- Gráficos -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <!-- Gráfico Evolução Mensal -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#006947] to-[#b51621] rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#059669] to-[#DC2626] rounded-xl flex items-center justify-center">
               <i class="ri-line-chart-line text-white"></i>
             </div>
             <h3 class="text-xl font-manrope font-bold text-on-surface">
               Evolução {{ tipoVisualizacao() === 'mensal' ? 'Mensal' : 'Anual' }}
             </h3>
           </div>
-          <div class="flex items-center bg-[#efefff] rounded-lg p-1">
+          <div class="flex items-center bg-[#F5F5F4] rounded-lg p-1">
             <button
               (click)="setTipoVisualizacao('mensal')"
               [class.bg-white]="tipoVisualizacao() === 'mensal'"
               [class.shadow-sm]="tipoVisualizacao() === 'mensal'"
               [class.text-primary]="tipoVisualizacao() === 'mensal'"
-              [class.text-[#515981]]="tipoVisualizacao() !== 'mensal'"
-              class="px-3 py-1.5 rounded-md text-xs font-bold font-inter transition-all">
+              [class.text-[#57534E]]="tipoVisualizacao() !== 'mensal'"
+              class="px-3 py-1.5 rounded-md text-xs font-bold font-body transition-all">
               Mensal
             </button>
             <button
@@ -209,8 +209,8 @@
               [class.bg-white]="tipoVisualizacao() === 'anual'"
               [class.shadow-sm]="tipoVisualizacao() === 'anual'"
               [class.text-primary]="tipoVisualizacao() === 'anual'"
-              [class.text-[#515981]]="tipoVisualizacao() !== 'anual'"
-              class="px-3 py-1.5 rounded-md text-xs font-bold font-inter transition-all">
+              [class.text-[#57534E]]="tipoVisualizacao() !== 'anual'"
+              class="px-3 py-1.5 rounded-md text-xs font-bold font-body transition-all">
               Anual
             </button>
           </div>
@@ -221,14 +221,14 @@
       </div>
 
       <!-- Gráfico Despesas por Categoria -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
         <div class="flex items-center space-x-3 mb-6">
-          <div class="w-10 h-10 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center">
+          <div class="w-10 h-10 bg-gradient-to-br from-[#DC2626] to-[#F87171] rounded-xl flex items-center justify-center">
             <i class="ri-pie-chart-line text-white"></i>
           </div>
           <div>
             <h3 class="text-xl font-manrope font-bold text-on-surface">Despesas por Categoria</h3>
-            <p class="text-xs text-[#515981] font-inter capitalize">{{ nomeMesSelecionado() }}</p>
+            <p class="text-xs text-[#57534E] font-body capitalize">{{ nomeMesSelecionado() }}</p>
           </div>
         </div>
         <div class="h-64 relative">
@@ -237,14 +237,14 @@
       </div>
 
       <!-- Gráfico Utilização de Cartões -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
         <div class="flex items-center space-x-3 mb-6">
-          <div class="w-10 h-10 bg-gradient-to-br from-[#b51621] to-[#006947] rounded-xl flex items-center justify-center">
+          <div class="w-10 h-10 bg-gradient-to-br from-[#DC2626] to-[#059669] rounded-xl flex items-center justify-center">
             <i class="ri-bank-card-line text-white"></i>
           </div>
           <div>
             <h3 class="text-xl font-manrope font-bold text-on-surface">Utilização de Cartões</h3>
-            <p class="text-xs text-[#515981] font-inter">Fatura aberta {{ ehMesAtual() ? 'hoje' : 'no fim do mês' }} · toque na barra para ver o período</p>
+            <p class="text-xs text-[#57534E] font-body">Fatura aberta {{ ehMesAtual() ? 'hoje' : 'no fim do mês' }} · toque na barra para ver o período</p>
           </div>
         </div>
         <div class="h-64 relative">
@@ -253,14 +253,14 @@
       </div>
 
       <!-- Gráfico Status dos Orçamentos -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
         <div class="flex items-center space-x-3 mb-6">
-          <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+          <div class="w-10 h-10 bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center">
             <i class="ri-bar-chart-line text-white"></i>
           </div>
           <div>
             <h3 class="text-xl font-manrope font-bold text-on-surface">Status dos Orçamentos</h3>
-            <p class="text-xs text-[#515981] font-inter capitalize">{{ nomeMesSelecionado() }}</p>
+            <p class="text-xs text-[#57534E] font-body capitalize">{{ nomeMesSelecionado() }}</p>
           </div>
         </div>
         <div class="h-64 relative">
@@ -272,14 +272,14 @@
     <!-- Mapa de Despesas -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
       <!-- Mapa -->
-      <div class="lg:col-span-2 bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="lg:col-span-2 bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
         <div class="flex items-center space-x-3 mb-6">
-          <div class="w-10 h-10 bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl flex items-center justify-center">
+          <div class="w-10 h-10 bg-gradient-to-br from-[#DC2626] to-[#F87171] rounded-xl flex items-center justify-center">
             <i class="ri-map-pin-line text-white"></i>
           </div>
           <div class="flex-1">
             <h3 class="text-xl font-manrope font-bold text-on-surface">Locais das Despesas</h3>
-            <p class="text-xs text-[#515981] font-inter">
+            <p class="text-xs text-[#57534E] font-body">
               {{ despesasComLocalizacao().length }} {{ despesasComLocalizacao().length === 1 ? 'despesa' : 'despesas' }}
               em {{ totalLocais() }} {{ totalLocais() === 1 ? 'local' : 'locais' }}
             </p>
@@ -288,7 +288,7 @@
 
         <div *ngIf="despesasComLocalizacao().length > 0" class="space-y-4">
           <!-- Mapa com Clustering -->
-          <div class="rounded-xl overflow-hidden border-2 border-[#a3abd7]/20">
+          <div class="rounded-xl overflow-hidden border-2 border-[#A8A29E]/20">
             <app-map-clusterer
               [despesas]="despesasComLocalizacao()"
               [googleMapsApiKey]="googleMapsApiKey">
@@ -298,21 +298,21 @@
           <!-- Botão Ver Todas no Maps -->
           <a
             [href]="getMapUrlComMarcadores()"
-            target="_blank" class="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+            target="_blank" class="flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-[#DC2626] to-[#F87171] text-white rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-transform font-body">
             <i class="ri-external-link-line"></i>
             <span>Ver Todos os Locais no Google Maps</span>
           </a>
         </div>
 
         <!-- Estado Vazio -->
-        <div *ngIf="despesasComLocalizacao().length === 0" class="p-12 bg-[#efefff] rounded-xl text-center">
+        <div *ngIf="despesasComLocalizacao().length === 0" class="p-12 bg-[#F5F5F4] rounded-xl text-center">
           <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="ri-map-pin-line text-[#515981]/30"></i>
+            <i class="ri-map-pin-line text-[#57534E]/30"></i>
           </div>
           <h3 class="text-lg font-bold text-on-surface mb-2 font-manrope">
             Nenhuma despesa com localização neste mês
           </h3>
-          <p class="text-sm text-[#515981] font-inter max-w-md mx-auto">
+          <p class="text-sm text-[#57534E] font-body max-w-md mx-auto">
             As despesas com localização registrada aparecem aqui no mapa.
             Use o GPS ou informe o endereço ao cadastrar uma despesa.
           </p>
@@ -320,19 +320,19 @@
       </div>
 
       <!-- Lista de Todas as Despesas -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
         <div class="flex items-center space-x-3 mb-6">
-          <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+          <div class="w-10 h-10 bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center">
             <i class="ri-list-check text-white"></i>
           </div>
           <div class="flex-1">
             <h3 class="text-xl font-manrope font-bold text-on-surface">Despesas com Localização</h3>
-            <p class="text-xs text-[#515981] font-inter">Do mês selecionado, mais recentes primeiro</p>
+            <p class="text-xs text-[#57534E] font-body">Do mês selecionado, mais recentes primeiro</p>
           </div>
         </div>
 
         <div *ngIf="despesasComLocalizacao().length > 0" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
-          <div *ngFor="let despesa of despesasComLocalizacao()" class="p-4 bg-[#efefff] hover:bg-[#dde1ff] rounded-xl transition-all group">
+          <div *ngFor="let despesa of despesasComLocalizacao()" class="p-4 bg-[#F5F5F4] hover:bg-[#D1FAE5] rounded-xl transition-all group">
             <div class="flex items-start justify-between mb-2">
               <div class="flex items-center space-x-2 flex-1">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -341,25 +341,25 @@
                   <i class="ri-shopping-bag-line"></i>
                 </div>
                 <div class="min-w-0 flex-1">
-                  <p class="font-inter font-bold text-sm text-on-surface truncate">{{ despesa.descricao }}</p>
-                  <p class="text-xs text-[#515981] font-inter">{{ despesa.categoriaNome }}</p>
+                  <p class="font-body font-bold text-sm text-on-surface truncate">{{ despesa.descricao }}</p>
+                  <p class="text-xs text-[#57534E] font-body">{{ despesa.categoriaNome }}</p>
                 </div>
               </div>
-              <p class="font-manrope font-extrabold text-sm text-[#b51621] ml-2 flex-shrink-0">
+              <p class="font-manrope font-extrabold text-sm text-[#DC2626] ml-2 flex-shrink-0">
                 {{ despesa.valor | currency:'BRL' }}
               </p>
             </div>
 
-            <div class="flex items-start space-x-2 mt-3 pt-3 border-t border-[#a3abd7]/10">
-              <i class="ri-map-pin-line text-[#0057bd] mt-0.5 flex-shrink-0"></i>
-              <p class="text-xs text-[#515981] font-inter truncate flex-1" [title]="despesa.endereco">
+            <div class="flex items-start space-x-2 mt-3 pt-3 border-t border-[#A8A29E]/10">
+              <i class="ri-map-pin-line text-[#10B981] mt-0.5 flex-shrink-0"></i>
+              <p class="text-xs text-[#57534E] font-body truncate flex-1" [title]="despesa.endereco">
                 {{ despesa.endereco }}
               </p>
             </div>
 
             <div class="flex items-center space-x-2 mt-2">
-              <i class="ri-calendar-line text-[#515981]"></i>
-              <p class="text-xs text-[#515981] font-inter">
+              <i class="ri-calendar-line text-[#57534E]"></i>
+              <p class="text-xs text-[#57534E] font-body">
                 {{ despesa.data | date:'dd/MM/yyyy' }}
               </p>
             </div>
@@ -367,7 +367,7 @@
             <!-- Link para ver no mapa -->
             <a
               [href]="'https://www.google.com/maps?q=' + despesa.latitude + ',' + despesa.longitude"
-              target="_blank" class="mt-3 flex items-center justify-center space-x-1 p-2 bg-white border border-[#0057bd]/30 text-[#0057bd] rounded-lg text-xs font-bold hover:bg-[#0057bd] hover:text-white transition-colors opacity-0 group-hover:opacity-100 font-inter">
+              target="_blank" class="mt-3 flex items-center justify-center space-x-1 p-2 bg-white border border-[#10B981]/30 text-[#10B981] rounded-lg text-xs font-bold hover:bg-[#10B981] hover:text-white transition-colors opacity-0 group-hover:opacity-100 font-body">
               <i class="ri-external-link-line"></i>
               <span>Ver no Maps</span>
             </a>
@@ -375,8 +375,8 @@
         </div>
 
         <div *ngIf="despesasComLocalizacao().length === 0" class="text-center py-8">
-          <i class="ri-inbox-line text-[#515981]/30 mx-auto mb-3"></i>
-          <p class="text-sm text-[#515981] font-inter">
+          <i class="ri-inbox-line text-[#57534E]/30 mx-auto mb-3"></i>
+          <p class="text-sm text-[#57534E] font-body">
             Nenhuma despesa com localização neste mês
           </p>
         </div>
@@ -384,30 +384,30 @@
     </div>
 
     <!-- Transações Recentes -->
-    <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+    <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
       <div class="flex items-center space-x-3 mb-6">
-        <div class="w-10 h-10 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center">
+        <div class="w-10 h-10 bg-gradient-to-br from-[#57534E] to-[#A8A29E] rounded-xl flex items-center justify-center">
           <i class="ri-history-line text-white"></i>
         </div>
         <div class="flex-1">
           <h3 class="text-xl font-manrope font-bold text-on-surface">Transações Recentes</h3>
-          <p class="text-xs text-gray-500 font-inter">Últimas movimentações financeiras</p>
+          <p class="text-xs text-stone-500 font-body">Últimas movimentações financeiras</p>
         </div>
       </div>
       <div class="space-y-3">
         <a *ngFor="let transacao of transacoesRecentes()"
            [routerLink]="['/transacao', transacao.tipo, transacao._id]"
-           class="flex justify-between items-center p-4 bg-[#efefff] hover:bg-[#dde1ff] rounded-xl transition-all cursor-pointer group">
+           class="flex justify-between items-center p-4 bg-[#F5F5F4] hover:bg-[#D1FAE5] rounded-xl transition-all cursor-pointer group">
           <div class="flex items-center gap-3">
             <div [ngClass]="transacao.tipo === 'receita'
-                ? 'bg-gradient-to-br from-[#006947] to-[#69f6b8]'
-                : 'bg-gradient-to-br from-[#b51621] to-[#ff928b]'" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                ? 'bg-gradient-to-br from-[#059669] to-[#6EE7B7]'
+                : 'bg-gradient-to-br from-[#DC2626] to-[#F87171]'" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
               <i [class]="transacao.tipo === 'receita' ? 'ri-arrow-up-line text-white' : 'ri-arrow-down-line text-white'">
               </i>
             </div>
             <div>
-              <p class="font-inter font-bold text-on-surface group-hover:text-primary transition-colors">{{ transacao.descricao }}</p>
-              <div class="flex items-center gap-1 text-xs text-[#515981] font-inter">
+              <p class="font-body font-bold text-on-surface group-hover:text-primary transition-colors">{{ transacao.descricao }}</p>
+              <div class="flex items-center gap-1 text-xs text-[#57534E] font-body">
                 <i class="ri-calendar-line"></i>
                 <span>{{ transacao.data | date:'dd/MM/yyyy' }}</span>
               </div>
@@ -415,19 +415,19 @@
           </div>
           <div class="flex items-center gap-2">
             <p class="font-manrope font-extrabold text-xl"
-               [ngClass]="transacao.tipo === 'receita' ? 'text-[#006947]' : 'text-[#b51621]'">
+               [ngClass]="transacao.tipo === 'receita' ? 'text-[#059669]' : 'text-[#DC2626]'">
               {{ transacao.tipo === 'receita' ? '+' : '' }}{{ transacao.valor | currency:'BRL' }}
             </p>
-            <i class="ri-arrow-right-s-line text-[#515981] group-hover:translate-x-1 transition-transform"></i>
+            <i class="ri-arrow-right-s-line text-[#57534E] group-hover:translate-x-1 transition-transform"></i>
           </div>
         </a>
 
         <!-- Empty State -->
         <div *ngIf="transacoesRecentes().length === 0" class="p-8 text-center">
-          <div class="w-16 h-16 bg-[#efefff] rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="ri-exchange-line text-2xl text-[#515981]"></i>
+          <div class="w-16 h-16 bg-[#F5F5F4] rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="ri-exchange-line text-2xl text-[#57534E]"></i>
           </div>
-          <p class="text-sm text-[#515981] font-inter">Nenhuma transação recente encontrada</p>
+          <p class="text-sm text-[#57534E] font-body">Nenhuma transação recente encontrada</p>
         </div>
       </div>
     </div>

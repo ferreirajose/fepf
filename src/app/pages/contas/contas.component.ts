@@ -117,11 +117,11 @@ export class ContasComponent implements OnInit {
   getTipoCor(tipo: TipoConta): string {
     const mapa: Record<TipoConta, string> = {
       'conta_corrente': '#4CAF50',
-      'poupanca': '#2196F3',
-      'investimentos': '#FF9800',
+      'poupanca': '#0284C7',
+      'investimentos': '#F59E0B',
       'conta_beneficios': '#9C27B0'
     };
-    return mapa[tipo] || '#006947';
+    return mapa[tipo] || '#059669';
   }
 
   getTipoIcone(tipo: TipoConta): string {

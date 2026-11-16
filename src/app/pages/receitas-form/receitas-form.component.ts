@@ -112,7 +112,7 @@ export class ReceitasFormComponent implements OnInit {
               id: c._id || '',
               nome: c.nome,
               icone: c.icone || 'dollar-sign',
-              cor: c.cor || '#006947',
+              cor: c.cor || '#059669',
               subcategorias: c.subcategorias?.filter(s => s.ativo).map(s => ({
                 id: s.id,
                 nome: s.nome,

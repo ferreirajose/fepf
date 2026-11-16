@@ -1,18 +1,18 @@
-<div class="min-h-screen p-8 bg-[#f7f5ff]">
+<div class="min-h-screen p-8 bg-[#FAFFFE]">
   <div class="max-w-4xl mx-auto w-full">
 
     <!-- Header -->
     <div class="mb-8">
       <div class="flex items-center space-x-4 mb-4">
         <button
-          (click)="cancelar()" class="p-2 text-[#515981] hover:bg-white rounded-xl transition-colors">
+          (click)="cancelar()" class="p-2 text-[#57534E] hover:bg-white rounded-xl transition-colors">
           <i class="ri-arrow-left-line"></i>
         </button>
         <div>
           <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
             {{ isEdicao() ? 'Editar Cartão' : 'Cadastro de Cartão' }}
           </h1>
-          <p class="text-[#515981] font-inter mt-1">
+          <p class="text-[#57534E] font-body mt-1">
             {{ isEdicao() ? 'Atualize as informações do cartão' : 'Registre um novo cartão de crédito' }}
           </p>
         </div>
@@ -24,9 +24,9 @@
       <div class="space-y-6">
 
         <!-- Card Preview -->
-        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
           <div class="flex items-center space-x-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#820AD1] to-[#B47EDE] rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#0284C7] to-[#38BDF8] rounded-xl flex items-center justify-center">
               <i class="ri-eye-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Visualização do Cartão</h2>
@@ -38,7 +38,7 @@
             <div class="relative z-10">
               <div class="flex items-center justify-between mb-10">
                 <i class="ri-bank-card-line text-white/80"></i>
-                <span class="text-white/90 font-bold font-inter text-sm uppercase">
+                <span class="text-white/90 font-bold font-body text-sm uppercase">
                   {{ getBandeiraSelecionada()?.nome || 'Bandeira' }}
                 </span>
               </div>
@@ -47,14 +47,14 @@
               </p>
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-white/70 text-xs font-inter mb-1">Nome do Cartão</p>
-                  <p class="text-white font-bold font-inter">
+                  <p class="text-white/70 text-xs font-body mb-1">Nome do Cartão</p>
+                  <p class="text-white font-bold font-body">
                     {{ form.get('nome')?.value || 'Nome do Cartão' }}
                   </p>
                 </div>
                 <div class="text-right">
-                  <p class="text-white/70 text-xs font-inter mb-1">Dono</p>
-                  <p class="text-white font-bold font-inter">
+                  <p class="text-white/70 text-xs font-body mb-1">Dono</p>
+                  <p class="text-white font-bold font-body">
                     {{ form.get('dono')?.value || 'Não informado' }}
                   </p>
                 </div>
@@ -66,9 +66,9 @@
         </div>
 
         <!-- Informações Básicas Card -->
-        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
           <div class="flex items-center space-x-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#820AD1] to-[#B47EDE] rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#0284C7] to-[#38BDF8] rounded-xl flex items-center justify-center">
               <i class="ri-file-text-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Informações do Cartão</h2>
@@ -77,17 +77,17 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Nome -->
             <div class="md:col-span-2">
-              <label for="nome" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label for="nome" class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Nome do Cartão *
               </label>
               <input
                 id="nome"
                 type="text"
                 formControlName="nome"
-                placeholder="Ex: Nubank Ultravioleta" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
-                [ngClass]="form.get('nome')?.invalid && form.get('nome')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
+                placeholder="Ex: Nubank Ultravioleta" class="w-full px-4 py-3 bg-[#F5F5F4] rounded-xl text-on-surface placeholder-[#57534E]/50 focus:outline-none focus:ring-2 focus:ring-[#0284C7]/20 font-body transition-all"
+                [ngClass]="form.get('nome')?.invalid && form.get('nome')?.touched ? 'ring-2 ring-[#DC2626]' : ''"
               />
-              <p *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+              <p *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched" class="text-[#DC2626] text-xs mt-2 font-body flex items-center space-x-1">
                 <i class="ri-alert-line"></i>
                 <span>O nome deve ter no mínimo 3 caracteres</span>
               </p>
@@ -95,16 +95,16 @@
 
             <!-- Dono do Cartão -->
             <div class="md:col-span-2">
-              <label for="dono" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label for="dono" class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Dono do Cartão
               </label>
               <input
                 id="dono"
                 type="text"
                 formControlName="dono"
-                placeholder="Ex: Ana, João, Maria..." class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
+                placeholder="Ex: Ana, João, Maria..." class="w-full px-4 py-3 bg-[#F5F5F4] rounded-xl text-on-surface placeholder-[#57534E]/50 focus:outline-none focus:ring-2 focus:ring-[#0284C7]/20 font-body transition-all"
               />
-              <p class="text-[#515981] text-xs mt-2 font-inter flex items-center space-x-1">
+              <p class="text-[#57534E] text-xs mt-2 font-body flex items-center space-x-1">
                 <i class="ri-information-line"></i>
                 <span>Campo opcional - Útil para identificar de quem é o cartão (ex: Nubank da Ana)</span>
               </p>
@@ -112,11 +112,11 @@
 
             <!-- Limite -->
             <div>
-              <label for="limite" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label for="limite" class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Limite do Cartão *
               </label>
               <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#820AD1] font-inter font-bold">R$</span>
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#0284C7] font-body font-bold">R$</span>
                 <input
                   id="limite"
                   type="text"
@@ -125,11 +125,11 @@
                   thousandSeparator="."
                   decimalMarker=","
                   [dropSpecialCharacters]="false"
-                  placeholder="0,00" class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-[#820AD1] placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter font-bold text-xl transition-all"
-                  [ngClass]="form.get('limite')?.invalid && form.get('limite')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
+                  placeholder="0,00" class="w-full pl-12 pr-4 py-3 bg-[#F5F5F4] rounded-xl text-[#0284C7] placeholder-[#57534E]/50 focus:outline-none focus:ring-2 focus:ring-[#0284C7]/20 font-body font-bold text-xl transition-all"
+                  [ngClass]="form.get('limite')?.invalid && form.get('limite')?.touched ? 'ring-2 ring-[#DC2626]' : ''"
                 />
               </div>
-              <p *ngIf="form.get('limite')?.invalid && form.get('limite')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+              <p *ngIf="form.get('limite')?.invalid && form.get('limite')?.touched" class="text-[#DC2626] text-xs mt-2 font-body flex items-center space-x-1">
                 <i class="ri-alert-line"></i>
                 <span>Informe um limite válido</span>
               </p>
@@ -137,16 +137,16 @@
 
             <!-- Bandeira -->
             <div>
-              <label class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Bandeira (vazio se personalizado) *
               </label>
               <select
-                formControlName="bandeira" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
-                [ngClass]="form.get('bandeira')?.invalid && form.get('bandeira')?.touched ? 'ring-2 ring-[#b31b25]' : ''">
+                formControlName="bandeira" class="w-full px-4 py-3 bg-[#F5F5F4] rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-[#0284C7]/20 font-body transition-all"
+                [ngClass]="form.get('bandeira')?.invalid && form.get('bandeira')?.touched ? 'ring-2 ring-[#DC2626]' : ''">
                 <option value="">Selecione a bandeira</option>
                 <option *ngFor="let bandeira of bandeiras" [value]="bandeira.id">{{ bandeira.nome }}</option>
               </select>
-              <p *ngIf="form.get('bandeira')?.invalid && form.get('bandeira')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+              <p *ngIf="form.get('bandeira')?.invalid && form.get('bandeira')?.touched" class="text-[#DC2626] text-xs mt-2 font-body flex items-center space-x-1">
                 <i class="ri-alert-line"></i>
                 <span>Selecione uma bandeira</span>
               </p>
@@ -155,9 +155,9 @@
         </div>
 
         <!-- Datas Card -->
-        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
           <div class="flex items-center space-x-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center">
               <i class="ri-calendar-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Datas de Cobrança</h2>
@@ -166,7 +166,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Dia Vencimento -->
             <div>
-              <label for="diaVencimento" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label for="diaVencimento" class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Dia do Vencimento *
               </label>
               <input
@@ -175,10 +175,10 @@
                 min="1"
                 max="31"
                 formControlName="diaVencimento"
-                placeholder="Ex: 15" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
-                [ngClass]="form.get('diaVencimento')?.invalid && form.get('diaVencimento')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
+                placeholder="Ex: 15" class="w-full px-4 py-3 bg-[#F5F5F4] rounded-xl text-on-surface placeholder-[#57534E]/50 focus:outline-none focus:ring-2 focus:ring-[#0284C7]/20 font-body transition-all"
+                [ngClass]="form.get('diaVencimento')?.invalid && form.get('diaVencimento')?.touched ? 'ring-2 ring-[#DC2626]' : ''"
               />
-              <p *ngIf="form.get('diaVencimento')?.invalid && form.get('diaVencimento')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+              <p *ngIf="form.get('diaVencimento')?.invalid && form.get('diaVencimento')?.touched" class="text-[#DC2626] text-xs mt-2 font-body flex items-center space-x-1">
                 <i class="ri-alert-line"></i>
                 <span>Dia entre 1 e 31</span>
               </p>
@@ -186,7 +186,7 @@
 
             <!-- Dia Fechamento -->
             <div>
-              <label for="diaFechamento" class="block text-sm font-bold text-on-surface mb-2 font-inter">
+              <label for="diaFechamento" class="block text-sm font-bold text-on-surface mb-2 font-body">
                 Dia do Fechamento *
               </label>
               <input
@@ -195,18 +195,18 @@
                 min="1"
                 max="31"
                 formControlName="diaFechamento"
-                placeholder="Ex: 10" class="w-full px-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-[#820AD1]/20 font-inter transition-all"
-                [ngClass]="form.get('diaFechamento')?.invalid && form.get('diaFechamento')?.touched ? 'ring-2 ring-[#b31b25]' : ''"
+                placeholder="Ex: 10" class="w-full px-4 py-3 bg-[#F5F5F4] rounded-xl text-on-surface placeholder-[#57534E]/50 focus:outline-none focus:ring-2 focus:ring-[#0284C7]/20 font-body transition-all"
+                [ngClass]="form.get('diaFechamento')?.invalid && form.get('diaFechamento')?.touched ? 'ring-2 ring-[#DC2626]' : ''"
               />
-              <p *ngIf="form.get('diaFechamento')?.invalid && form.get('diaFechamento')?.touched" class="text-[#b31b25] text-xs mt-2 font-inter flex items-center space-x-1">
+              <p *ngIf="form.get('diaFechamento')?.invalid && form.get('diaFechamento')?.touched" class="text-[#DC2626] text-xs mt-2 font-body flex items-center space-x-1">
                 <i class="ri-alert-line"></i>
                 <span>Dia entre 1 e 31</span>
               </p>
             </div>
           </div>
 
-          <div class="mt-4 p-4 bg-[#efefff] rounded-xl">
-            <p class="text-xs text-[#515981] font-inter">
+          <div class="mt-4 p-4 bg-[#F5F5F4] rounded-xl">
+            <p class="text-xs text-[#57534E] font-body">
               <i class="ri-information-line inline mr-1"></i>
               O dia de fechamento é quando o período de compras do mês se encerra. O dia de vencimento é a data limite para pagamento.
             </p>
@@ -214,9 +214,9 @@
         </div>
 
         <!-- Personalização Card -->
-        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+        <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
           <div class="flex items-center space-x-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#515981] to-[#a3abd7] rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-[#57534E] to-[#A8A29E] rounded-xl flex items-center justify-center">
               <i class="ri-drop-line text-white"></i>
             </div>
             <h2 class="text-xl font-bold text-on-surface font-manrope">Personalização</h2>
@@ -225,7 +225,7 @@
           <div class="space-y-6">
             <!-- Cor -->
             <div>
-              <label class="block text-sm font-bold text-on-surface mb-3 font-inter">
+              <label class="block text-sm font-bold text-on-surface mb-3 font-body">
                 Cor do Cartão *
               </label>
               <div class="grid grid-cols-5 md:grid-cols-10 gap-3">
@@ -240,17 +240,17 @@
             </div>
 
             <!-- Status Ativo -->
-            <div class="flex items-center justify-between p-4 bg-[#efefff] rounded-xl">
+            <div class="flex items-center justify-between p-4 bg-[#F5F5F4] rounded-xl">
               <div class="flex items-center space-x-3">
-                <i class="ri-toggle-line text-[#820AD1]"></i>
+                <i class="ri-toggle-line text-[#0284C7]"></i>
                 <div>
-                  <p class="text-sm font-bold text-on-surface font-inter">Cartão ativo?</p>
-                  <p class="text-xs text-[#515981] font-inter">Cartões inativos não aparecem nas opções de pagamento</p>
+                  <p class="text-sm font-bold text-on-surface font-body">Cartão ativo?</p>
+                  <p class="text-xs text-[#57534E] font-body">Cartões inativos não aparecem nas opções de pagamento</p>
                 </div>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" formControlName="ativo" class="sr-only peer">
-                <div class="w-11 h-6 bg-[#a3abd7] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#820AD1]"></div>
+                <div class="w-11 h-6 bg-[#A8A29E] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0284C7]"></div>
               </label>
             </div>
           </div>
@@ -260,13 +260,13 @@
         <div class="flex flex-col md:flex-row gap-4">
           <button
             type="submit"
-            [disabled]="form.invalid" class="flex-1 bg-gradient-to-r from-[#820AD1] to-[#B47EDE] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#820AD1]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-inter flex items-center justify-center space-x-3">
+            [disabled]="form.invalid" class="flex-1 bg-gradient-to-r from-[#0284C7] to-[#38BDF8] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#0284C7]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 font-body flex items-center justify-center space-x-3">
             <i [class]="isEdicao() ? 'ri-checkbox-circle-line' : 'ri-save-line'" class="w-6 h-6"></i>
             <span>{{ isEdicao() ? 'Atualizar Cartão' : 'Salvar Cartão' }}</span>
           </button>
           <button
             type="button"
-            (click)="cancelar()" class="flex-1 bg-white border-2 border-[#a3abd7]/30 text-[#515981] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#efefff] transition-colors font-inter flex items-center justify-center space-x-3">
+            (click)="cancelar()" class="flex-1 bg-white border-2 border-[#A8A29E]/30 text-[#57534E] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#F5F5F4] transition-colors font-body flex items-center justify-center space-x-3">
             <i class="ri-close-line"></i>
             <span>Cancelar</span>
           </button>

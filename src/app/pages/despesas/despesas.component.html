@@ -7,12 +7,12 @@
         <h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-manrope">
           Despesas
         </h1>
-        <p class="text-[#515981] max-w-lg font-inter">
+        <p class="text-[#57534E] max-w-lg font-body">
           Registre e acompanhe todas as suas despesas mensais com controle detalhado por categoria.
         </p>
       </div>
       <a
-        routerLink="/despesas/novo" class="bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-[#b51621]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-inter">
+        routerLink="/despesas/novo" class="bg-gradient-to-r from-[#DC2626] to-[#F87171] text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-[#DC2626]/20 hover:scale-[1.02] active:scale-[0.98] transition-transform font-body">
         <i class="ri-add-circle-line"></i>
         <span>Nova Despesa</span>
       </a>
@@ -21,12 +21,12 @@
     <!-- Period Selector & Filters -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Period -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <i class="ri-calendar-line text-primary"></i>
             <div>
-              <p class="text-xs text-[#515981] font-inter">Período</p>
+              <p class="text-xs text-[#57534E] font-body">Período</p>
               <h2 class="text-2xl font-extrabold text-on-surface font-manrope">
                 {{ getMesNome() }} {{ anoAtual() }}
               </h2>
@@ -34,11 +34,11 @@
           </div>
           <div class="flex items-center space-x-2">
             <button
-              (click)="mesAnterior()" class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+              (click)="mesAnterior()" class="p-2 text-[#57534E] hover:bg-[#D1FAE5] rounded-lg transition-colors">
               <i class="ri-arrow-left-s-line"></i>
             </button>
             <button
-              (click)="proximoMes()" class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+              (click)="proximoMes()" class="p-2 text-[#57534E] hover:bg-[#D1FAE5] rounded-lg transition-colors">
               <i class="ri-arrow-right-s-line"></i>
             </button>
           </div>
@@ -46,13 +46,13 @@
       </div>
 
       <!-- Search -->
-      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10">
+      <div class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10">
         <div class="relative">
           <input
             type="text"
             [(ngModel)]="filtroTexto"
-            placeholder="Buscar por descrição ou categoria..." class="w-full pl-12 pr-4 py-3 bg-[#efefff] rounded-xl text-on-surface placeholder-[#515981]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter">
-          <i class="ri-search-line text-[#515981] absolute left-4 top-1/2 -translate-y-1/2"></i>
+            placeholder="Buscar por descrição ou categoria..." class="w-full pl-12 pr-4 py-3 bg-[#F5F5F4] rounded-xl text-on-surface placeholder-[#57534E]/50 focus:outline-none focus:ring-2 focus:ring-primary/20 font-body">
+          <i class="ri-search-line text-[#57534E] absolute left-4 top-1/2 -translate-y-1/2"></i>
         </div>
       </div>
     </div>
@@ -61,20 +61,20 @@
     <div class="flex flex-col md:flex-row md:flex-wrap md:items-center gap-4">
       <select
         [ngModel]="filtroCategoria()"
-        (ngModelChange)="filtroCategoria.set($event); onCategoriaChange($event)" class="w-full md:w-auto px-4 py-2 bg-white border border-[#a3abd7]/20 rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter text-sm">
+        (ngModelChange)="filtroCategoria.set($event); onCategoriaChange($event)" class="w-full md:w-auto px-4 py-2 bg-white border border-[#A8A29E]/20 rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-body text-sm">
         <option *ngFor="let cat of categorias()" [value]="cat.id">{{ cat.nome }}</option>
       </select>
 
       <select
         [ngModel]="filtroSubcategoria()"
         (ngModelChange)="filtroSubcategoria.set($event); onSubcategoriaChange()"
-        [disabled]="!subcategoriaHabilitada()" class="w-full md:w-auto px-4 py-2 bg-white border border-[#a3abd7]/20 rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+        [disabled]="!subcategoriaHabilitada()" class="w-full md:w-auto px-4 py-2 bg-white border border-[#A8A29E]/20 rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-body text-sm disabled:opacity-50 disabled:cursor-not-allowed">
         <option *ngFor="let subcat of subcategorias()" [value]="subcat.id">{{ subcat.nome }}</option>
       </select>
 
       <select
         [ngModel]="filtroStatus()"
-        (ngModelChange)="filtroStatus.set($event); onStatusChange()" class="w-full md:w-auto px-4 py-2 bg-white border border-[#a3abd7]/20 rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter text-sm">
+        (ngModelChange)="filtroStatus.set($event); onStatusChange()" class="w-full md:w-auto px-4 py-2 bg-white border border-[#A8A29E]/20 rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-body text-sm">
         <option value="todas">Todos Status</option>
         <option value="pagas">Pagas</option>
         <option value="pendentes">Pendentes</option>
@@ -82,7 +82,7 @@
 
       <select
         [ngModel]="filtroFormaPagamento()"
-        (ngModelChange)="filtroFormaPagamento.set($event); onFormaPagamentoChange()" class="w-full md:w-auto px-4 py-2 bg-white border border-[#a3abd7]/20 rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-inter text-sm">
+        (ngModelChange)="filtroFormaPagamento.set($event); onFormaPagamentoChange()" class="w-full md:w-auto px-4 py-2 bg-white border border-[#A8A29E]/20 rounded-xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-body text-sm">
         <option value="todas">Todas Formas de Pagamento</option>
         <option value="dinheiro">Dinheiro</option>
         <option value="debito">Débito</option>
@@ -91,20 +91,20 @@
       </select>
 
       <button
-        (click)="limparFiltros()" class="w-full md:w-auto px-4 py-2 text-[#515981] hover:bg-[#efefff] rounded-xl transition-colors font-inter text-sm font-bold">
+        (click)="limparFiltros()" class="w-full md:w-auto px-4 py-2 text-[#57534E] hover:bg-[#F5F5F4] rounded-xl transition-colors font-body text-sm font-bold">
         Limpar Filtros
       </button>
 
       <button
         (click)="exportarDespesas()"
-        [disabled]="carregandoImportExport()" class="w-full md:w-auto px-4 py-2 bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white rounded-xl font-inter text-sm font-bold hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
+        [disabled]="carregandoImportExport()" class="w-full md:w-auto px-4 py-2 bg-gradient-to-r from-[#DC2626] to-[#F87171] text-white rounded-xl font-body text-sm font-bold hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
         <i class="ri-download-line"></i>
         <span>{{ carregandoImportExport() ? 'Exportando...' : 'Exportar Excel' }}</span>
       </button>
 
       <button
         (click)="triggerFileInput()"
-        [disabled]="carregandoImportExport()" class="w-full md:w-auto px-4 py-2 bg-white border-2 border-[#b51621] text-[#b51621] rounded-xl font-inter text-sm font-bold hover:bg-[#b51621] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
+        [disabled]="carregandoImportExport()" class="w-full md:w-auto px-4 py-2 bg-white border-2 border-[#DC2626] text-[#DC2626] rounded-xl font-body text-sm font-bold hover:bg-[#DC2626] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
         <i class="ri-upload-line"></i>
         <span>{{ carregandoImportExport() ? 'Importando...' : 'Importar Excel' }}</span>
       </button>
@@ -115,7 +115,7 @@
         accept=".xlsx,.xls"
         (change)="onFileSelected($event)" class="hidden">
 
-      <div class="w-full md:w-auto md:ml-auto text-sm font-inter text-[#515981] text-center md:text-left">
+      <div class="w-full md:w-auto md:ml-auto text-sm font-body text-[#57534E] text-center md:text-left">
         {{ getQuantidadeDespesas() }} despesas encontradas
       </div>
     </div>
@@ -123,18 +123,18 @@
     <!-- Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Total Despesas -->
-      <div class="bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-xl p-6 text-white relative overflow-hidden">
+      <div class="bg-gradient-to-br from-[#DC2626] to-[#F87171] rounded-xl p-6 text-white relative overflow-hidden">
         <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <i class="ri-arrow-down-line"></i>
             </div>
           </div>
-          <p class="text-sm text-red-100 font-inter mb-1">Total de Despesas</p>
+          <p class="text-sm text-red-100 font-body mb-1">Total de Despesas</p>
           <p class="text-3xl font-extrabold font-manrope">
             R$ {{ getTotalDespesas().toFixed(2).replace('.', ',') }}
           </p>
-          <p class="text-xs text-white/80 mt-2 font-inter">
+          <p class="text-xs text-white/80 mt-2 font-body">
             {{ getQuantidadeDespesas() }} lançamentos
           </p>
         </div>
@@ -142,18 +142,18 @@
       </div>
 
       <!-- Despesas Pagas -->
-      <div class="bg-gradient-to-br from-[#006947] to-[#69f6b8] rounded-xl p-6 text-white relative overflow-hidden">
+      <div class="bg-gradient-to-br from-[#059669] to-[#6EE7B7] rounded-xl p-6 text-white relative overflow-hidden">
         <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <i class="ri-check-line"></i>
             </div>
           </div>
-          <p class="text-sm text-green-100 font-inter mb-1">Despesas Pagas</p>
+          <p class="text-sm text-emerald-100 font-body mb-1">Despesas Pagas</p>
           <p class="text-3xl font-extrabold font-manrope">
             R$ {{ getTotalPago().toFixed(2).replace('.', ',') }}
           </p>
-          <p class="text-xs text-white/80 mt-2 font-inter">
+          <p class="text-xs text-white/80 mt-2 font-body">
             {{ getQuantidadePagas() }} pagas
           </p>
         </div>
@@ -161,18 +161,18 @@
       </div>
 
       <!-- Despesas Pendentes -->
-      <div class="bg-gradient-to-br from-[#0057bd] to-[#6e9fff] rounded-xl p-6 text-white relative overflow-hidden">
+      <div class="bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-xl p-6 text-white relative overflow-hidden">
         <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <i class="ri-close-line"></i>
             </div>
           </div>
-          <p class="text-sm text-blue-100 font-inter mb-1">Despesas Pendentes</p>
+          <p class="text-sm text-sky-100 font-body mb-1">Despesas Pendentes</p>
           <p class="text-3xl font-extrabold font-manrope">
             R$ {{ getTotalPendente().toFixed(2).replace('.', ',') }}
           </p>
-          <p class="text-xs text-white/80 mt-2 font-inter">
+          <p class="text-xs text-white/80 mt-2 font-body">
             {{ getQuantidadePendentes() }} pendentes
           </p>
         </div>
@@ -188,7 +188,7 @@
 
       <!-- Expense Item -->
       <div
-        *ngFor="let despesa of getDespesasFiltradas()" class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(36,44,81,0.02)] border border-[#a3abd7]/10 hover:shadow-[0_8px_30px_rgba(36,44,81,0.06)] transition-shadow">
+        *ngFor="let despesa of getDespesasFiltradas()" class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(28,25,23,0.02)] border border-[#A8A29E]/10 hover:shadow-[0_8px_30px_rgba(28,25,23,0.06)] transition-shadow">
 
         <div class="flex items-start justify-between">
           <!-- Info -->
@@ -210,54 +210,54 @@
                     {{ despesa.descricao }}
                   </h3>
                   <div class="flex items-center space-x-3 mt-1">
-                    <span class="text-xs text-[#515981] font-inter">
+                    <span class="text-xs text-[#57534E] font-body">
                       {{ despesa.categoriaNome }}
-                      <span *ngIf="despesa.subcategoriaNome" class="text-[#515981]/70">
+                      <span *ngIf="despesa.subcategoriaNome" class="text-[#57534E]/70">
                         &gt; {{ despesa.subcategoriaNome }}
                       </span>
                     </span>
-                    <span *ngIf="despesa.cartaoNome" class="text-xs text-[#515981] font-inter flex items-center space-x-1">
+                    <span *ngIf="despesa.cartaoNome" class="text-xs text-[#57534E] font-body flex items-center space-x-1">
                       <i class="ri-bank-card-line"></i>
                       <span>{{ despesa.cartaoNome }}</span>
                     </span>
-                    <span *ngIf="despesa.formaPagamento" class="text-xs text-[#515981] font-inter flex items-center space-x-1">
+                    <span *ngIf="despesa.formaPagamento" class="text-xs text-[#57534E] font-body flex items-center space-x-1">
                       <i [class]="getFormaPagamentoIcone(despesa.formaPagamento)"></i>
                       <span>{{ getFormaPagamentoTexto(despesa.formaPagamento) }}</span>
                     </span>
-                    <span *ngIf="despesa.recorrente" class="bg-[#6e9fff]/10 text-primary px-2 py-0.5 rounded-lg text-xs font-bold font-inter">
+                    <span *ngIf="despesa.recorrente" class="bg-[#34D399]/10 text-primary px-2 py-0.5 rounded-lg text-xs font-bold font-body">
                       Recorrente
                     </span>
                   </div>
                 </div>
                 <div class="text-right">
-                  <p class="text-2xl font-extrabold text-[#b51621] font-manrope">
+                  <p class="text-2xl font-extrabold text-[#DC2626] font-manrope">
                     R$ {{ despesa.valor.toFixed(2).replace('.', ',') }}
                   </p>
-                  <p class="text-xs text-[#515981] font-inter mt-1">
+                  <p class="text-xs text-[#57534E] font-body mt-1">
                     {{ formatarData(despesa.data) }}
                   </p>
                 </div>
               </div>
 
-              <div class="flex items-center justify-between mt-4 pt-4 border-t border-[#a3abd7]/10">
+              <div class="flex items-center justify-between mt-4 pt-4 border-t border-[#A8A29E]/10">
                 <div class="flex items-center space-x-2">
                   <button
                     (click)="togglePago(despesa, $event)"
                     [ngClass]="{
-                      'bg-[#69f6b8]/20 text-[#006947]': despesa.pago,
-                      'bg-[#ff928b]/20 text-[#b51621]': !despesa.pago
-                    }" class="px-4 py-2 rounded-lg text-xs font-bold font-inter flex items-center space-x-2 transition-colors">
+                      'bg-[#6EE7B7]/20 text-[#059669]': despesa.pago,
+                      'bg-[#F87171]/20 text-[#DC2626]': !despesa.pago
+                    }" class="px-4 py-2 rounded-lg text-xs font-bold font-body flex items-center space-x-2 transition-colors">
                     <i [class]="despesa.pago ? 'ri-check-line' : 'ri-close-line'" class="w-4 h-4"></i>
                     <span>{{ despesa.pago ? 'Paga' : 'Pendente' }}</span>
                   </button>
                 </div>
                 <div class="flex items-center space-x-2">
                   <a
-                    [routerLink]="['/despesas', despesa.id, 'editar']" class="p-2 text-[#515981] hover:bg-[#dde1ff] rounded-lg transition-colors">
+                    [routerLink]="['/despesas', despesa.id, 'editar']" class="p-2 text-[#57534E] hover:bg-[#D1FAE5] rounded-lg transition-colors">
                     <i class="ri-edit-line"></i>
                   </a>
                   <button
-                    (click)="excluirDespesa(despesa.id, $event)" class="p-2 text-[#515981] hover:text-[#b31b25] hover:bg-[#fb5151]/10 rounded-lg transition-colors">
+                    (click)="excluirDespesa(despesa.id, $event)" class="p-2 text-[#57534E] hover:text-[#DC2626] hover:bg-[#EF4444]/10 rounded-lg transition-colors">
                     <i class="ri-delete-bin-line"></i>
                   </button>
                 </div>
@@ -269,18 +269,18 @@
 
       <!-- Empty State -->
       <div
-        *ngIf="getDespesasFiltradas().length === 0" class="bg-white rounded-xl p-12 text-center border-2 border-dashed border-[#a3abd7]/30">
-        <div class="w-16 h-16 bg-[#efefff] rounded-full flex items-center justify-center mx-auto mb-4">
+        *ngIf="getDespesasFiltradas().length === 0" class="bg-white rounded-xl p-12 text-center border-2 border-dashed border-[#A8A29E]/30">
+        <div class="w-16 h-16 bg-[#F5F5F4] rounded-full flex items-center justify-center mx-auto mb-4">
           <i class="ri-arrow-down-line"></i>
         </div>
         <h3 class="text-lg font-bold text-on-surface mb-2 font-manrope">
           Nenhuma despesa encontrada
         </h3>
-        <p class="text-sm text-[#515981] mb-4 font-inter">
+        <p class="text-sm text-[#57534E] mb-4 font-body">
           Não há despesas cadastradas para este período ou filtros aplicados.
         </p>
         <a
-          routerLink="/despesas/novo" class="inline-flex items-center space-x-2 bg-gradient-to-r from-[#b51621] to-[#ff928b] text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity font-inter">
+          routerLink="/despesas/novo" class="inline-flex items-center space-x-2 bg-gradient-to-r from-[#DC2626] to-[#F87171] text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity font-body">
           <i class="ri-add-circle-line"></i>
           <span>Adicionar Primeira Despesa</span>
         </a>
@@ -290,19 +290,19 @@
     <!-- Tips Section -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Dica Card -->
-      <div class="bg-gradient-to-br from-[#b51621] to-[#ff928b] rounded-3xl p-8 text-white relative overflow-hidden group">
+      <div class="bg-gradient-to-br from-[#DC2626] to-[#F87171] rounded-3xl p-8 text-white relative overflow-hidden group">
         <div class="relative z-10 space-y-4">
-          <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-inter">
+          <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-body">
             Dica de Controle
           </span>
           <h2 class="text-2xl font-extrabold leading-tight font-manrope">
             Categorize suas despesas.
           </h2>
-          <p class="text-red-50 text-sm max-w-sm font-inter">
+          <p class="text-red-50 text-sm max-w-sm font-body">
             Manter despesas bem categorizadas facilita a análise de onde seu dinheiro está sendo gasto
             e ajuda a identificar oportunidades de economia.
           </p>
-          <button class="mt-4 bg-white text-[#b51621] px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors font-inter">
+          <button class="mt-4 bg-white text-[#DC2626] px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors font-body">
             Gerenciar Categorias
           </button>
         </div>
@@ -313,13 +313,13 @@
       </div>
 
       <!-- Stats Card -->
-      <div class="bg-white rounded-3xl p-8 flex flex-col justify-center space-y-6 border border-[#a3abd7]/10">
+      <div class="bg-white rounded-3xl p-8 flex flex-col justify-center space-y-6 border border-[#A8A29E]/10">
         <div class="flex items-center space-x-4">
-          <div class="w-16 h-16 rounded-full bg-[#ff928b]/20 flex items-center justify-center text-[#b51621]">
+          <div class="w-16 h-16 rounded-full bg-[#F87171]/20 flex items-center justify-center text-[#DC2626]">
             <i class="ri-bar-chart-line"></i>
           </div>
           <div>
-            <p class="text-sm text-[#515981] font-inter">Maior Despesa</p>
+            <p class="text-sm text-[#57534E] font-body">Maior Despesa</p>
             <p class="text-3xl font-extrabold text-on-surface font-manrope">
               R$ {{ getMaiorDespesa().toFixed(2).replace('.', ',') }}
             </p>
@@ -327,16 +327,16 @@
         </div>
         <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <span class="text-sm text-[#515981] font-inter">Total de Despesas</span>
-            <span class="text-sm font-bold text-on-surface font-inter">{{ getQuantidadeDespesas() }}</span>
+            <span class="text-sm text-[#57534E] font-body">Total de Despesas</span>
+            <span class="text-sm font-bold text-on-surface font-body">{{ getQuantidadeDespesas() }}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-sm text-[#515981] font-inter">Despesas Pagas</span>
-            <span class="text-sm font-bold text-[#006947] font-inter">{{ getQuantidadePagas() }}</span>
+            <span class="text-sm text-[#57534E] font-body">Despesas Pagas</span>
+            <span class="text-sm font-bold text-[#059669] font-body">{{ getQuantidadePagas() }}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-sm text-[#515981] font-inter">Despesas Pendentes</span>
-            <span class="text-sm font-bold text-[#b51621] font-inter">{{ getQuantidadePendentes() }}</span>
+            <span class="text-sm text-[#57534E] font-body">Despesas Pendentes</span>
+            <span class="text-sm font-bold text-[#DC2626] font-body">{{ getQuantidadePendentes() }}</span>
           </div>
         </div>
       </div>

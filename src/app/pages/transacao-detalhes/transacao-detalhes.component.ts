@@ -93,7 +93,7 @@ export class TransacaoDetalhesComponent implements OnInit {
   }
 
   getCorCategoria(): string {
-    return this.transacao()?.categoriaId?.cor || '#6e9fff';
+    return this.transacao()?.categoriaId?.cor || '#34D399';
   }
 
   getNomeCategoria(): string {
@@ -127,13 +127,13 @@ export class TransacaoDetalhesComponent implements OnInit {
       const recebido = this.transacao()?.recebido;
       return {
         texto: recebido ? 'Recebido' : 'Pendente',
-        cor: recebido ? '#006947' : '#ffa500'
+        cor: recebido ? '#059669' : '#F59E0B'
       };
     } else {
       const pago = this.transacao()?.pago;
       return {
         texto: pago ? 'Pago' : 'Pendente',
-        cor: pago ? '#006947' : '#ffa500'
+        cor: pago ? '#059669' : '#F59E0B'
       };
     }
   }

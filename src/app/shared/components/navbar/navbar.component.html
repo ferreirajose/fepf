@@ -1,8 +1,8 @@
-<nav class="bg-white shadow-sm border-b border-gray-100 px-6 py-4">
+<nav class="bg-white shadow-sm border-b border-stone-100 px-6 py-4">
   <div class="flex items-center justify-between">
     <!-- Left Section -->
     <div class="flex items-center gap-4">
-      <div class="flex items-center gap-2 text-sm font-inter text-gray-600">
+      <div class="flex items-center gap-2 text-sm font-body text-stone-600">
         <i class="ri-calendar-line"></i>
         <span>{{ formatDate() }}</span>
       </div>
@@ -12,7 +12,7 @@
     <div class="flex items-center gap-4">
       <!-- Notifications -->
       <button class="relative p-2 hover:bg-surface rounded-lg transition-colors">
-        <i class="ri-notification-line text-gray-600"></i>
+        <i class="ri-notification-line text-stone-600"></i>
         <span class="absolute top-1 right-1 w-2 h-2 bg-tertiary rounded-full"></span>
       </button>
 
@@ -22,8 +22,8 @@
           <i class="ri-user-line text-white"></i>
         </div>
         <div class="hidden md:block">
-          <p class="text-sm font-inter font-medium text-on-surface">{{ userName }}</p>
-          <p class="text-xs text-gray-500">Administrador</p>
+          <p class="text-sm font-body font-medium text-on-surface">{{ userName }}</p>
+          <p class="text-xs text-stone-500">Administrador</p>
         </div>
       </div>
     </div>

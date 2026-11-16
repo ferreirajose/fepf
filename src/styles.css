@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
-/* Import Google Fonts - Manrope and Inter */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+/* Design System: BudgetZen — Manrope (headlines), Nunito (corpo), Source Code Pro (mono) */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;600&display=swap');
 
 /* Import Remixicon */
 @import 'remixicon/fonts/remixicon.css';
@@ -11,12 +11,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tokens BudgetZen (para CSS de componentes) */
+:root {
+  --bz-primary: #10B981;
+  --bz-primary-hover: #059669;
+  --bz-secondary: #38BDF8;
+  --bz-tertiary: #A8A29E;
+  --bz-neutral: #78716C;
+  --bz-background: #FAFFFE;
+  --bz-surface: #FFFFFF;
+  --bz-success: #10B981;
+  --bz-warning: #F59E0B;
+  --bz-error: #EF4444;
+  --bz-info: #38BDF8;
+  --bz-text: #1C1917;
+  --bz-text-label: #57534E;
+  --bz-fill-muted: #F5F5F4;
+  --bz-border: #E7E5E4;
+  --bz-border-input: #D6D3D1;
+  --bz-radius-sm: 6px;
+  --bz-radius-md: 12px;
+  --bz-radius-lg: 16px;
+  --bz-radius-xl: 24px;
+  --bz-shadow-subtle: 0 1px 3px rgba(28, 25, 23, 0.06);
+  --bz-shadow-medium: 0 4px 12px rgba(28, 25, 23, 0.08);
+  --bz-shadow-large: 0 8px 24px rgba(28, 25, 23, 0.10);
+  --bz-shadow-overlay: 0 16px 48px rgba(28, 25, 23, 0.14);
+}
+
 /* Global Styles */
 @layer base {
   body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f7f5ff;
-    color: #242c51;
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--bz-background);
+    color: var(--bz-text);
     /* iOS Safe Area Support */
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
@@ -73,4 +101,42 @@
       min-width: 44px;
     }
   }
+}
+
+/* Componentes BudgetZen */
+@layer components {
+  /* Botões — 40px (md), raio 12px */
+  .bz-btn {
+    @apply inline-flex items-center justify-center gap-2 h-10 px-5 text-[15px] font-bold font-body rounded-bz-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .bz-btn-sm { @apply h-8 px-4 text-[13px]; }
+  .bz-btn-lg { @apply h-12 px-7 text-[17px]; }
+  .bz-btn-primary { @apply bz-btn bg-[#10B981] text-white hover:bg-[#059669]; }
+  .bz-btn-secondary { @apply bz-btn bg-transparent text-[#10B981] border-[1.5px] border-[#10B981] hover:bg-[#10B981]/10 hover:border-[#059669]; }
+  .bz-btn-ghost { @apply bz-btn bg-transparent text-[#57534E] hover:bg-[#F5F5F4] hover:text-[#1C1917]; }
+  .bz-btn-destructive { @apply bz-btn bg-[#EF4444] text-white hover:bg-[#DC2626]; }
+
+  /* Cards */
+  .bz-card { @apply bg-white border border-[#E7E5E4] rounded-bz-md p-5 shadow-bz-subtle transition-shadow hover:shadow-bz-medium; }
+  .bz-card-elevated { @apply bg-white rounded-bz-lg p-6 shadow-bz-medium transition-shadow hover:shadow-bz-large; }
+
+  /* Inputs — 44px, borda 1.5px, foco Mint com anel 15% */
+  .bz-label { @apply block mb-1.5 text-sm font-semibold text-[#57534E] font-body; }
+  .bz-helper { @apply mt-1 text-[13px] text-[#78716C] font-body; }
+  .bz-input {
+    @apply w-full h-11 px-4 py-3 bg-white text-[#1C1917] font-body rounded-bz-md border-[1.5px] border-[#D6D3D1] outline-none transition
+           hover:border-[#A8A29E] focus:border-[#10B981] focus:ring-[3px] focus:ring-[#10B981]/15
+           disabled:bg-[#F5F5F4] disabled:border-[#E7E5E4] disabled:text-[#A8A29E];
+  }
+  .bz-input-error { @apply border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/[0.12]; }
+
+  /* Chips */
+  .bz-chip { @apply inline-flex items-center gap-1 px-3 py-1.5 text-[13px] font-semibold font-body rounded-bz-sm border bg-[#F5F5F4] text-[#57534E] border-[#E7E5E4]; }
+  .bz-chip-active { @apply bg-[#10B981]/10 border-[#10B981] text-[#059669]; }
+  .bz-chip-on-track { @apply bz-chip bg-[#10B981]/10 text-[#059669] border-[#10B981]/20; }
+  .bz-chip-at-risk { @apply bz-chip bg-[#F59E0B]/10 text-[#D97706] border-[#F59E0B]/20; }
+  .bz-chip-over { @apply bz-chip bg-[#EF4444]/10 text-[#DC2626] border-[#EF4444]/20; }
+
+  /* Callout de dica/informação (Sky) */
+  .bz-tip { @apply p-4 rounded-bz-md bg-[#38BDF8]/10 border border-[#38BDF8]/30 text-[#0369A1] font-body text-sm; }
 }
